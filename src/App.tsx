@@ -1,0 +1,24 @@
+
+import { BrowserRouter, Routes, Route } from 'react-router';
+
+import Landing from './pages/Landing';
+import Observatory from './pages/Observatory';
+import Minigame from './pages/Minigame';
+
+import LandingV2 from './pages/presentation/LandingV2';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* <Route path="/" element={<Landing />} /> */}
+        <Route path="/" element={<LandingV2 />} />
+
+        <Route path="/observatorio" element={<Observatory />} />
+        <Route path="/exploracion" element={<Minigame />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;

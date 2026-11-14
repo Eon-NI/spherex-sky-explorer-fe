@@ -1,0 +1,155 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');@import "tailwindcss";
+
+/*Tokens
+   --color-night -> bg-night, text-night, border-night...
+   --font-sans   -> font-sans
+*/
+@theme {
+  --font-sans: "Bricolage Grotesque", system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif; /* se conserva por si otras páginas lo usan */
+  --font-hud: "JetBrains Mono", ui-monospace, monospace;
+
+
+  /* Fondos oscuros (cielo nocturno) */
+  --color-night: #0d1230;
+  --color-night-soft: #171e4a;
+
+  /* Fondo claro y textos */
+  --color-paper: #f5f7fb;
+  --color-mist: #b7bdd6; /* texto secundario sobre fondos oscuros */
+  --color-dim: #4b5173; /* texto secundario sobre fondos claros */
+
+  /* Único acento: botones y foco */
+  --color-star: #ffb938;
+  --color-star-hover: #ffc95e;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-night);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Para que el header fijo no tape los títulos al usar #anclas */
+section[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* Foco visible en todo el sitio. En secciones claras se cambia con
+   la clase [--focus:var(--color-night)] para que se vea con buen contraste. */
+:focus-visible {
+  outline: 2px solid var(--focus, var(--color-star));
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--color-star);
+  color: var(--color-night);
+}
+
+/* Oculta la barra de scroll del carrusel */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* =====================================================
+   LEGACY: estilos de la landing anterior.
+   Déjalos mientras alguna página los use y bórralos después.
+   ===================================================== */
+
+/* Degradado estilo página de misión de la NASA */
+.bg-nasa {
+  background:
+    radial-gradient(ellipse 80% 60% at 85% 0%, rgba(37, 99, 235, 0.35), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 0% 100%, rgba(124, 58, 237, 0.22), transparent 60%),
+    linear-gradient(180deg, #05070f 0%, #0a1230 55%, #05070f 100%);
+}
+
+/* Degradado suave para cards y "Acerca de" */
+.bg-nasa-soft {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(30, 64, 175, 0.25), transparent 70%),
+    #05070f;
+}
+
+.liquid-glass {
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.03) 40%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  backdrop-filter: blur(5px) saturate(90%);
+  -webkit-backdrop-filter: blur(5px) saturate(90%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 24px rgba(255, 255, 255, 0.04),
+    0 24px 60px -16px rgba(0, 0, 0, 0.65);
+}
+
+/* Borde de luz en degradado (canto del cristal) */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* border-radius: inherit; */
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.1) 30%,
+    rgba(255, 255, 255, 0.02) 60%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Reflejo especular */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* border-radius: inherit; */
+  background: radial-gradient(
+    900% 70% at 0% 0%,
+    rgba(255, 255, 255, 0.14),
+    transparent 30%
+  );
+  pointer-events: none;
+}
+
+/* Variante con un toque oscuro para que el texto se lea mejor */
+.liquid-glass-dark {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(15, 23, 42, 0.25) 45%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+}
