@@ -9,11 +9,11 @@ import {
   BUS_RADIUS,
   FACE,
   STOPS,
-  TIMELAPSE_SCREEN,
-  TIMELAPSE_STOP,
   WL_MAX,
   WL_MIN,
+  ZOOM_TARGETS,
   type TourControls,
+  type ZoomTarget,
 } from './tourConfig';
 import {
   drawRadar,
@@ -29,10 +29,10 @@ type SceneProps = {
   controlsRef: RefObject<TourControls>;
   isMobile: boolean;
   reducedMotion: boolean;
-  /** true mientras la cámara hace zoom hacia la pantalla del timelapse */
-  zoomRef: RefObject<boolean>;
-  /** Clic en la pantalla del timelapse */
-  onOpenTimelapse: () => void;
+  /** Pantalla hacia la que la cámara está haciendo zoom (null = ninguna) */
+  zoomRef: RefObject<ZoomTarget | null>;
+  /** Clic en una pantalla que abre una página (timelapse o spectral) */
+  onOpenScreen: (target: ZoomTarget) => void;
 };
 
 /* =========================================================
@@ -288,11 +288,12 @@ function Satellite({
   controlsRef,
   reducedMotion,
   zoomRef,
-  onOpenTimelapse,
+  onOpenScreen,
 }: Omit<SceneProps, 'isMobile'>) {
-  // la pantalla solo es clicable cuando el tour está parado en el timelapse
-  const canOpenTimelapse = () =>
-    !zoomRef.current && Math.round(progressRef.current * (STOPS.length - 1)) === TIMELAPSE_STOP;
+  // cada pantalla solo es clicable cuando el tour está parado en su módulo
+  const canOpen = (target: ZoomTarget) => () =>
+    !zoomRef.current &&
+    Math.round(progressRef.current * (STOPS.length - 1)) === ZOOM_TARGETS[target].stop;
 
   const group = useRef<THREE.Group>(null);
   const radarTexture = useScreenTexture(drawRadar, controlsRef, 512, 512);
@@ -332,8 +333,8 @@ function Satellite({
           controlsRef={controlsRef}
           size={[1, 0.62]}
           position={[0, 0.15, 0]}
-          canActivate={canOpenTimelapse}
-          onActivate={onOpenTimelapse}
+          canActivate={canOpen('timelapse')}
+          onActivate={() => onOpenScreen('timelapse')}
         />
       </FaceMount>
 
@@ -343,7 +344,14 @@ function Satellite({
       </FaceMount>
 
       <FaceMount angle={FACE.spectral}>
-        <Screen draw={drawSpectral} controlsRef={controlsRef} size={[1, 0.5]} position={[0, 0.3, 0]} />
+        <Screen
+          draw={drawSpectral}
+          controlsRef={controlsRef}
+          size={[1, 0.5]}
+          position={[0, 0.3, 0]}
+          canActivate={canOpen('spectral')}
+          onActivate={() => onOpenScreen('spectral')}
+        />
         <SpectralControls controlsRef={controlsRef} />
       </FaceMount>
 
@@ -418,7 +426,7 @@ function CameraRig({
   isMobile,
   reducedMotion,
   zoomRef,
-}: Omit<SceneProps, 'controlsRef' | 'onOpenTimelapse'>) {
+}: Omit<SceneProps, 'controlsRef' | 'onOpenScreen'>) {
   const camera = useThree((s) => s.camera);
   const pointer = useThree((s) => s.pointer);
   const aspect = useThree((s) => s.size.width / s.size.height);
@@ -449,16 +457,17 @@ function CameraRig({
     goalPos.y += arc * 0.5;
     goalPos.multiplyScalar(1 + arc * 0.12);
 
-    const zooming = zoomRef.current;
+    const zoomTarget = zoomRef.current;
+    const zooming = zoomTarget !== null;
 
     // en pantallas verticales el campo horizontal es estrecho: alejamos la cámara
     const zoomOut = !zooming && aspect < 1 ? THREE.MathUtils.clamp(1.1 / aspect, 1, 2.2) : 1;
     if (zoomOut > 1) goalPos.sub(goalTarget).multiplyScalar(zoomOut).add(goalTarget);
 
-    if (zooming) {
-      // "entra" en la pantalla del timelapse
-      goalPos.copy(TIMELAPSE_SCREEN.camera);
-      goalTarget.copy(TIMELAPSE_SCREEN.center);
+    if (zoomTarget) {
+      // "entra" en la pantalla elegida
+      goalPos.copy(ZOOM_TARGETS[zoomTarget].camera);
+      goalTarget.copy(ZOOM_TARGETS[zoomTarget].center);
     } else if (!reducedMotion) {
       goalPos.x += pointer.x * 0.12;
       goalPos.y += pointer.y * 0.08;
@@ -491,7 +500,7 @@ export default function SatelliteScene({
   isMobile,
   reducedMotion,
   zoomRef,
-  onOpenTimelapse,
+  onOpenScreen,
 }: SceneProps) {
   return (
     <>
@@ -525,7 +534,7 @@ export default function SatelliteScene({
         controlsRef={controlsRef}
         reducedMotion={reducedMotion}
         zoomRef={zoomRef}
-        onOpenTimelapse={onOpenTimelapse}
+        onOpenScreen={onOpenScreen}
       />
       <CameraRig
         progressRef={progressRef}

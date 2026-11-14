@@ -1,8 +1,16 @@
 /**
- * Datos simulados se  hace cutouts sintéticos (estrellas fijas + un asteroide que se mueve + una estrella variable)
+ * Datos simulados para generar cutouts sintéticos (estrellas fijas + un asteroide que se mueve + una estrella variable)
  * para poder probar el timelapse, el clic y las acciones.
  */
-import type { ObservationQuery, ObservationsResponse, SpectrumResponse } from './spherex';
+import {
+  CHANNEL_COUNT,
+  channelDetector,
+  channelWavelength,
+  type ObservationQuery,
+  type ObservationsResponse,
+  type SpectralCubeResponse,
+  type SpectrumResponse,
+} from './spherex';
 
 function mulberry32(seed: number) {
   let a = seed >>> 0;
@@ -173,8 +181,8 @@ export async function mockFetchSpectrum(
   const r = mulberry32(seedFrom(ra, dec) + 9);
   const amp = 20 + r() * 40;
   const gauss = (x: number, mu: number, s: number) => Math.exp(-((x - mu) ** 2) / (2 * s * s));
-  const points = Array.from({ length: 102 }, (_, i) => {
-    const wl = 0.75 + (i * 4.25) / 101;
+  const points = Array.from({ length: CHANNEL_COUNT }, (_, i) => {
+    const wl = channelWavelength(i);
     const flux =
       amp * Math.pow(wl, -1.1) +
       7 * gauss(wl, 3.3, 0.05) - // PAH
@@ -183,4 +191,105 @@ export async function mockFetchSpectrum(
     return { wavelength: wl, flux, error: 0.8 + r() * 0.6 };
   });
   return { ra, dec, unit: 'µJy', points };
+}
+
+/* =========================================================
+   Cubo espectral simulado: la misma región vista en 102 canales.
+   - estrellas "calientes" brillan más en el azul, las "frías" en el rojo
+   - una nebulosa emite en 3.3 µm (PAH) y 4.05 µm
+   - una nube oscura absorbe cerca de 3.05 µm (hielo de agua)
+   ========================================================= */
+const CUBE_SIZE = 320;
+const cubeCache = new Map<string, SpectralCubeResponse>();
+const g = (x: number, mu: number, s: number) => Math.exp(-((x - mu) ** 2) / (2 * s * s));
+
+function drawChannel(seed: number, wl: number): Promise<string> {
+  const S = CUBE_SIZE;
+  const canvas = document.createElement('canvas');
+  canvas.width = S;
+  canvas.height = S;
+  const ctx = canvas.getContext('2d')!;
+  const x = (wl - 0.75) / 4.25; // 0 = azul, 1 = rojo
+
+  ctx.fillStyle = '#030408';
+  ctx.fillRect(0, 0, S, S);
+
+  // galaxia central (más brillante en longitudes de onda largas)
+  const gb = 0.25 + 0.35 * x + 0.15 * g(wl, 1.6, 0.3);
+  ctx.save();
+  ctx.translate(S * 0.5, S * 0.5);
+  ctx.rotate(-0.6);
+  ctx.scale(1, 0.38);
+  const gal = ctx.createRadialGradient(0, 0, 0, 0, 0, S * 0.34);
+  gal.addColorStop(0, `rgba(255,255,255,${Math.min(1, gb + 0.35)})`);
+  gal.addColorStop(0.25, `rgba(230,230,240,${gb * 0.6})`);
+  gal.addColorStop(1, 'rgba(230,230,240,0)');
+  ctx.fillStyle = gal;
+  ctx.beginPath();
+  ctx.arc(0, 0, S * 0.34, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // nebulosa con emisión PAH
+  const neb = 0.04 + 0.75 * g(wl, 3.3, 0.07) + 0.35 * g(wl, 4.05, 0.05);
+  const nx = S * 0.22;
+  const ny = S * 0.74;
+  const ng = ctx.createRadialGradient(nx, ny, 0, nx, ny, S * 0.22);
+  ng.addColorStop(0, `rgba(255,255,255,${neb})`);
+  ng.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = ng;
+  ctx.fillRect(0, 0, S, S);
+
+  // estrellas
+  const rs = mulberry32(seed + 1);
+  const ice = 1 - 0.85 * g(wl, 3.05, 0.12);
+  for (let i = 0; i < 220; i++) {
+    const sx = rs() * S;
+    const sy = rs() * S;
+    const m = Math.pow(rs(), 3);
+    const temp = rs();
+    // las estrellas detrás de la nube oscura (arriba a la derecha) se apagan en 3 µm
+    const behindCloud = Math.hypot(sx - S * 0.78, sy - S * 0.25) < S * 0.16 ? ice : 1;
+    const b = (0.25 + 0.75 * (temp * (1 - x) + (1 - temp) * x)) * behindCloud;
+    const r = 0.5 + m * 2.6;
+    const sg = ctx.createRadialGradient(sx, sy, 0, sx, sy, r * 3);
+    sg.addColorStop(0, `rgba(255,255,255,${Math.min(1, (0.3 + m) * b)})`);
+    sg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sg;
+    ctx.beginPath();
+    ctx.arc(sx, sy, r * 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ruido del detector
+  const rn = mulberry32(seed + Math.round(wl * 1000));
+  for (let i = 0; i < 500; i++) {
+    ctx.fillStyle = `rgba(255,255,255,${rn() * 0.05})`;
+    ctx.fillRect(rn() * S, rn() * S, 1, 1);
+  }
+
+  return new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b ? URL.createObjectURL(b) : canvas.toDataURL()), 'image/jpeg', 0.9),
+  );
+}
+
+export async function mockFetchSpectralCube(
+  q: { ra: number; dec: number; fovDeg: number },
+  signal?: AbortSignal,
+): Promise<SpectralCubeResponse> {
+  const key = JSON.stringify(q);
+  const cached = cubeCache.get(key);
+  if (cached) return cached;
+
+  await wait(600, signal);
+  const seed = seedFrom(q.ra, q.dec);
+  const channels: SpectralCubeResponse['channels'] = [];
+  for (let i = 0; i < CHANNEL_COUNT; i++) {
+    const wl = channelWavelength(i);
+    channels.push({ index: i, wavelength: wl, detector: channelDetector(i), imageUrl: await drawChannel(seed, wl) });
+    if (i % 10 === 9) await wait(0, signal); // deja respirar al navegador
+  }
+  const res = { target: { ...q }, channels };
+  cubeCache.set(key, res);
+  return res;
 }

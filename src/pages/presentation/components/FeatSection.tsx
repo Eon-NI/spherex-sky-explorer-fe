@@ -6,7 +6,7 @@ const features: FeatCardProps[] = [
         title: 'Timelapse del cielo',
         description:
             'Observa cómo cambia el cielo a través de imágenes capturadas en diferentes fechas.',
-        to: '/observatorio',
+        to: '/timelapse',
         linkText: 'Explorar timelapse',
         tone: 'star',
         art: 'rings',

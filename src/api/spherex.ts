@@ -1,6 +1,8 @@
-import { mockFetchObservations, mockFetchSpectrum } from './spherexMock';
+import { mockFetchObservations, mockFetchSpectralCube, mockFetchSpectrum } from './spherexMock';
 
-
+/* =========================================================
+   Tipos del contrato con el backend (Django)
+   ========================================================= */
 export type Detector = 'All' | 'D1' | 'D2' | 'D3' | 'D4' | 'D5' | 'D6';
 
 /** Rangos aproximados de longitud de onda de cada detector de SPHEREx (µm) */
@@ -13,6 +15,32 @@ export const DETECTORS: { id: Detector; label: string; range?: [number, number] 
   { id: 'D5', label: 'D5 · 3.83–4.41 µm', range: [3.83, 4.41] },
   { id: 'D6', label: 'D6 · 4.42–5.00 µm', range: [4.42, 5.0] },
 ];
+
+/* ---------- 102 canales: 6 detectores × 17 canales ---------- */
+export const CHANNEL_COUNT = 102;
+const CHANNELS_PER_DETECTOR = 17;
+const DETECTOR_RANGES = DETECTORS.filter((d) => d.range).map((d) => ({ id: d.id, range: d.range! }));
+
+/** Longitud de onda central (µm) del canal 0–101 */
+export function channelWavelength(index: number) {
+  const det = DETECTOR_RANGES[Math.min(5, Math.floor(index / CHANNELS_PER_DETECTOR))];
+  const k = index % CHANNELS_PER_DETECTOR;
+  const [min, max] = det.range;
+  return min + ((k + 0.5) * (max - min)) / CHANNELS_PER_DETECTOR;
+}
+
+/** Detector (D1–D6) al que pertenece el canal */
+export const channelDetector = (index: number) =>
+  DETECTOR_RANGES[Math.min(5, Math.floor(index / CHANNELS_PER_DETECTOR))].id;
+
+/** Canal más cercano a una longitud de onda */
+export function nearestChannel(wavelength: number) {
+  let best = 0;
+  for (let i = 1; i < CHANNEL_COUNT; i++) {
+    if (Math.abs(channelWavelength(i) - wavelength) < Math.abs(channelWavelength(best) - wavelength)) best = i;
+  }
+  return best;
+}
 
 export type ObservationQuery = {
   ra: number;
@@ -44,6 +72,20 @@ export type ObservationsResponse = {
 };
 
 export type SpectrumPoint = { wavelength: number; flux: number; error?: number };
+
+export type SpectralChannel = {
+  /** 0–101 */
+  index: number;
+  wavelength: number;
+  detector: string;
+  /** Imagen del canal (cutout del All-Sky Spectral Cube convertido a PNG/JPEG) */
+  imageUrl: string;
+};
+
+export type SpectralCubeResponse = {
+  target: { ra: number; dec: number; fovDeg: number };
+  channels: SpectralChannel[];
+};
 
 export type SpectrumResponse = {
   ra: number;
@@ -80,6 +122,15 @@ export function fetchObservations(q: ObservationQuery, signal?: AbortSignal) {
     { ra: q.ra, dec: q.dec, fov: q.fovDeg, start: q.start, end: q.end, detector: q.detector },
     signal,
   );
+}
+
+/** GET /api/spectral-cube?ra=&dec=&fov= → 102 imágenes, una por canal */
+export function fetchSpectralCube(
+  q: { ra: number; dec: number; fovDeg: number },
+  signal?: AbortSignal,
+) {
+  if (USE_MOCK) return mockFetchSpectralCube(q, signal);
+  return getJson<SpectralCubeResponse>('/api/spectral-cube', { ra: q.ra, dec: q.dec, fov: q.fovDeg }, signal);
 }
 
 /** GET /api/spectrum?ra=&dec= → 102 canales */

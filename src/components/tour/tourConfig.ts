@@ -103,12 +103,28 @@ export const STOPS: CameraStop[] = [
   },
 ];
 
-/* ---------- Zoom hacia la pantalla del Timelapse ---------- */
-/** Centro de la pantalla del timelapse y punto donde termina la cámara al "entrar" en ella */
-export const TIMELAPSE_SCREEN = {
-  center: facePoint(FACE.timelapse, BUS_APOTHEM + 0.05, 0.15),
-  camera: facePoint(FACE.timelapse, BUS_APOTHEM + 0.5, 0.15),
-};
+/* ---------- Zoom hacia las pantallas que abren una página ---------- */
+export type ZoomTarget = 'timelapse' | 'spectral';
 
-/** Índice de la parada del timelapse en STOPS */
-export const TIMELAPSE_STOP = STOPS.findIndex((s) => s.id === 'timelapse');
+export const ZOOM_TARGETS: Record<
+  ZoomTarget,
+  {
+    /** Centro de la pantalla */
+    center: THREE.Vector3;
+    /** Dónde termina la cámara al "entrar" en la pantalla */
+    camera: THREE.Vector3;
+    /** Parada del tour en la que la pantalla es clicable */
+    stop: number;
+  }
+> = {
+  timelapse: {
+    center: facePoint(FACE.timelapse, BUS_APOTHEM + 0.05, 0.15),
+    camera: facePoint(FACE.timelapse, BUS_APOTHEM + 0.5, 0.15),
+    stop: STOPS.findIndex((s) => s.id === 'timelapse'),
+  },
+  spectral: {
+    center: facePoint(FACE.spectral, BUS_APOTHEM + 0.05, 0.3),
+    camera: facePoint(FACE.spectral, BUS_APOTHEM + 0.45, 0.3),
+    stop: STOPS.findIndex((s) => s.id === 'spectral'),
+  },
+};

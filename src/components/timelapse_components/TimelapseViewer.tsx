@@ -1,6 +1,7 @@
 import { useEffect, useRef, type PointerEvent, type RefObject } from 'react';
 
-type Marker = { u: number; v: number };
+export type ViewerMarker = { u: number; v: number; color?: string; label?: string };
+type Marker = ViewerMarker;
 
 type TimelapseViewerProps = {
   images: HTMLImageElement[];
@@ -14,6 +15,8 @@ type TimelapseViewerProps = {
   markers: Marker[];
   /** Clic sobre la imagen: posición normalizada y posición en px dentro del visor */
   onSelect: (u: number, v: number, x: number, y: number) => void;
+  /** Opcional: tono (0–360) con el que colorear la imagen según la posición (falso color espectral) */
+  hueAt?: (pos: number) => number;
 };
 
 export const MIN_ZOOM = 1;
@@ -33,6 +36,7 @@ export default function TimelapseViewer({
   selected,
   markers,
   onSelect,
+  hueAt,
 }: TimelapseViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pan = useRef({ x: 0, y: 0 });
@@ -40,10 +44,10 @@ export default function TimelapseViewer({
   const drag = useRef<{ x: number; y: number; px: number; py: number; moved: boolean } | null>(null);
 
   // Los props que usa el bucle de dibujo se guardan en un ref
-  const props = useRef({ images, fade, zoom, selected, markers });
+  const props = useRef({ images, fade, zoom, selected, markers, hueAt });
   useEffect(() => {
-    props.current = { images, fade, zoom, selected, markers };
-  }, [images, fade, zoom, selected, markers]);
+    props.current = { images, fade, zoom, selected, markers, hueAt };
+  }, [images, fade, zoom, selected, markers, hueAt]);
 
   // Al cambiar de búsqueda o al alejar, recentra
   useEffect(() => {
@@ -72,7 +76,7 @@ export default function TimelapseViewer({
       const canvas = canvasRef.current;
       const ctx = canvas?.getContext('2d');
       if (!canvas || !ctx) return;
-      const { images: imgs, fade: f, zoom: z, selected: sel, markers: mk } = props.current;
+      const { images: imgs, fade: f, zoom: z, selected: sel, markers: mk, hueAt: hue } = props.current;
       const W = canvas.width;
       const H = canvas.height;
       const dpr = layout.current.dpr;
@@ -114,13 +118,30 @@ export default function TimelapseViewer({
         ctx.globalAlpha = 1;
       }
 
-      // cambios registrados
+      // falso color: tiñe la imagen según la longitud de onda
+      if (hue) {
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = `hsl(${hue(p)}, 90%, 66%)`;
+        ctx.fillRect(x, y, dw, dh);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      // marcadores (cambios registrados u objetos seleccionados)
       ctx.lineWidth = 1.5 * dpr;
-      ctx.strokeStyle = 'rgba(167, 139, 250, 0.9)';
       for (const m of mk) {
+        const mx = x + m.u * dw;
+        const my = y + m.v * dh;
+        ctx.strokeStyle = m.color ?? 'rgba(167, 139, 250, 0.9)';
         ctx.beginPath();
-        ctx.arc(x + m.u * dw, y + m.v * dh, 7 * dpr, 0, Math.PI * 2);
+        ctx.arc(mx, my, (m.label ? 11 : 7) * dpr, 0, Math.PI * 2);
         ctx.stroke();
+        if (m.label) {
+          ctx.font = `600 ${12 * dpr}px "Space Grotesk", system-ui, sans-serif`;
+          ctx.fillStyle = m.color ?? '#ffffff';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(m.label, mx + 15 * dpr, my);
+        }
       }
 
       // punto seleccionado

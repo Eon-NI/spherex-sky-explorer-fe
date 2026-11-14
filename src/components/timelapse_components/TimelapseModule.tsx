@@ -255,14 +255,12 @@ export default function TimelapseModule() {
     const ready = preload.images.length > 0;
 
     return (
-        <section id="timelapse" className="px-4 py-16 md:px-8">
+        <section id="timelapse" className="px-4 py-16 md:px-5">
             <div className="mx-auto max-w-7xl">
                 {/* ---------- encabezado ---------- */}
                 <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
                     <div>
-                        <span className="text-xs font-medium uppercase tracking-[0.35em] text-sky-400">
-                            Módulo · Timelapse
-                        </span>
+                        
                         <h2 className="font-display mt-3 text-3xl font-bold text-white md:text-4xl">
                             El cielo a través del tiempo
                         </h2>
