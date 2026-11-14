@@ -1,10 +1,10 @@
-import Header from '../presentation/components/Header';
+import Header from './components/Header';
 import Hero from '../presentation/components/Hero';
 import TravelHook from '../presentation/components/TravelHook';
 import InfoSection from '../presentation/components/InfoSection';
 import FeatSection from '../presentation/components/FeatSection';
 import About from '../presentation/components/About';
-import Footer from '../presentation/components/Footer';
+import Footer from './components/Footer';
 
 import spherexImage from '../../assets/Spherex.webp';
 import planetXImage from '../../assets/Plantex.webp';

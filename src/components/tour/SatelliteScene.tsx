@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer, Sparkles, Stars } from '@react-three/drei';
 import * as THREE from 'three';
@@ -9,6 +9,8 @@ import {
   BUS_RADIUS,
   FACE,
   STOPS,
+  TIMELAPSE_SCREEN,
+  TIMELAPSE_STOP,
   WL_MAX,
   WL_MIN,
   type TourControls,
@@ -24,17 +26,25 @@ import {
 
 type SceneProps = {
   progressRef: RefObject<number>;
-  controls: RefObject<TourControls>;
+  controlsRef: RefObject<TourControls>;
   isMobile: boolean;
   reducedMotion: boolean;
+  /** true mientras la cámara hace zoom hacia la pantalla del timelapse */
+  zoomRef: RefObject<boolean>;
+  /** Clic en la pantalla del timelapse */
+  onOpenTimelapse: () => void;
 };
 
 /* =========================================================
    Textura de canvas animada para las pantallas
    ========================================================= */
+/** Avisa a three.js de que el canvas cambió (fuera del componente para el linter de React) */
+function markDirty(texture: THREE.Texture) {
+  texture.needsUpdate = true;
+}
 function useScreenTexture(
   draw: DrawFn,
-  controls: RefObject<TourControls>,
+  controlsRef: RefObject<TourControls>,
   width = 512,
   height = 320,
 ) {
@@ -61,8 +71,8 @@ function useScreenTexture(
     acc.current = 0;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    draw(ctx, width, height, clock.elapsedTime, controls.current);
-    texture.needsUpdate = true;
+    draw(ctx, width, height, clock.elapsedTime, controlsRef.current);
+    markDirty(texture);
   });
 
   return texture;
@@ -84,27 +94,63 @@ function FaceMount({ angle, children }: { angle: number; children: ReactNode }) 
 
 function Screen({
   draw,
-  controls,
+  controlsRef,
   size = [1, 0.6],
   position = [0, 0.2, 0],
+  canActivate,
+  onActivate,
 }: {
   draw: DrawFn;
-  controls: RefObject<TourControls>;
+  controlsRef: RefObject<TourControls>;
   size?: [number, number];
   position?: [number, number, number];
+  /** Si devuelve true, la pantalla responde al hover/clic */
+  canActivate?: () => boolean;
+  onActivate?: () => void;
 }) {
-  const texture = useScreenTexture(draw, controls);
+  const texture = useScreenTexture(draw, controlsRef);
   const [w, h] = size;
+  const [hovered, setHovered] = useState(false);
+  const interactive = !!onActivate;
+
+  useEffect(() => {
+    if (!interactive) return;
+    document.body.style.cursor = hovered ? 'pointer' : '';
+    return () => {
+      document.body.style.cursor = '';
+    };
+  }, [hovered, interactive]);
 
   return (
     <group position={position}>
+      {/* halo al pasar el ratón */}
+      {interactive && (
+        <mesh position-z={0.001}>
+          <planeGeometry args={[w + 0.2, h + 0.2]} />
+          <meshBasicMaterial color="#38bdf8" transparent opacity={hovered ? 0.45 : 0} toneMapped={false} />
+        </mesh>
+      )}
       {/* bisel */}
       <mesh position-z={0.02}>
         <boxGeometry args={[w + 0.08, h + 0.08, 0.04]} />
         <meshStandardMaterial color="#0a0e18" metalness={0.7} roughness={0.35} />
       </mesh>
       {/* pantalla */}
-      <mesh position-z={0.045}>
+      <mesh
+        position-z={0.045}
+        onPointerOver={(e) => {
+          if (!interactive) return;
+          e.stopPropagation();
+          setHovered(canActivate ? canActivate() : true);
+        }}
+        onPointerOut={() => setHovered(false)}
+        onClick={(e) => {
+          if (!interactive || (canActivate && !canActivate())) return;
+          e.stopPropagation();
+          setHovered(false);
+          onActivate?.();
+        }}
+      >
         <planeGeometry args={[w, h]} />
         <meshBasicMaterial map={texture} toneMapped={false} />
       </mesh>
@@ -147,13 +193,13 @@ function Keypad() {
 }
 
 /** Slider + perillas tipo "volumen" que reflejan los µm seleccionados */
-function SpectralControls({ controls }: { controls: RefObject<TourControls> }) {
+function SpectralControls({ controlsRef }: { controlsRef: RefObject<TourControls> }) {
   const handle = useRef<THREE.Mesh>(null);
   const knobs = useRef<(THREE.Group | null)[]>([]);
   const smooth = useRef(0.3);
 
   useFrame(({ clock }, delta) => {
-    const n = (controls.current.wavelength - WL_MIN) / (WL_MAX - WL_MIN);
+    const n = (controlsRef.current.wavelength - WL_MIN) / (WL_MAX - WL_MIN);
     smooth.current = THREE.MathUtils.damp(smooth.current, n, 8, delta);
     if (handle.current) handle.current.position.x = -0.4 + smooth.current * 0.8;
     knobs.current.forEach((k, i) => {
@@ -237,12 +283,22 @@ const SHIELDS = [
   { top: 1.9, bottom: 0.84, h: 1.7 },
 ];
 
-function Satellite({ progressRef, controls, reducedMotion }: Omit<SceneProps, 'isMobile'>) {
+function Satellite({
+  progressRef,
+  controlsRef,
+  reducedMotion,
+  zoomRef,
+  onOpenTimelapse,
+}: Omit<SceneProps, 'isMobile'>) {
+  // la pantalla solo es clicable cuando el tour está parado en el timelapse
+  const canOpenTimelapse = () =>
+    !zoomRef.current && Math.round(progressRef.current * (STOPS.length - 1)) === TIMELAPSE_STOP;
+
   const group = useRef<THREE.Group>(null);
-  const radarTexture = useScreenTexture(drawRadar, controls, 512, 512);
+  const radarTexture = useScreenTexture(drawRadar, controlsRef, 512, 512);
 
   useFrame(({ clock }, delta) => {
-    if (controls.current.playing) controls.current.tlTime += delta;
+    if (controlsRef.current.playing) controlsRef.current.tlTime += delta;
 
     const g = group.current;
     if (!g) return;
@@ -271,17 +327,24 @@ function Satellite({ progressRef, controls, reducedMotion }: Omit<SceneProps, 'i
 
       {/* ---------- Pantallas de los módulos ---------- */}
       <FaceMount angle={FACE.timelapse}>
-        <Screen draw={drawTimelapse} controls={controls} size={[1, 0.62]} position={[0, 0.15, 0]} />
+        <Screen
+          draw={drawTimelapse}
+          controlsRef={controlsRef}
+          size={[1, 0.62]}
+          position={[0, 0.15, 0]}
+          canActivate={canOpenTimelapse}
+          onActivate={onOpenTimelapse}
+        />
       </FaceMount>
 
       <FaceMount angle={FACE.search}>
-        <Screen draw={drawSearch} controls={controls} size={[1, 0.5]} position={[0, 0.3, 0]} />
+        <Screen draw={drawSearch} controlsRef={controlsRef} size={[1, 0.5]} position={[0, 0.3, 0]} />
         <Keypad />
       </FaceMount>
 
       <FaceMount angle={FACE.spectral}>
-        <Screen draw={drawSpectral} controls={controls} size={[1, 0.5]} position={[0, 0.3, 0]} />
-        <SpectralControls controls={controls} />
+        <Screen draw={drawSpectral} controlsRef={controlsRef} size={[1, 0.5]} position={[0, 0.3, 0]} />
+        <SpectralControls controlsRef={controlsRef} />
       </FaceMount>
 
       {/* ---------- Escudos cónicos + telescopio ---------- */}
@@ -350,18 +413,27 @@ function cylLerp(a: THREE.Vector3, b: THREE.Vector3, f: number, out: THREE.Vecto
   return out;
 }
 
-function CameraRig({ progressRef, isMobile, reducedMotion }: Omit<SceneProps, 'controls'>) {
+function CameraRig({
+  progressRef,
+  isMobile,
+  reducedMotion,
+  zoomRef,
+}: Omit<SceneProps, 'controlsRef' | 'onOpenTimelapse'>) {
   const camera = useThree((s) => s.camera);
   const pointer = useThree((s) => s.pointer);
   const aspect = useThree((s) => s.size.width / s.size.height);
 
-  const goalPos = useMemo(() => new THREE.Vector3(), []);
-  const goalTarget = useMemo(() => new THREE.Vector3(), []);
-  const pos = useMemo(() => STOPS[0].position.clone(), []);
-  const target = useMemo(() => STOPS[0].target.clone(), []);
+  const goalPosRef = useRef(new THREE.Vector3());
+  const goalTargetRef = useRef(new THREE.Vector3());
+  const posRef = useRef(STOPS[0].position.clone());
+  const targetRef = useRef(STOPS[0].target.clone());
   const shift = useRef({ x: STOPS[0].shiftX, y: STOPS[0].shiftY });
 
   useFrame((_, delta) => {
+    const goalPos = goalPosRef.current;
+    const goalTarget = goalTargetRef.current;
+    const pos = posRef.current;
+    const target = targetRef.current;
     const last = STOPS.length - 1;
     const p = THREE.MathUtils.clamp(progressRef.current, 0, 1) * last;
     const i = Math.min(Math.floor(p), last - 1);
@@ -377,20 +449,28 @@ function CameraRig({ progressRef, isMobile, reducedMotion }: Omit<SceneProps, 'c
     goalPos.y += arc * 0.5;
     goalPos.multiplyScalar(1 + arc * 0.12);
 
+    const zooming = zoomRef.current;
+
     // en pantallas verticales el campo horizontal es estrecho: alejamos la cámara
-    const zoomOut = aspect < 1 ? THREE.MathUtils.clamp(1.1 / aspect, 1, 2.2) : 1;
+    const zoomOut = !zooming && aspect < 1 ? THREE.MathUtils.clamp(1.1 / aspect, 1, 2.2) : 1;
     if (zoomOut > 1) goalPos.sub(goalTarget).multiplyScalar(zoomOut).add(goalTarget);
 
-    if (!reducedMotion) {
+    if (zooming) {
+      // "entra" en la pantalla del timelapse
+      goalPos.copy(TIMELAPSE_SCREEN.camera);
+      goalTarget.copy(TIMELAPSE_SCREEN.center);
+    } else if (!reducedMotion) {
       goalPos.x += pointer.x * 0.12;
       goalPos.y += pointer.y * 0.08;
     }
 
-    const k = 1 - Math.exp(-4 * delta); // suavizado independiente de los FPS
+    const k = 1 - Math.exp((zooming ? -3 : -4) * delta); // suavizado independiente de los FPS
     pos.lerp(goalPos, k);
     target.lerp(goalTarget, k);
-    shift.current.x = THREE.MathUtils.lerp(shift.current.x, THREE.MathUtils.lerp(a.shiftX, b.shiftX, f), k);
-    shift.current.y = THREE.MathUtils.lerp(shift.current.y, THREE.MathUtils.lerp(a.shiftY, b.shiftY, f), k);
+    const goalShiftX = zooming ? 0 : THREE.MathUtils.lerp(a.shiftX, b.shiftX, f);
+    const goalShiftY = zooming ? 0 : THREE.MathUtils.lerp(a.shiftY, b.shiftY, f);
+    shift.current.x = THREE.MathUtils.lerp(shift.current.x, goalShiftX, k);
+    shift.current.y = THREE.MathUtils.lerp(shift.current.y, goalShiftY, k);
 
     camera.position.copy(pos);
     camera.lookAt(target);
@@ -405,7 +485,14 @@ function CameraRig({ progressRef, isMobile, reducedMotion }: Omit<SceneProps, 'c
 /* =========================================================
    Escena
    ========================================================= */
-export default function SatelliteScene({ progressRef, controls, isMobile, reducedMotion }: SceneProps) {
+export default function SatelliteScene({
+  progressRef,
+  controlsRef,
+  isMobile,
+  reducedMotion,
+  zoomRef,
+  onOpenTimelapse,
+}: SceneProps) {
   return (
     <>
       {/* sin color de fondo: se ve el degradado .bg-nasa del landing detrás del canvas */}
@@ -433,8 +520,19 @@ export default function SatelliteScene({ progressRef, controls, isMobile, reduce
       <Stars radius={80} depth={40} count={4000} factor={3} saturation={0} fade speed={0.4} />
       <Sparkles count={60} scale={[14, 8, 14]} size={1.6} speed={0.2} color="#7dd3fc" opacity={0.5} />
 
-      <Satellite progressRef={progressRef} controls={controls} reducedMotion={reducedMotion} />
-      <CameraRig progressRef={progressRef} isMobile={isMobile} reducedMotion={reducedMotion} />
+      <Satellite
+        progressRef={progressRef}
+        controlsRef={controlsRef}
+        reducedMotion={reducedMotion}
+        zoomRef={zoomRef}
+        onOpenTimelapse={onOpenTimelapse}
+      />
+      <CameraRig
+        progressRef={progressRef}
+        isMobile={isMobile}
+        reducedMotion={reducedMotion}
+        zoomRef={zoomRef}
+      />
     </>
   );
 }

@@ -1,7 +1,6 @@
 
 import { BrowserRouter, Routes, Route } from 'react-router';
-
-import Landing from './pages/Landing';
+import TimeLapse from './pages/TimeLapse';
 import Observatory from './pages/Observatory';
 import Minigame from './pages/Minigame';
 
@@ -16,6 +15,8 @@ function App() {
 
         <Route path="/observatorio" element={<Observatory />} />
         <Route path="/exploracion" element={<Minigame />} />
+
+        <Route path="/timelapse" element={<TimeLapse />} />
       </Routes>
     </BrowserRouter>
   );

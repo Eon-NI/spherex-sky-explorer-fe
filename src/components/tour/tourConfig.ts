@@ -13,7 +13,7 @@ export const FACE = {
   spectral: Math.PI / 2,
 } as const;
 
-const facePoint = (angle: number, distance: number, y: number) =>
+export const facePoint = (angle: number, distance: number, y: number) =>
   new THREE.Vector3(Math.sin(angle) * distance, y, Math.cos(angle) * distance);
 
 /* ---------- Estado compartido entre la UI HTML y la escena 3D ---------- */
@@ -102,3 +102,13 @@ export const STOPS: CameraStop[] = [
     shiftY: -0.5,
   },
 ];
+
+/* ---------- Zoom hacia la pantalla del Timelapse ---------- */
+/** Centro de la pantalla del timelapse y punto donde termina la cámara al "entrar" en ella */
+export const TIMELAPSE_SCREEN = {
+  center: facePoint(FACE.timelapse, BUS_APOTHEM + 0.05, 0.15),
+  camera: facePoint(FACE.timelapse, BUS_APOTHEM + 0.5, 0.15),
+};
+
+/** Índice de la parada del timelapse en STOPS */
+export const TIMELAPSE_STOP = STOPS.findIndex((s) => s.id === 'timelapse');

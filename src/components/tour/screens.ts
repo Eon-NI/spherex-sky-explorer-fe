@@ -103,7 +103,7 @@ export const drawTimelapse: DrawFn = (ctx, w, h, _t, c) => {
   hudFrame(ctx, w, h, 'MOD 01 // TIMELAPSE');
 
   const frame = Math.floor(c.tlTime * 10) % 120;
-  const year = 2010 + Math.floor((frame / 119) * 16);
+  const year = 2025 + Math.floor((frame / 119) * 1.99); // misión SPHEREx: 2025 → 2026
   ctx.font = HUD_FONT;
   ctx.textAlign = 'right';
   ctx.fillStyle = '#ffffff';

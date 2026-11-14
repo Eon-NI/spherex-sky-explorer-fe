@@ -1,5 +1,5 @@
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Header from './presentation/components/Header';
+import Footer from './presentation/components/Footer';
 import ObservatoryTour from '../components/tour/ObservatoryTour';
 
 export default function Observatory() {
