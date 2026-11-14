@@ -38,6 +38,11 @@ const ZOOM_DURATION = 1300;
 /** Región de ejemplo con la que se abre el Spectral Explorer (galaxia de Andrómeda, M31) */
 const SPECTRAL_EXAMPLE = { ra: 10.6847, dec: 41.26875, fov: 0.5 };
 
+/** Ejemplo del módulo Search: Galaxia del Molinete (M101) */
+const SEARCH_EXAMPLE = { ra: '210.80227', dec: '54.34895', fov: '0.1' };
+
+type SearchCoords = { ra: string; dec: string };
+
 /* ---------- media queries sin re-renders innecesarios ---------- */
 function useMediaQuery(query: string) {
   return useSyncExternalStore(
@@ -67,6 +72,8 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
   const zoomRef = useRef<ZoomTarget | null>(null);
+  /** Coordenadas escritas en la tarjeta Search (se usan al entrar por la pantalla o el botón) */
+  const searchRef = useRef<SearchCoords>({ ra: SEARCH_EXAMPLE.ra, dec: SEARCH_EXAMPLE.dec });
   const leaveTimer = useRef<number | undefined>(undefined);
   const [leaving, setLeaving] = useState(false);
 
@@ -123,12 +130,20 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
     (target: ZoomTarget) => {
       if (zoomRef.current) return;
       // la página Spectral se abre en el canal elegido en el slider del tour
-      const route =
-        target === 'timelapse'
-          ? '/timelapse'
-          : `/spectral?ra=${SPECTRAL_EXAMPLE.ra}&dec=${SPECTRAL_EXAMPLE.dec}&fov=${SPECTRAL_EXAMPLE.fov}&ch=${
-              nearestChannel(controlsRef.current.wavelength) + 1
-            }`;
+      let route = '/timelapse';
+      if (target === 'spectral') {
+        route = `/spectral?ra=${SPECTRAL_EXAMPLE.ra}&dec=${SPECTRAL_EXAMPLE.dec}&fov=${SPECTRAL_EXAMPLE.fov}&ch=${
+          nearestChannel(controlsRef.current.wavelength) + 1
+        }`;
+      } else if (target === 'search') {
+        const { ra, dec } = searchRef.current;
+        const params = new URLSearchParams({
+          ra: ra.trim() || SEARCH_EXAMPLE.ra,
+          dec: dec.trim() || SEARCH_EXAMPLE.dec,
+          fov: SEARCH_EXAMPLE.fov,
+        });
+        route = `/search?${params}`;
+      }
       zoomRef.current = target;
       setLeaving(true);
       leaveTimer.current = window.setTimeout(
@@ -215,25 +230,25 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
         </Stop>
 
         <Stop index={1} active={shown}>
-          <HudCard  title="El cielo a través del tiempo">
+          <HudCard code="01" label="Timelapse" title="El cielo a través del tiempo">
             <TimelapseContent controlsRef={controlsRef} onOpen={() => openScreen('timelapse')} />
           </HudCard>
         </Stop>
 
         <Stop index={2} active={shown}>
-          <HudCard  title="Busca un punto de interés">
-            <SearchContent />
+          <HudCard code="02" label="Search" title="Busca un punto de interés">
+            <SearchContent searchRef={searchRef} onOpen={() => openScreen('search')} />
           </HudCard>
         </Stop>
 
         <Stop index={3} active={shown}>
-          <HudCard  title="Los 102 canales de SPHEREx">
+          <HudCard code="03" label="Spectral Explorer" title="Los 102 canales de SPHEREx">
             <SpectralContent controlsRef={controlsRef} onOpen={() => openScreen('spectral')} />
           </HudCard>
         </Stop>
 
         <Stop index={4} active={shown}>
-          <HudCard title="Descubre lugares asombrosos">
+          <HudCard code="04" label="Discovery" title="Descubre lugares asombrosos">
             <SurpriseContent onSurprise={handleSurprise} />
           </HudCard>
         </Stop>
@@ -288,11 +303,13 @@ function Stop({ index, active, children }: { index: number; active: number; chil
    Tarjeta HUD
    ========================================================= */
 function HudCard({
- 
+  code,
+  label,
   title,
   children,
 }: {
- 
+  code: string;
+  label: string;
   title: string;
   children: ReactNode;
 }) {
@@ -301,8 +318,16 @@ function HudCard({
       {/* velo oscuro para que el texto se lea aunque detrás haya metal brillante */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-[#05070f]/45" />
       <div className="mb-4 flex items-center justify-between gap-4">
-        
-        
+        <span className="text-xs font-medium uppercase tracking-[0.35em] text-sky-400">
+          {code} · {label}
+        </span>
+        <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          </span>
+          Activo
+        </span>
       </div>
 
       <h3 className="font-display text-2xl font-semibold text-white md:text-3xl">{title}</h3>
@@ -435,12 +460,32 @@ function TimelapseContent({
   );
 }
 
-function SearchContent() {
+function SearchContent({
+  searchRef,
+  onOpen,
+}: {
+  searchRef: RefObject<SearchCoords>;
+  onOpen: () => void;
+}) {
+  const [ra, setRa] = useState('');
+  const [dec, setDec] = useState('');
   const field =
     'font-display mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 focus:border-sky-400 focus:outline-none';
 
+  const update = (next: SearchCoords) => {
+    setRa(next.ra);
+    setDec(next.dec);
+    searchRef.current = next;
+  };
+
   return (
-    <>
+    <form
+      className="space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        onOpen();
+      }}
+    >
       <p>
         Cada punto del cielo tiene una "dirección", igual que la latitud y longitud en la Tierra.
         Escríbela y la cámara viaja hasta esa región.
@@ -451,7 +496,13 @@ function SearchContent() {
           <span className="text-xs font-medium uppercase tracking-[0.25em] text-sky-300">
             RA · Ascensión recta
           </span>
-          <input readOnly className={field} placeholder="210.80227°" />
+          <input
+            className={field}
+            inputMode="decimal"
+            placeholder="210.80227°"
+            value={ra}
+            onChange={(e) => update({ ra: e.target.value, dec })}
+          />
           <span className="mt-1.5 block text-xs leading-5 text-slate-400">
             Como la longitud: de 0° a 360° hacia el este.
           </span>
@@ -461,20 +512,40 @@ function SearchContent() {
           <span className="text-xs font-medium uppercase tracking-[0.25em] text-sky-300">
             Dec · Declinación
           </span>
-          <input readOnly className={field} placeholder="54.34895°" />
+          <input
+            className={field}
+            inputMode="decimal"
+            placeholder="54.34895°"
+            value={dec}
+            onChange={(e) => update({ ra, dec: e.target.value })}
+          />
           <span className="mt-1.5 block text-xs leading-5 text-slate-400">
             Como la latitud: de −90° a +90° desde el ecuador celeste.
           </span>
         </label>
       </div>
 
-      <button
-        type="button"
-        className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-      >
-        <Crosshair size={14} /> Ejemplo: Galaxia del Molinete (M101)
-      </button>
-    </>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="submit"
+          className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+        >
+          <Maximize2 size={16} />
+          Buscar
+        </button>
+        <button
+          type="button"
+          onClick={() => update({ ra: SEARCH_EXAMPLE.ra, dec: SEARCH_EXAMPLE.dec })}
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+        >
+          <Crosshair size={14} /> Ejemplo: M101
+        </button>
+      </div>
+
+      <p className="flex items-center gap-2 text-xs text-slate-500">
+        <MousePointerClick size={14} /> También puedes hacer clic en la pantalla del satélite.
+      </p>
+    </form>
   );
 }
 

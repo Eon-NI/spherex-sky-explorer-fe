@@ -104,7 +104,7 @@ export const STOPS: CameraStop[] = [
 ];
 
 /* ---------- Zoom hacia las pantallas que abren una página ---------- */
-export type ZoomTarget = 'timelapse' | 'spectral';
+export type ZoomTarget = 'timelapse' | 'search' | 'spectral';
 
 export const ZOOM_TARGETS: Record<
   ZoomTarget,
@@ -121,6 +121,11 @@ export const ZOOM_TARGETS: Record<
     center: facePoint(FACE.timelapse, BUS_APOTHEM + 0.05, 0.15),
     camera: facePoint(FACE.timelapse, BUS_APOTHEM + 0.5, 0.15),
     stop: STOPS.findIndex((s) => s.id === 'timelapse'),
+  },
+  search: {
+    center: facePoint(FACE.search, BUS_APOTHEM + 0.05, 0.3),
+    camera: facePoint(FACE.search, BUS_APOTHEM + 0.45, 0.3),
+    stop: STOPS.findIndex((s) => s.id === 'search'),
   },
   spectral: {
     center: facePoint(FACE.spectral, BUS_APOTHEM + 0.05, 0.3),

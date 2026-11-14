@@ -11,7 +11,7 @@ type PreloadState = {
  * Descarga y decodifica todas las imágenes antes de reproducir,
  * para que el timelapse no se trabe a mitad de la animación.
  */
-export function useFramePreloader(urls: string[]) {
+export function useFramePreloader(urls: string[], crossOrigin?: 'anonymous') {
   const [state, setState] = useState<PreloadState>({ urls: [], images: [], loaded: 0 });
 
   useEffect(() => {
@@ -24,6 +24,8 @@ export function useFramePreloader(urls: string[]) {
         (src) =>
           new Promise<HTMLImageElement>((resolve, reject) => {
             const img = new Image();
+            // necesario para leer píxeles (diferencia/apilado) de imágenes de otro dominio
+            if (crossOrigin) img.crossOrigin = crossOrigin;
             img.decoding = 'async';
             img.onload = () => {
               img
@@ -50,7 +52,7 @@ export function useFramePreloader(urls: string[]) {
     return () => {
       cancelled = true;
     };
-  }, [urls]);
+  }, [urls, crossOrigin]);
 
   // Si el estado pertenece a otra búsqueda, aún estamos cargando
   const current = state.urls === urls;

@@ -339,7 +339,14 @@ function Satellite({
       </FaceMount>
 
       <FaceMount angle={FACE.search}>
-        <Screen draw={drawSearch} controlsRef={controlsRef} size={[1, 0.5]} position={[0, 0.3, 0]} />
+        <Screen
+          draw={drawSearch}
+          controlsRef={controlsRef}
+          size={[1, 0.5]}
+          position={[0, 0.3, 0]}
+          canActivate={canOpen('search')}
+          onActivate={() => onOpenScreen('search')}
+        />
         <Keypad />
       </FaceMount>
 
