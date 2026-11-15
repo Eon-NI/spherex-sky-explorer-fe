@@ -8,12 +8,13 @@ import LanguageSwitcher from "../../../i18n/LanguageSwitcher";
 const navLink =
   "rounded-full px-3 py-2 transition-colors hover:bg-paper/10 sm:px-4";
 
-type NavItem = { key: "observatory" | "features" | "about"; to?: string; href?: string };
+type NavItem = { key: "observatory" | "features" | "about" | "references"; to?: string; href?: string };
 
 const links: NavItem[] = [
   { key: "observatory", to: "/observatorio" },
-  { key: "features", href: "#caracteristicas" },
-  { key: "about", href: "#about" },
+  { key: "features", href: "/#caracteristicas" },
+  { key: "about", href: "/#about" },
+  { key: "references", to: "/referencias" },
 ];
 
 export default function Header() {
@@ -30,14 +31,12 @@ export default function Header() {
 
   const item = (l: NavItem, className: string) => {
     const label = m.landing.nav[l.key];
-    return l.to ? (
-      <Link key={l.key} to={l.to} className={className} onClick={() => setOpen(false)}>
+    // Link también para las anclas ("/#about"): desde otra página vuelve a la landing
+    // sin recargar y LandingV2 hace el scroll a la sección
+    return (
+      <Link key={l.key} to={(l.to ?? l.href)!} className={className} onClick={() => setOpen(false)}>
         {label}
       </Link>
-    ) : (
-      <a key={l.key} href={l.href} className={className} onClick={() => setOpen(false)}>
-        {label}
-      </a>
     );
   };
 
@@ -50,16 +49,16 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Escritorio / tablet */}
-        <div className="hidden items-center gap-3 sm:flex">
+        {/* Escritorio */}
+        <div className="hidden items-center gap-3 lg:flex">
           <nav className="flex items-center gap-1 text-base font-semibold" aria-label={m.common.mainNav}>
             {links.map((l) => item(l, navLink))}
           </nav>
           <LanguageSwitcher />
         </div>
 
-        {/* Móvil: idioma + menú desplegable, así la barra nunca provoca scroll horizontal */}
-        <div className="flex items-center gap-2 sm:hidden">
+        {/* Móvil y tablet: idioma + menú desplegable, así la barra nunca provoca scroll horizontal */}
+        <div className="flex items-center gap-2 lg:hidden">
           <LanguageSwitcher />
           <button
             type="button"
@@ -78,7 +77,7 @@ export default function Header() {
         <nav
           id="mobile-nav"
           aria-label={m.common.mainNav}
-          className="flex flex-col gap-1 border-t border-paper/10 px-4 py-3 text-base font-semibold sm:hidden"
+          className="flex flex-col gap-1 border-t border-paper/10 px-4 py-3 text-base font-semibold lg:hidden"
         >
           {links.map((l) => item(l, "rounded-xl px-3 py-3 transition-colors hover:bg-paper/10"))}
         </nav>

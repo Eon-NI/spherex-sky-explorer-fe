@@ -15,7 +15,6 @@ import { useTimelapsePlayer } from '../timelapse_components/useTimelapsePlayer';
 import { formatDate, skyToUv, uvToSky } from '../timelapse_components/skyMath';
 import type { ChangeRecord, PointAction, SelectedPoint } from '../timelapse_components/types';
 import ActionsPanel, { type ViewMode } from './ActionsPanel';
-import { differenceImage, stackImage } from './imageOps';
 
 /* =========================================================
    Formulario, URL y validación
@@ -25,7 +24,7 @@ type FormValues = { ra: string; dec: string; fov: string; fovUnit: 'deg' | 'arcm
 const DEFAULT_FORM: FormValues = { ra: '210.80227', dec: '54.34895', fov: '0.1', fovUnit: 'deg' };
 const MISSION_START = '2025-05-01';
 const DETECTOR = 'D2';
-const MODES: ViewMode[] = ['single', 'blink', 'difference', 'stack'];
+const MODES: ViewMode[] = ['single', 'blink'];
 const RECORDS_KEY = 'eon:timelapse:changes'; // compartido con el Timelapse
 
 type ValidationError = 'ra' | 'dec' | 'fov';
@@ -141,54 +140,16 @@ export default function SearchModule() {
   const a = Math.min(epochA, Math.max(0, obsImages.length - 1));
   const b = Math.min(epochB, Math.max(0, obsImages.length - 1));
 
-  /* ---------- difference / stack (se calculan en el navegador) ---------- */
-  const computedKey = loaded && (mode === 'difference' || mode === 'stack') ? `${queryKey}|${mode}|${a}|${b}` : '';
-  const [computed, setComputed] = useState<{ key: string; url?: string; error?: string } | null>(null);
-
-  useEffect(() => {
-    if (!computedKey) return;
-    let cancelled = false;
-    let created: string | undefined;
-    const job = mode === 'difference' ? differenceImage(obsImages[a], obsImages[b]) : stackImage(obsImages);
-    job
-      .then((url) => {
-        created = url;
-        if (cancelled) URL.revokeObjectURL(url);
-        else setComputed({ key: computedKey, url });
-      })
-      .catch((e: Error) => {
-        if (cancelled) return;
-        setComputed({
-          key: computedKey,
-          error:
-            e.name === 'SecurityError' ? 'cors' : e.message || 'error',
-        });
-      });
-    return () => {
-      cancelled = true;
-      if (created) URL.revokeObjectURL(created);
-    };
-  }, [computedKey, mode, obsImages, a, b]);
-
-  const computedUrls = useMemo(
-    () => (computed?.key === computedKey && computed.url ? [computed.url] : []),
-    [computed, computedKey],
-  );
-  const computedPreload = useFramePreloader(computedUrls);
-
   /* ---------- lo que muestra el visor según la acción ---------- */
   const viewImages = useMemo(() => {
     if (!loaded) return [];
     if (mode === 'single') return [obsImages[a]];
-    if (mode === 'blink') return [obsImages[a], obsImages[b]];
-    return computedPreload.images;
-  }, [loaded, mode, obsImages, a, b, computedPreload.images]);
+    return [obsImages[a], obsImages[b]];
+  }, [loaded, mode, obsImages, a, b]);
 
   const player = useTimelapsePlayer(viewImages.length);
-  const computing = loaded && (mode === 'difference' || mode === 'stack') && viewImages.length === 0;
-  const computeError = computed?.key === computedKey ? computed.error : undefined;
 
-  const shownIndex = mode === 'blink' ? (player.index === 0 ? a : b) : mode === 'difference' ? b : a;
+  const shownIndex = mode === 'blink' ? (player.index === 0 ? a : b) : a;
   const observation = observations[shownIndex];
   const ready = viewImages.length > 0;
   const loading = fetching || preload.loading;
@@ -289,22 +250,12 @@ export default function SearchModule() {
       ? m.common.serverError
       : preload.error
         ? m.common.imageLoadError
-        : computeError === 'cors'
-          ? sm.corsError
-          : computeError ?? null;
+        : null;
   const modeLabel: Record<ViewMode, string> = {
     single: observation ? formatDate(observation.observationTime, loc) : '',
     blink: observation
       ? fmt(sm.labelBlink, { epoch: player.index === 0 ? 'A' : 'B', date: formatDate(observation.observationTime, loc) })
       : sm.actions.blink,
-    difference:
-      observations[a] && observations[b]
-        ? fmt(sm.labelDifference, {
-            b: formatDate(observations[b].observationTime, loc),
-            a: formatDate(observations[a].observationTime, loc),
-          })
-        : sm.actions.difference,
-    stack: fmt(sm.labelStack, { count: observations.length }),
   };
 
   return (
@@ -346,7 +297,7 @@ export default function SearchModule() {
                 </div>
               )}
 
-              {ready && observation && mode !== 'stack' && (
+              {ready && observation && (
                 <div className="pointer-events-none absolute bottom-4 left-4">
                   {observation.flags.length === 0 ? (
                     <span className="flex items-center gap-1.5 rounded-full bg-night/70 px-3 py-1 text-xs text-emerald-300 backdrop-blur">
@@ -393,19 +344,13 @@ export default function SearchModule() {
 
               {!ready && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-                  {loading || computing ? (
+                  {loading ? (
                     <>
                       <Hourglass size={34} className="animate-spin text-star [animation-duration:2.4s]" />
                       <p className="text-lg text-paper">
-                        {fetching
-                          ? sm.querying
-                          : computing
-                            ? mode === 'stack'
-                              ? sm.stacking
-                              : sm.differencing
-                            : sm.loading}
+                        {fetching ? sm.querying : sm.loading}
                       </p>
-                      {!fetching && !computing && preload.total > 0 && (
+                      {!fetching && preload.total > 0 && (
                         <p className="font-hud text-xs tabular-nums text-mist">
                           {preload.loaded} / {preload.total}
                         </p>

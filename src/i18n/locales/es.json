@@ -31,7 +31,8 @@
       "features": "Características",
       "about": "Acerca de",
       "openMenu": "Abrir menú",
-      "closeMenu": "Cerrar menú"
+      "closeMenu": "Cerrar menú", 
+      "references": "Referencias"
     },
     "hero": {
       "title": "EXPLORA EL COSMOS Y DESCUBRE NUEVOS MUNDOS A TRAVÉS DEL TIEMPO",
@@ -118,12 +119,13 @@
       "functions": "Funcionalidades",
       "about": "Acerca de EON",
       "backToTop": "Volver arriba"
+      , "references": "Referencias"
     }
   },
 
   "observatory": {
     "header": {
-      "back": "Volver a Inicio"
+      "back": "Volver a Inicio", "backObservatory": "Volver al Observatorio", "backObservatoryShort": "Observatorio"
     },
     "footer": {
       "ctaTitle": "Gracias por explorar el cielo con <hl>LOOK-EON</hl>.",
@@ -199,26 +201,17 @@
     "search": {
       "eyebrow": "Módulo · Search",
       "title": "Busca un punto de <hl>interés</hl>",
-      "text": "Compara las observaciones de una región con blink, difference o stack, y haz clic sobre un objeto para analizarlo.",
+      "text": "Compara las observaciones de una región con imagen o blink, y haz clic sobre un objeto para analizarlo.",
       "querying": "Buscando observaciones de SPHEREx…",
-      "stacking": "Apilando observaciones…",
-      "differencing": "Calculando la diferencia…",
       "loading": "Cargando imágenes…",
       "noObs": "Sin observaciones en esa región",
-      "corsError": "El servidor de imágenes debe permitir CORS para calcular la diferencia o el apilado.",
       "labelBlink": "Blink · {{epoch}} · {{date}}",
-      "labelDifference": "B − A · {{b}} − {{a}}",
-      "labelStack": "Stack · {{count}} observaciones",
       "actions": {
         "title": "Acciones",
         "single": "Imagen",
         "blink": "Blink",
-        "difference": "Difference",
-        "stack": "Stack",
         "singleHelp": "Muestra la observación de la época A.",
         "blinkHelp": "Alterna rápido entre A y B: lo que salta de sitio se está moviendo.",
-        "differenceHelp": "Resta A de B: en celeste lo que apareció o brilló más; en violeta lo que desapareció.",
-        "stackHelp": "Promedia las {{count}} observaciones: más profundidad y menos ruido; lo que se mueve se borra.",
         "epochA": "Época A",
         "epochB": "Época B",
         "pauseBlink": "Pausar blink",
@@ -357,5 +350,20 @@
   "minigame": {
     "line1": "EON © 2026. Proyecto de exploración astronómica.",
     "line2": "Explora el universo, descubre el tiempo."
+  }  ,"references": {
+    "eyebrow": "Referencias",
+    "title": "Referencias para explorar más",
+    "text": "Consulta fuentes externas seleccionadas para ampliar lo aprendido y profundizar en SPHEREx y la exploración del universo.",
+    "listAria": "Referencias externas",
+    "open": "Abrir referencia",
+    "newTab": "(se abre en una pestaña nueva)",
+    "count": "SPHEREx · {{count}} referencias",
+    "items": {
+      "spherex": { "title": "Misión SPHEREx", "source": "NASA", "description": "Conoce la misión de la NASA que mapeará el cielo en 102 bandas infrarrojas." },
+      "planetX": { "title": "Planeta X", "source": "NASA", "description": "Explora la hipótesis del misterioso planeta oculto en los confines del sistema solar." },
+      "coordinates": { "title": "Declinación y Ascensión Recta", "source": "NASA", "description": "Aprende cómo se ubican los objetos celestes usando coordenadas del cielo." },
+      "spectrum": { "title": "¿Qué es un espectro?", "source": "Video", "description": "Visualiza de forma sencilla cómo la luz se descompone y revela información del universo." }
+    }
   }
 }
+

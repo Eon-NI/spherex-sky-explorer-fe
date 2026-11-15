@@ -1,16 +1,14 @@
-import { Image as ImageIcon, Layers, Pause, Play, Repeat, SplitSquareHorizontal } from 'lucide-react';
+import { Image as ImageIcon, Pause, Play, Repeat } from 'lucide-react';
 import type { Observation } from '../../api/spherex';
 import { formatDate } from '../timelapse_components/skyMath';
 import { useI18n } from '../../i18n/useI18n';
 import { fmt } from '../../i18n/format';
 
-export type ViewMode = 'single' | 'blink' | 'difference' | 'stack';
+export type ViewMode = 'single' | 'blink';
 
 const MODES: { id: ViewMode; icon: typeof Repeat }[] = [
   { id: 'single', icon: ImageIcon },
   { id: 'blink', icon: Repeat },
-  { id: 'difference', icon: SplitSquareHorizontal },
-  { id: 'stack', icon: Layers },
 ];
 
 type ActionsPanelProps = {
@@ -45,13 +43,13 @@ export default function ActionsPanel({
   const t = m.modules.search.actions;
   const loc = m.common.dateLocale;
   const help = fmt(t[`${mode}Help`], { count: observations.length });
-  const usesB = mode === 'blink' || mode === 'difference';
+  const usesB = mode === 'blink';
 
   return (
     <div>
       <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{t.title}</p>
 
-      <div className="mt-3 grid grid-cols-4 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         {MODES.map(({ id, icon: Icon }) => (
           <button
             key={id}
@@ -86,40 +84,38 @@ export default function ActionsPanel({
         )}
       </div>
 
-      {mode !== 'stack' && (
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <label className="block">
-            <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{t.epochA}</span>
-            <select
-              className={selectClass}
-              value={epochA}
-              disabled={disabled}
-              onChange={(e) => onEpochA(Number(e.target.value))}
-            >
-              {observations.map((o, i) => (
-                <option key={o.id} value={i}>
-                  {formatDate(o.observationTime, loc)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={`block ${usesB ? '' : 'opacity-40'}`}>
-            <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{t.epochB}</span>
-            <select
-              className={selectClass}
-              value={epochB}
-              disabled={disabled || !usesB}
-              onChange={(e) => onEpochB(Number(e.target.value))}
-            >
-              {observations.map((o, i) => (
-                <option key={o.id} value={i}>
-                  {formatDate(o.observationTime, loc)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      )}
+      <div className="mt-3 grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{t.epochA}</span>
+          <select
+            className={selectClass}
+            value={epochA}
+            disabled={disabled}
+            onChange={(e) => onEpochA(Number(e.target.value))}
+          >
+            {observations.map((o, i) => (
+              <option key={o.id} value={i}>
+                {formatDate(o.observationTime, loc)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={`block ${usesB ? '' : 'opacity-40'}`}>
+          <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{t.epochB}</span>
+          <select
+            className={selectClass}
+            value={epochB}
+            disabled={disabled || !usesB}
+            onChange={(e) => onEpochB(Number(e.target.value))}
+          >
+            {observations.map((o, i) => (
+              <option key={o.id} value={i}>
+                {formatDate(o.observationTime, loc)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
     </div>
   );
 }
