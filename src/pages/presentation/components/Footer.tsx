@@ -15,10 +15,11 @@ const EXPLORE = [
     { key: 'spectral', to: '/spectral' },
 ] as const;
 
+// rutas con "/" delante para que las anclas funcionen también desde /referencias
 const PROJECT = [
-    { key: 'features', href: '#caracteristicas' },
-    { key: 'functions', href: '#servicios' },
-    { key: 'about', href: '#about' },
+    { key: 'features', href: '/#caracteristicas' },
+    { key: 'functions', href: '/#servicios' },
+    { key: 'about', href: '/#about' },
 ] as const;
 
 export default function Footer() {
@@ -72,11 +73,16 @@ export default function Footer() {
                     <ul className="mt-4 flex flex-col gap-3">
                         {PROJECT.map((l) => (
                             <li key={l.href}>
-                                <a href={l.href} className={footerLink}>
+                                <Link to={l.href} className={footerLink}>
                                     {f[l.key]}
-                                </a>
+                                </Link>
                             </li>
                         ))}
+                        <li>
+                            <Link to="/referencias" className={footerLink}>
+                                {f.references}
+                            </Link>
+                        </li>
                     </ul>
                 </nav>
             </div>

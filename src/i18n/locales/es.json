@@ -2,7 +2,7 @@
   "common": {
     "dateLocale": "es",
     "logoAlt": "EON",
-    "homeAria": "Ir al inicio de LOOK-EON",
+    "homeAria": "Ir al inicio de Aetheris",
     "mainNav": "Navegación principal",
     "simulatedData": "Datos simulados",
     "copyright": "EON © {{year}}. Proyecto de exploración astronómica.",
@@ -31,7 +31,8 @@
       "features": "Características",
       "about": "Acerca de",
       "openMenu": "Abrir menú",
-      "closeMenu": "Cerrar menú"
+      "closeMenu": "Cerrar menú", 
+      "references": "Referencias"
     },
     "hero": {
       "title": "EXPLORA EL COSMOS Y DESCUBRE NUEVOS MUNDOS A TRAVÉS DEL TIEMPO",
@@ -58,7 +59,7 @@
       }
     },
     "info": {
-      "title": "Conoce el universo detrás de LOOK-EON",
+      "title": "Conoce el universo detrás de Aetheris",
       "spherex": {
         "title": "¿Qué es la misión SPHEREx?",
         "text": "Lanzada en <hl>2025</hl>, SPHEREx es el observatorio espacial de la NASA que escanea la totalidad del cielo <hl>cada seis meses</hl>. A diferencia de los telescopios convencionales, observa el cosmos en <hl>102 bandas</hl> de luz infrarroja cercana, permitiendo detectar la huella química de moléculas esenciales como agua, carbono e hidrógeno en más de mil millones de objetos (desde galaxias lejanas y cuásares hasta cometas cercanos).",
@@ -67,7 +68,7 @@
       },
       "planetX": {
         "title": "En la búsqueda del Planeta X y mundos ocultos",
-        "text": "En los confines de nuestro sistema solar y más allá, existen cuerpos celestes demasiado fríos y oscuros para verse a simple vista: desde enanas marrones (cuerpos masivos a medio camino entre un planeta gigante y una estrella) hasta el hipotético Planeta X. Aunque apenas emiten luz visible, brillan en el espectro infrarrojo de SPHEREx y delatan su presencia al desplazarse lentamente entre una captura temporal y otra. Con LOOK-EON, cualquier persona puede rastrear estas anomalías en movimiento.",
+        "text": "En los confines de nuestro sistema solar y más allá, existen cuerpos celestes demasiado fríos y oscuros para verse a simple vista: desde enanas marrones (cuerpos masivos a medio camino entre un planeta gigante y una estrella) hasta el hipotético Planeta X. Aunque apenas emiten luz visible, brillan en el espectro infrarrojo de SPHEREx y delatan su presencia al desplazarse lentamente entre una captura temporal y otra. Con Aetheris, cualquier persona puede rastrear estas anomalías en movimiento.",
         "imageAlt": "Campo estelar con un objeto tenue que brilla en infrarrojo",
         "caption": "Ilustración: el objeto marcado representa un mundo hipotético; no es una observación real.",
         "chip": "Infrarrojo · objeto en movimiento"
@@ -75,7 +76,7 @@
     },
     "features": {
       "title": "Mucho más que una galería",
-      "subtitle": "Descubre diferentes formas de explorar el universo con LOOK-EON.",
+      "subtitle": "Descubre diferentes formas de explorar el universo con Aetheris.",
       "timelapse": {
         "label": "Vista por Tiempo",
         "title": "1. Evolución Temporal (Timelapse)",
@@ -98,7 +99,7 @@
     "about": {
       "title": "Somos EON",
       "lead": "Somos un equipo de estudiantes apasionados por la tecnología y la astronomía.",
-      "text": "A través de LOOK-EON buscamos acercar la exploración astronómica a los usuarios, permitiéndoles descubrir el cielo y explorar sus cambios a través del tiempo.",
+      "text": "A través de Aetheris buscamos acercar la exploración astronómica a los usuarios, permitiéndoles descubrir el cielo y explorar sus cambios a través del tiempo.",
       "logoAlt": "Logo EON",
       "pillars": {
         "astronomy": { "title": "Astronomía", "text": "Nos mueve la curiosidad por lo que el cielo aún esconde." },
@@ -108,7 +109,7 @@
     },
     "footer": {
       "ctaTitle": "El próximo hallazgo puede ser <hl>tuyo</hl>.",
-      "ctaText": "Compara épocas, busca por coordenadas y analiza 102 bandas infrarrojas. Explora el universo con LOOK-EON.",
+      "ctaText": "Compara épocas, busca por coordenadas y analiza 102 bandas infrarrojas. Explora el universo con Aetheris.",
       "ctaButton": "Iniciar exploración en el Observatorio",
       "tagline": "Proyecto de exploración astronómica con datos de la misión SPHEREx de la NASA.",
       "explore": "Explorar",
@@ -118,15 +119,16 @@
       "functions": "Funcionalidades",
       "about": "Acerca de EON",
       "backToTop": "Volver arriba"
+      , "references": "Referencias"
     }
   },
 
   "observatory": {
     "header": {
-      "back": "Volver a Inicio"
+      "back": "Volver a Inicio", "backObservatory": "Volver al Observatorio", "backObservatoryShort": "Observatorio"
     },
     "footer": {
-      "ctaTitle": "Gracias por explorar el cielo con <hl>LOOK-EON</hl>.",
+      "ctaTitle": "Gracias por explorar el cielo con <hl>Aetheris</hl>.",
       "ctaText": "Vuelve al inicio para conocer más sobre la misión SPHEREx, el Planeta X y el equipo detrás del proyecto.",
       "ctaButton": "Regresar al inicio",
       "modulesNav": "Módulos del Observatorio"
@@ -199,26 +201,17 @@
     "search": {
       "eyebrow": "Módulo · Search",
       "title": "Busca un punto de <hl>interés</hl>",
-      "text": "Compara las observaciones de una región con blink, difference o stack, y haz clic sobre un objeto para analizarlo.",
+      "text": "Compara las observaciones de una región con imagen o blink, y haz clic sobre un objeto para analizarlo.",
       "querying": "Buscando observaciones de SPHEREx…",
-      "stacking": "Apilando observaciones…",
-      "differencing": "Calculando la diferencia…",
       "loading": "Cargando imágenes…",
       "noObs": "Sin observaciones en esa región",
-      "corsError": "El servidor de imágenes debe permitir CORS para calcular la diferencia o el apilado.",
       "labelBlink": "Blink · {{epoch}} · {{date}}",
-      "labelDifference": "B − A · {{b}} − {{a}}",
-      "labelStack": "Stack · {{count}} observaciones",
       "actions": {
         "title": "Acciones",
         "single": "Imagen",
         "blink": "Blink",
-        "difference": "Difference",
-        "stack": "Stack",
         "singleHelp": "Muestra la observación de la época A.",
         "blinkHelp": "Alterna rápido entre A y B: lo que salta de sitio se está moviendo.",
-        "differenceHelp": "Resta A de B: en celeste lo que apareció o brilló más; en violeta lo que desapareció.",
-        "stackHelp": "Promedia las {{count}} observaciones: más profundidad y menos ruido; lo que se mueve se borra.",
         "epochA": "Época A",
         "epochB": "Época B",
         "pauseBlink": "Pausar blink",
@@ -357,5 +350,20 @@
   "minigame": {
     "line1": "EON © 2026. Proyecto de exploración astronómica.",
     "line2": "Explora el universo, descubre el tiempo."
+  }  ,"references": {
+    "eyebrow": "Referencias",
+    "title": "Referencias para explorar más",
+    "text": "Consulta fuentes externas seleccionadas para ampliar lo aprendido y profundizar en SPHEREx y la exploración del universo.",
+    "listAria": "Referencias externas",
+    "open": "Abrir referencia",
+    "newTab": "(se abre en una pestaña nueva)",
+    "count": "SPHEREx · {{count}} referencias",
+    "items": {
+      "spherex": { "title": "Misión SPHEREx", "source": "NASA", "description": "Conoce la misión de la NASA que mapeará el cielo en 102 bandas infrarrojas." },
+      "planetX": { "title": "Planeta X", "source": "NASA", "description": "Explora la hipótesis del misterioso planeta oculto en los confines del sistema solar." },
+      "coordinates": { "title": "Declinación y Ascensión Recta", "source": "NASA", "description": "Aprende cómo se ubican los objetos celestes usando coordenadas del cielo." },
+      "spectrum": { "title": "¿Qué es un espectro?", "source": "Video", "description": "Visualiza de forma sencilla cómo la luz se descompone y revela información del universo." }
+    }
   }
 }
+

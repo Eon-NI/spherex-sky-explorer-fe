@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router';
 import { MotionConfig, motion } from 'motion/react';
 
 import Header from './components/Header';
@@ -18,6 +20,18 @@ import planetXImage from '../../assets/Plantex.webp';
 export default function LandingV2() {
     const { m } = useI18n();
     const info = m.landing.info;
+    const { hash } = useLocation();
+
+    // al llegar con "/#about" o "/#caracteristicas" (p. ej. desde /referencias) baja a esa sección
+    useEffect(() => {
+        if (!hash) return;
+        const frame = requestAnimationFrame(() => {
+            document.getElementById(hash.slice(1))?.scrollIntoView({
+                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            });
+        });
+        return () => cancelAnimationFrame(frame);
+    }, [hash]);
     return (
         // reducedMotion="user": con prefers-reduced-motion se quitan desplazamientos y escalas
         <MotionConfig reducedMotion="user">
