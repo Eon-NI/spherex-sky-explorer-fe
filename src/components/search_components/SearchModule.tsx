@@ -5,7 +5,7 @@ import { useI18n } from '../../i18n/useI18n';
 import { fmt, rich } from '../../i18n/format';
 import { AlertTriangle, CheckCircle2, Hourglass, MousePointerClick, Satellite } from 'lucide-react';
 
-import { fetchObservations, type ObservationQuery, type ObservationsResponse } from '../../api/spherex';
+import { discoverSearchProducts, prepareSearchProducts, type TemporalProduct, type ObservationQuery, type ObservationsResponse } from '../../api/spherex';
 import TimelapseViewer from '../timelapse_components/TimelapseViewer';
 import PointActionsMenu from '../timelapse_components/PointActionsMenu';
 import PointDetailsPanel from '../timelapse_components/PointDetailsPanel';
@@ -14,6 +14,7 @@ import { useFramePreloader } from '../timelapse_components/useFramePreloader';
 import { useTimelapsePlayer } from '../timelapse_components/useTimelapsePlayer';
 import { formatDate, skyToUv, uvToSky } from '../timelapse_components/skyMath';
 import type { ChangeRecord, PointAction, SelectedPoint } from '../timelapse_components/types';
+import { catalogueObservations, resolveEpochs, currentSearchResult } from './epochs';
 import ActionsPanel, { type ViewMode } from './ActionsPanel';
 
 /* =========================================================
@@ -28,7 +29,7 @@ const MODES: ViewMode[] = ['single', 'blink'];
 const RECORDS_KEY = 'eon:timelapse:changes'; // compartido con el Timelapse
 
 type ValidationError = 'ra' | 'dec' | 'fov';
-const MAX_FOV = 2;
+const MAX_FOV = 0.2;
 
 function validate(f: FormValues): { query?: ObservationQuery; error?: ValidationError } {
   const ra = Number(f.ra.replace(',', '.'));
@@ -59,7 +60,6 @@ export default function SearchModule() {
   const { m } = useI18n();
   const sm = m.modules.search;
   const fl = m.modules.fields;
-  const loc = m.common.dateLocale;
   const [searchParams, setSearchParams] = useSearchParams();
   const [initial] = useState(() => {
     const form: FormValues = {
@@ -85,6 +85,8 @@ export default function SearchModule() {
     initial.auto ? (validate(initial.form).query ?? null) : null,
   );
   const queryKey = query ? JSON.stringify(query) : '';
+  const [catalogue, setCatalogue] = useState<{ key: string; products?: TemporalProduct[]; error?: string } | null>(null);
+  const [processing, setProcessing] = useState('');
   const [result, setResult] = useState<{ key: string; data?: ObservationsResponse; error?: string } | null>(null);
   const pendingPoint = useRef(initial.point);
 
@@ -102,11 +104,13 @@ export default function SearchModule() {
   useEffect(() => {
     if (!query) return;
     const ctrl = new AbortController();
-    fetchObservations(query, ctrl.signal)
+    setProcessing('');
+    discoverSearchProducts(query, ctrl.signal)
       .then((data) => {
-        setResult({ key: queryKey, data });
+        if (ctrl.signal.aborted) return;
+        setCatalogue({ key: queryKey, products: data });
         setEpochA(0);
-        setEpochB(Math.max(0, data.observations.length - 1));
+        setEpochB(Math.max(0, data.length - 1));
         const p = pendingPoint.current;
         if (p) {
           const { u, v } = skyToUv(p.ra, p.dec, query.ra, query.dec, query.fovDeg);
@@ -118,39 +122,48 @@ export default function SearchModule() {
         }
       })
       .catch((e: Error) => {
-        if (e.name !== 'AbortError')
-          setResult({ key: queryKey, error: e.message || 'server' });
+        if (!ctrl.signal.aborted)
+          setCatalogue({ key: queryKey, error: e.message || 'server' });
       });
     return () => ctrl.abort();
   }, [query, queryKey]);
 
-  const current = result?.key === queryKey ? result : null;
-  const fetching = !!query && !current;
-  const observations = useMemo(
-    () =>
-      [...(current?.data?.observations ?? [])].sort(
-        (a, b) => new Date(a.observationTime).getTime() - new Date(b.observationTime).getTime(),
-      ),
-    [current],
-  );
-  const urls = useMemo(() => observations.map((o) => o.imageUrl), [observations]);
+  const activeCatalogue = currentSearchResult(catalogue, queryKey);
+  const products = useMemo(() => activeCatalogue?.products ?? [], [activeCatalogue]);
+  const observations = useMemo(() => catalogueObservations(products), [products]);
+  const { a, b } = resolveEpochs(observations.length, epochA, epochB);
+  const selectedProducts = useMemo(() => {
+    if (a < 0 || (mode === 'blink' && b < 0)) return [];
+    return mode === 'single' ? [products[a]] : [products[a], products[b]];
+  }, [products, mode, a, b]);
+  const preparationKey = JSON.stringify([queryKey, selectedProducts.map(p => p.product_id)]);
+  useEffect(() => {
+    if (!query || !selectedProducts.length) return;
+    const ctrl = new AbortController();
+    setProcessing('');
+    prepareSearchProducts(query, selectedProducts, ctrl.signal, status => {
+      if (!ctrl.signal.aborted) setProcessing(status);
+    }).then(data => {
+      if (!ctrl.signal.aborted) setResult({ key: preparationKey, data });
+    }).catch((e: Error) => {
+      if (!ctrl.signal.aborted) setResult({ key: preparationKey, error: e.message });
+    });
+    return () => ctrl.abort();
+  }, [query, selectedProducts, preparationKey]);
+  const current = currentSearchResult(result, preparationKey);
+  const fetching = !!query && (!activeCatalogue || (selectedProducts.length > 0 && !current));
+  const prepared = current?.data?.observations ?? [];
+  const urls = useMemo(() => selectedProducts.map(p =>
+    current?.data?.observations.find(o => o.id === p.product_id)?.imageUrl ?? '').filter(Boolean),
+  [current, selectedProducts]);
   const preload = useFramePreloader(urls, 'anonymous');
   const obsImages = preload.images;
-  const loaded = obsImages.length > 0;
-  const a = Math.min(epochA, Math.max(0, obsImages.length - 1));
-  const b = Math.min(epochB, Math.max(0, obsImages.length - 1));
-
-  /* ---------- lo que muestra el visor según la acción ---------- */
-  const viewImages = useMemo(() => {
-    if (!loaded) return [];
-    if (mode === 'single') return [obsImages[a]];
-    return [obsImages[a], obsImages[b]];
-  }, [loaded, mode, obsImages, a, b]);
+  const viewImages = obsImages;
 
   const player = useTimelapsePlayer(viewImages.length);
 
   const shownIndex = mode === 'blink' ? (player.index === 0 ? a : b) : a;
-  const observation = observations[shownIndex];
+  const observation = prepared.find(o => o.id === observations[shownIndex]?.id);
   const ready = viewImages.length > 0;
   const loading = fetching || preload.loading;
 
@@ -207,6 +220,10 @@ export default function SearchModule() {
     setAction(null);
     setZoom(1);
     pendingPoint.current = undefined;
+    setCatalogue(null);
+    setResult(null);
+    setEpochA(0);
+    setEpochB(0);
     setQuery(q);
     setSearchParams(
       { ra: String(q.ra), dec: String(q.dec), fov: String(q.fovDeg), mode },
@@ -246,15 +263,15 @@ export default function SearchModule() {
     ? formError === 'check'
       ? m.common.checkData
       : fmt(m.modules.validation[formError], { max: MAX_FOV })
-    : current?.error
+    : current?.error || activeCatalogue?.error
       ? m.common.serverError
       : preload.error
         ? m.common.imageLoadError
         : null;
   const modeLabel: Record<ViewMode, string> = {
-    single: observation ? formatDate(observation.observationTime, loc) : '',
+    single: observation ? formatDate(observation.observationTime) : '',
     blink: observation
-      ? fmt(sm.labelBlink, { epoch: player.index === 0 ? 'A' : 'B', date: formatDate(observation.observationTime, loc) })
+      ? fmt(sm.labelBlink, { epoch: player.index === 0 ? 'A' : 'B', date: formatDate(observation.observationTime) })
       : sm.actions.blink,
   };
 
@@ -348,7 +365,9 @@ export default function SearchModule() {
                     <>
                       <Hourglass size={34} className="animate-spin text-star [animation-duration:2.4s]" />
                       <p className="text-lg text-paper">
-                        {fetching ? sm.querying : sm.loading}
+                        {fetching
+                          ? (processing.startsWith('running') ? m.modules.timelapse.preparing : sm.querying)
+                          : sm.loading}
                       </p>
                       {!fetching && preload.total > 0 && (
                         <p className="font-hud text-xs tabular-nums text-mist">
@@ -356,10 +375,10 @@ export default function SearchModule() {
                         </p>
                       )}
                     </>
-                  ) : current?.data && observations.length === 0 ? (
+                  ) : activeCatalogue?.products && (observations.length === 0 || (mode === 'blink' && b < 0)) ? (
                     <>
                       <Satellite size={34} className="text-mist/70" />
-                      <p className="text-lg text-paper">{sm.noObs}</p>
+                      <p className="text-lg text-paper">{observations.length === 0 ? sm.noObs : sm.actions.blinkUnavailable}</p>
                     </>
                   ) : (
                     <>
@@ -489,9 +508,9 @@ export default function SearchModule() {
                 observations={observations}
                 epochA={a}
                 epochB={b}
-                onEpochA={setEpochA}
-                onEpochB={setEpochB}
-                disabled={!loaded}
+                onEpochA={i => { setEpochA(i); if (i === epochB && observations.length > 1) setEpochB((i + 1) % observations.length); }}
+                onEpochB={i => { if (i !== epochA) setEpochB(i); }}
+                disabled={!observations.length}
                 blinkPlaying={player.playing}
                 onToggleBlink={() => {
                   if (player.playing) player.pause();

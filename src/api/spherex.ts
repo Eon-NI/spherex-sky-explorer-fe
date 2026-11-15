@@ -1,4 +1,4 @@
-import { mockFetchObservations } from './spherexMock';
+
 
 /* =========================================================
    Tipos del contrato con el backend (Django)
@@ -110,31 +110,126 @@ export type SpectrumResponse = {
 /* =========================================================
    Cliente
    ========================================================= */
-const API_URL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:8000';
+export const USE_MOCK = false;
 
-/** Mientras el backend no esté listo se usan datos simulados. Pon VITE_USE_MOCK=false para usar la API real. */
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
+const OBSERVATION_API_URL = import.meta.env.VITE_OBSERVATION_API_URL ?? 'http://localhost:8001';
+const JOBS_API_URL = import.meta.env.VITE_JOBS_API_URL ?? 'http://localhost:8004';
 
-async function getJson<T>(
-  path: string,
-  params: Record<string, string | number>,
-  signal?: AbortSignal,
-): Promise<T> {
-  const url = new URL(path, API_URL);
-  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
-  const res = await fetch(url, { signal });
-  if (!res.ok) throw new Error(`Error ${res.status} al consultar ${path}`);
-  return (await res.json()) as T;
+export type TemporalProduct = { product_id: string; time_bounds_lower: number; detector: string };
+type Frame = { index: number; product_id: string; timestamp: string; object_key: string };
+type FrameMetadata = { wavelength_um: number; bandwidth_um: number };
+type TimelapseStatus = {
+  job_id: string; status: 'pending' | 'running' | 'completed' | 'failed';
+  error: string | null; progress: number | null;
+  result: { job_id: string; status: string; frames: Frame[];
+    provenance: { observations: FrameMetadata[]; warning: string } } | null;
+  delivery: { index: number; url: string }[];
+};
+
+/** Select unique real acquisition times, including both ends when maximum=2. */
+export function selectTemporalProducts(products: TemporalProduct[], maximum: number): TemporalProduct[] {
+  const ordered = [...products].sort((a, b) => a.time_bounds_lower - b.time_bounds_lower || a.product_id.localeCompare(b.product_id));
+  const unique = ordered.filter((p, i) => i === 0 || p.time_bounds_lower !== ordered[i - 1].time_bounds_lower);
+  if (unique.length <= maximum) return unique;
+  if (maximum === 1) return [unique[0]];
+  return Array.from({ length: maximum }, (_, i) => unique[Math.round(i * (unique.length - 1) / (maximum - 1))]);
 }
 
-/** GET /api/observations?ra=&dec=&fov=&start=&end=&detector= */
-export function fetchObservations(q: ObservationQuery, signal?: AbortSignal) {
-  if (USE_MOCK) return mockFetchObservations(q, signal);
-  return getJson<ObservationsResponse>(
-    '/api/observations',
-    { ra: q.ra, dec: q.dec, fov: q.fovDeg, start: q.start, end: q.end, detector: q.detector },
-    signal,
-  );
+function temporalFetch(url: URL, init: RequestInit = {}) {
+  const timeout = AbortSignal.timeout(90000);
+  return fetch(url, { ...init, signal: init.signal ? AbortSignal.any([init.signal, timeout]) : timeout });
+}
+
+async function checkedJson<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({})) as { detail?: string };
+    throw new Error(error.detail ?? `HTTP ${response.status}`);
+  }
+  return response.json() as Promise<T>;
+}
+
+/** Real BE-01 discovery -> BE-03 orchestration -> BE-02 frames -> public delivery. */
+export async function fetchObservations(q: ObservationQuery, signal?: AbortSignal,
+  maximum = 2, onProgress?: (status: string) => void): Promise<ObservationsResponse> {
+  if (q.detector === 'All') throw new Error('Select one detector for a comparable temporal sequence.');
+  if (q.fovDeg > 0.2) throw new Error('Maximum temporal field size is 0.2 degrees.');
+  const detector = `SPHEREx-${q.detector}`;
+  const url = new URL('/api/v1/observations/temporal/', OBSERVATION_API_URL);
+  Object.entries({ ra_deg: q.ra, dec_deg: q.dec, size_deg: q.fovDeg, detector, limit: 100 })
+    .forEach(([key, value]) => url.searchParams.set(key, String(value)));
+  const found = await checkedJson<{ results: TemporalProduct[] }>(await temporalFetch(url, { signal }));
+  const start = Date.parse(q.start + 'T00:00:00Z');
+  const end = Date.parse(q.end + 'T00:00:00Z') + 86400000;
+  const selected = selectTemporalProducts(found.results.filter(p => {
+    const time = (p.time_bounds_lower - 40587) * 86400000;
+    return Number.isFinite(time) && p.detector === detector && time >= start && time < end;
+  }), maximum);
+  if (!selected.length) throw new Error('No real observations in the selected date interval.');
+  return prepareSearchProducts(q, selected, signal, onProgress);
+}
+
+/** Prepare selected products together to retain the backend common grid and scale. */
+export async function prepareSearchProducts(q: ObservationQuery, selected: TemporalProduct[], signal?: AbortSignal,
+  onProgress?: (status: string) => void): Promise<ObservationsResponse> {
+  const detector = `SPHEREx-${q.detector}`;
+  if (!selected.length || new Set(selected.map(p => p.product_id)).size !== selected.length)
+    throw new Error('Select distinct real observations.');
+  const submitted = await checkedJson<{ job_id: string; status_url: string }>(await temporalFetch(
+    new URL('/api/v1/timelapses/', JOBS_API_URL), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal,
+      body: JSON.stringify({ product_ids: selected.map(p => p.product_id), ra_deg: q.ra,
+        dec_deg: q.dec, size_deg: q.fovDeg, detector }),
+    }));
+  const deadline = Date.now() + 480000;
+  while (Date.now() < deadline) {
+    const job = await checkedJson<TimelapseStatus>(await temporalFetch(new URL(submitted.status_url, JOBS_API_URL), { signal }));
+    onProgress?.(job.progress == null ? job.status : `${job.status} ${job.progress}%`);
+    if (job.status === 'failed') throw new Error(job.error ?? 'Scientific processing failed.');
+    if (job.status === 'completed' && job.result) {
+      const result = job.result;
+      if (result.job_id !== submitted.job_id || result.status !== 'completed') throw new Error('Invalid processing manifest.');
+      if (result.frames.length !== selected.length || new Set(result.frames.map(f => f.product_id)).size !== selected.length)
+        throw new Error('Incomplete or duplicate processing frames.');
+      return { target: { ra: q.ra, dec: q.dec, fovDeg: q.fovDeg }, observations: result.frames.map((frame, i) => {
+        if (!selected.some(p => p.product_id === frame.product_id) || typeof frame.timestamp !== 'string' ||
+            !/(Z|[+-]\d{2}:\d{2})$/.test(frame.timestamp) || !Number.isFinite(Date.parse(frame.timestamp)))
+          throw new Error('Unexpected frame product or missing acquisition timestamp.');
+        const meta = result.provenance.observations[i];
+        const delivery = job.delivery.find(d => d.index === frame.index);
+        if (!delivery || !meta || !Number.isFinite(meta.wavelength_um) || !Number.isFinite(meta.bandwidth_um))
+          throw new Error('Missing frame delivery or scientific metadata.');
+        return { id: frame.product_id, observationTime: frame.timestamp, detector: q.detector,
+          wavelengthMin: meta.wavelength_um - meta.bandwidth_um / 2,
+          wavelengthMax: meta.wavelength_um + meta.bandwidth_um / 2,
+          imageUrl: new URL(delivery.url, JOBS_API_URL).href,
+          flags: [result.provenance.warning], dataRelease: 'SPHEREx' };
+      }) };
+    }
+    await waitWithAbort(2000, signal);
+  }
+  throw new Error('Temporal processing timed out; the existing job was not resubmitted.');
+}
+
+/** Search catalogue: preserve distinct products even when acquisition times coincide. */
+export async function discoverSearchProducts(q: ObservationQuery, signal?: AbortSignal): Promise<TemporalProduct[]> {
+  if (q.detector === 'All' || q.fovDeg > 0.2) throw new Error('Invalid temporal geometry or detector.');
+  const detector = `SPHEREx-${q.detector}`;
+  const url = new URL('/api/v1/observations/temporal/', OBSERVATION_API_URL);
+  Object.entries({ ra_deg: q.ra, dec_deg: q.dec, size_deg: q.fovDeg, detector, limit: 100 })
+    .forEach(([key, value]) => url.searchParams.set(key, String(value)));
+  const found = await checkedJson<{ results: TemporalProduct[] }>(await temporalFetch(url, { signal }));
+  if (!Array.isArray(found.results)) throw new Error('Missing temporal discovery results.');
+  const start = Date.parse(q.start + 'T00:00:00Z');
+  const end = Date.parse(q.end + 'T00:00:00Z') + 86400000;
+  const products = found.results.filter(p => {
+    if (typeof p.product_id !== 'string' || !p.product_id.trim() ||
+        typeof p.time_bounds_lower !== 'number' || !Number.isFinite(p.time_bounds_lower))
+      throw new Error('Missing temporal product identifier or acquisition MJD.');
+    const time = (p.time_bounds_lower - 40587) * 86400000;
+    if (!Number.isFinite(new Date(time).getTime())) throw new Error('Invalid acquisition MJD.');
+    return p.detector === detector && time >= start && time < end;
+  }).sort((a, b) => a.time_bounds_lower - b.time_bounds_lower || a.product_id.localeCompare(b.product_id));
+  return products.filter((p, i) => products.findIndex(other => other.product_id === p.product_id) === i);
 }
 
 const SPECTRAL_API_URL = import.meta.env.VITE_SPECTRAL_API_URL ?? 'http://localhost:8003';

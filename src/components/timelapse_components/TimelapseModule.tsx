@@ -48,7 +48,7 @@ function readUrl(sp: URLSearchParams) {
     fov: get('fov') ?? DEFAULT_FORM.fov,
     start: get('start') ?? DEFAULT_FORM.start,
     end: get('end') ?? DEFAULT_FORM.end,
-    detector: det && DETECTORS.some((d) => d.id === det) ? det : DEFAULT_FORM.detector,
+    detector: det && det !== 'All' && DETECTORS.some((d) => d.id === det) ? det : DEFAULT_FORM.detector,
   };
   const pra = Number(get('pra'));
   const pdec = Number(get('pdec'));
@@ -63,7 +63,7 @@ function readUrl(sp: URLSearchParams) {
 }
 
 type ValidationError = 'ra' | 'dec' | 'fov' | 'dates';
-const MAX_FOV = 2;
+const MAX_FOV = 0.2;
 
 function validate(f: SearchFormValues): { query?: ObservationQuery; error?: ValidationError } {
   const ra = Number(f.ra.replace(',', '.'));
@@ -103,6 +103,7 @@ export default function TimelapseModule() {
     initial.auto ? (validate(initial.form).query ?? null) : null,
   );
   const queryKey = query ? JSON.stringify(query) : '';
+  const [processing, setProcessing] = useState('');
   const [result, setResult] = useState<{ key: string; data?: ObservationsResponse; error?: string } | null>(null);
 
   // frame y punto que vienen de un enlace compartido
@@ -123,7 +124,8 @@ export default function TimelapseModule() {
   useEffect(() => {
     if (!query) return;
     const ctrl = new AbortController();
-    fetchObservations(query, ctrl.signal)
+    setProcessing('');
+    fetchObservations(query, ctrl.signal, 5, status => { if (!ctrl.signal.aborted) setProcessing(status); })
       .then((data) => {
         setResult({ key: queryKey, data });
         const p = pending.current.point;
@@ -154,7 +156,7 @@ export default function TimelapseModule() {
     [current],
   );
   const urls = useMemo(() => observations.map((o) => o.imageUrl), [observations]);
-  const preload = useFramePreloader(urls);
+  const preload = useFramePreloader(urls, 'anonymous');
   const player = useTimelapsePlayer(preload.images.length);
   const { jumpTo } = player;
   const loading = fetching || preload.loading;
@@ -301,7 +303,7 @@ export default function TimelapseModule() {
               {ready && observation && (
                 <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap gap-2">
                   <span className="font-hud rounded-full bg-night/70 px-3 py-1 text-sm tabular-nums text-paper backdrop-blur">
-                    {formatDate(observation.observationTime, m.common.dateLocale)}
+                    {formatDate(observation.observationTime)}
                   </span>
                   <span className="rounded-full bg-night/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-star backdrop-blur">
                     {observation.detector}
@@ -340,7 +342,7 @@ export default function TimelapseModule() {
                     <>
                       <Hourglass size={34} className="animate-spin text-star [animation-duration:2.4s]" />
                       <p className="text-lg text-paper">
-                        {fetching ? tm.querying : tm.preparing}
+                        {fetching && !processing.startsWith('running') ? tm.querying : tm.preparing}
                       </p>
                       {!fetching && preload.total > 0 && (
                         <div className="w-56">

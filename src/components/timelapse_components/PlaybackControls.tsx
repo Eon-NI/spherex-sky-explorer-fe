@@ -62,14 +62,13 @@ export function Timeline({
   onSeek,
 }: Pick<PlaybackControlsProps, 'observations' | 'index' | 'disabled' | 'onSeek'>) {
   const { m } = useI18n();
-  const loc = m.common.dateLocale;
   const n = observations.length;
   const current = observations[index];
 
   return (
     <div className="flex items-center gap-4">
-      <span className="font-hud hidden w-24 shrink-0 text-xs tabular-nums text-mist sm:block">
-        {n ? formatDate(observations[0].observationTime, loc) : '—'}
+      <span className="font-hud hidden w-28 shrink-0 whitespace-nowrap text-xs tabular-nums text-mist sm:block">
+        {n ? formatDate(observations[0].observationTime) : '—'}
       </span>
 
       <div className="relative flex-1">
@@ -93,13 +92,13 @@ export function Timeline({
           disabled={disabled || n === 0}
           onChange={(e) => onSeek(Number(e.target.value))}
           aria-label={m.modules.player.timeline}
-          aria-valuetext={current ? formatDate(current.observationTime, loc) : undefined}
+          aria-valuetext={current ? formatDate(current.observationTime) : undefined}
           className="relative w-full cursor-pointer accent-star disabled:cursor-not-allowed disabled:opacity-40"
         />
       </div>
 
-      <span className="font-hud hidden w-24 shrink-0 text-right text-xs tabular-nums text-mist sm:block">
-        {n ? formatDate(observations[n - 1].observationTime, loc) : '—'}
+      <span className="font-hud hidden w-28 shrink-0 whitespace-nowrap text-right text-xs tabular-nums text-mist sm:block">
+        {n ? formatDate(observations[n - 1].observationTime) : '—'}
       </span>
     </div>
   );

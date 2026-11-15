@@ -1,3 +1,10 @@
+# EON MVP frontend
+
+Real Search Image/Blink and five-frame Timelapse now use BE-01 discovery and public
+Jobs orchestration/PNG delivery. Existing Spectral functionality is preserved.
+See [MVP integration, Docker setup and real test results](docs/MVP_INTEGRATION.md).
+Both repositories use independent feature/eon-mvp-integration branches.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

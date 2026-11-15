@@ -309,8 +309,7 @@ function HudCard({
       {/* velo oscuro para que el texto se lea aunque detrás haya metal brillante */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-night/45" />
       <div className="mb-4 flex items-center justify-between gap-4">
-        <span className="text-xs font-semibold uppercase tracking-widest text-star">{code} · {label}</span>
-        <span className="text-xs text-mist">{activeLabel}</span>
+        
       </div>
 
       <h3 className="text-2xl font-semibold text-paper md:text-3xl">{title}</h3>
@@ -327,9 +326,7 @@ function HeroContent({ onStart }: { onStart: () => void }) {
   const h = m.observatory.tour.hero;
   return (
     <div className="md:max-w-xl">
-      <span className="text-xs font-medium uppercase tracking-[0.35em] text-star">
-        {h.eyebrow}
-      </span>
+      
       <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-paper md:text-6xl">
         {h.titleA}
         <span className="block text-star">

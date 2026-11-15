@@ -82,7 +82,7 @@ export function CoordinateFields({ values, onChange }: FieldsProps) {
             value={values.detector}
             onChange={(e) => onChange({ detector: e.target.value as Detector })}
           >
-            {DETECTORS.map((d) => (
+            {DETECTORS.filter(d => d.id !== 'All').map((d) => (
               <option key={d.id} value={d.id}>
                 {d.id === 'All' ? t.allBands : d.id}
               </option>

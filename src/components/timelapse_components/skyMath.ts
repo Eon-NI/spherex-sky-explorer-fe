@@ -47,5 +47,34 @@ export function formatDecDms(decDeg: number) {
   return `${sign}${pad(a)}° ${pad(m)}′ ${s.toFixed(1).padStart(4, '0')}″`;
 }
 
-export const formatDate = (iso: string, locale = 'es') =>
-  new Date(iso).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: '2-digit' });
+/* Fechas de los módulos en formato estadounidense (MM/DD/YYYY), en cualquier idioma */
+const US_DATE = new Intl.DateTimeFormat('en-US', { month: '2-digit', day: '2-digit', year: 'numeric', timeZone: 'UTC' });
+const US_TIME = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', timeZone: 'UTC' });
+const US_TIME_MS = new Intl.DateTimeFormat('en-US', {
+  hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3, hourCycle: 'h23', timeZone: 'UTC',
+});
+
+/** "2025-05-13T…" → "05/13/2025" (sin sufijo) */
+export const formatUsDay = (iso: string) => US_DATE.format(new Date(iso));
+
+/** "2025-05-13T…" → "05/13/2025 UTC" */
+export const formatDate = (iso: string) => `${formatUsDay(iso)} UTC`;
+
+/** "05/13/2025 14:03:22 UTC"; con ms: "05/13/2025 14:03:22.123 UTC" */
+export const formatDateTime = (iso: string, ms = false) =>
+  `${formatUsDay(iso)} ${(ms ? US_TIME_MS : US_TIME).format(new Date(iso))} UTC`;
+
+/** "2025-05-13" (valor de los campos) → "05/13/2025" */
+export const isoDayToUs = (day: string) => {
+  const [y, m, d] = day.split('-');
+  return y && m && d ? `${m}/${d}/${y}` : '';
+};
+
+/** "05/13/2025" → "2025-05-13"; null si no es una fecha real */
+export const usToIsoDay = (text: string) => {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(text.trim());
+  if (!match) return null;
+  const [, m, d, y] = match;
+  const date = new Date(`${y}-${m}-${d}T00:00:00Z`);
+  return Number.isNaN(date.getTime()) || date.getUTCDate() !== Number(d) ? null : `${y}-${m}-${d}`;
+};
