@@ -1,0 +1,15 @@
+# Docker Compose >= 2.24.4; combine with docker-compose.yml.
+services:
+  frontend:
+    image: spherex-sky-explorer-fe:${RELEASE_TAG:?set RELEASE_TAG}
+    build:
+      args:
+        VITE_OBSERVATION_API_URL: ${PUBLIC_ORIGIN:?set HTTP or HTTPS PUBLIC_ORIGIN}
+        VITE_JOBS_API_URL: ${PUBLIC_ORIGIN:?set HTTP or HTTPS PUBLIC_ORIGIN}
+        VITE_SPECTRAL_API_URL: ${PUBLIC_ORIGIN:?set HTTP or HTTPS PUBLIC_ORIGIN}
+    ports: !override ["127.0.0.1:8080:80"]
+    mem_limit: 128m
+    cpus: 0.25
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
