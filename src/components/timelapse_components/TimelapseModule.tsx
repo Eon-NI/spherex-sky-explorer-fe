@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router';
+import ModuleHeader from '../ModuleHeader';
 import { AlertTriangle, CheckCircle2, Hourglass, MousePointerClick, Satellite } from 'lucide-react';
 
 import {
     DETECTORS,
-    USE_MOCK,
+
     fetchObservations,
     type Detector,
     type ObservationQuery,
@@ -255,26 +256,13 @@ export default function TimelapseModule() {
     const ready = preload.images.length > 0;
 
     return (
-        <section id="timelapse" className="px-4 py-16 md:px-5">
+        <section id="timelapse" className="px-4 pt-6 pb-16 md:px-8 md:pt-8" encabezado>
             <div className="mx-auto max-w-7xl">
-                {/* ---------- encabezado ---------- */}
-                <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-                    <div>
-                        
-                        <h2 className="font-display mt-3 text-3xl font-bold text-white md:text-4xl">
-                            El cielo a través del tiempo
-                        </h2>
-                        <p className="mt-3 max-w-2xl text-slate-400">
-                            Elige una región y un rango de fechas: verás sus imágenes de SPHEREx como un vídeo.
-                            Haz clic sobre cualquier objeto que cambie para analizarlo.
-                        </p>
-                    </div>
-                    {USE_MOCK && (
-                        <span className="rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
-                            Datos simulados
-                        </span>
-                    )}
-                </div>
+                <ModuleHeader
+                    eyebrow="Módulo · Timelapse"
+                    title="El cielo a través del tiempo"
+                    text="Elige una región y un rango de fechas para ver sus imágenes como un vídeo. Haz clic sobre un objeto que cambie para analizarlo."
+                />
 
                 <div className="liquid-glass rounded-3xl p-3 md:p-4">
                     {/* ---------- visor ---------- */}

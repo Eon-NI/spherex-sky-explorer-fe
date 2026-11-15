@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router';
+import ModuleHeader from '../ModuleHeader';
 import { AlertTriangle, Hourglass, Layers, MousePointerClick, X } from 'lucide-react';
 
 import {
     CHANNEL_COUNT,
-    USE_MOCK,
+
     channelDetector,
     channelWavelength,
     fetchSpectralCube,
@@ -186,30 +187,17 @@ export default function SpectralModule() {
     const wl = channelWavelength(channel);
 
     return (
-        <section id="spectral" className="px-4 py-16 md:px-8">
+        <section id="spectral" className="px-4 pt-6 pb-16 md:px-8 md:pt-8">
             <div className="mx-auto max-w-7xl">
-                {/* ---------- encabezado ---------- */}
-                <div className="mb-10 text-center">
-                    <span className="text-xs font-medium uppercase tracking-[0.35em] text-sky-400">
-                        Módulo · Spectral Explorer
-                    </span>
-                    <h2 className="font-display mx-auto mt-3 max-w-3xl text-3xl font-bold text-white md:text-5xl">
-                        Mira un punto a través de los{' '}
-                        <span className="bg-gradient-to-r from-sky-300 via-blue-400 to-violet-400 bg-clip-text text-transparent">
-                            102 canales
-                        </span>{' '}
-                        de SPHEREx
-                    </h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-slate-400">
-                        SPHEREx fotografía cada región en 102 longitudes de onda infrarrojas. Desliza entre canales
-                        para ver cómo cambia la imagen y haz clic en hasta 3 objetos para comparar sus espectros.
-                    </p>
-                    {USE_MOCK && (
-                        <span className="mt-4 inline-block rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
-                            Datos simulados
-                        </span>
-                    )}
-                </div>
+                <ModuleHeader
+                    eyebrow="Módulo · Spectral Explorer"
+                    title={
+                        <>
+                            Un punto a través de <span className="text-star">102 canales</span>
+                        </>
+                    }
+                    text="Desliza entre las longitudes de onda infrarrojas de SPHEREx y haz clic en hasta 3 objetos para comparar sus espectros."
+                />
 
                 <div className="liquid-glass rounded-3xl p-3 md:p-4">
                     <div className="grid gap-3 lg:grid-cols-[1.55fr_1fr]">

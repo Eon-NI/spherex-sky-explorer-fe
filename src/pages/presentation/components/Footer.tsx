@@ -1,8 +1,7 @@
 import { Link } from 'react-router';
-import { motion } from 'motion/react';
 import { ArrowRight, ArrowUp } from 'lucide-react';
 import logo from '../../../assets/EON.svg';
-import { VIEWPORT, rise, stagger } from './motionPresets';
+import CtaBanner from '../../../components/CtaBanner';
 
 const footerLink =
     'inline-flex w-fit text-mist transition-colors hover:text-paper focus-visible:text-paper underline-offset-4 hover:underline';
@@ -26,44 +25,30 @@ export default function Footer() {
             {/* horizonte luminoso */}
             <div
                 aria-hidden="true"
-                className="absolute inset-x-0 -top-40 -z-10 mx-auto h-72 max-w-4xl rounded-full bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--color-sky)_22%,transparent),transparent_70%)] blur-2xl"
+                className="absolute inset-x-0 -top-40 -z-10 mx-auto h-72 max-w-4xl rounded-full bg-[radial-gradient(ellipse_at_center,color-mix(in_oklab,var(--color-star)_12%,transparent),transparent_70%)] blur-2xl"
             />
 
             {/* llamada a la acción */}
-            <motion.div
-                className="mx-auto max-w-6xl px-6 pt-16"
-                variants={stagger(0.1)}
-                initial="hidden"
-                whileInView="show"
-                viewport={VIEWPORT}
-            >
-                <div className="flex flex-col items-start justify-between gap-6 rounded-3xl border border-paper/10 bg-night-soft/70 p-8 md:flex-row md:items-center md:p-10">
-                    <motion.div variants={rise}>
-                        <p className="font-display text-2xl font-extrabold tracking-tight text-balance md:text-3xl">
-                            El próximo hallazgo puede ser tuyo.
-                        </p>
-                        <p className="mt-2 text-mist">Explora el universo con LOOK-EON.</p>
-                    </motion.div>
-                    <motion.div variants={rise}>
-                        <Link
-                            to="/observatorio"
-                            className="group inline-flex items-center gap-2 rounded-full bg-[color-mix(in_oklab,var(--color-star)_86%,black)] px-6 py-3 font-bold text-night transition-colors hover:bg-star"
-                        >
-                            Ir al Observatorio
-                            <ArrowRight
-                                aria-hidden="true"
-                                className="size-4 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
-                            />
-                        </Link>
-                    </motion.div>
-                </div>
-            </motion.div>
+            <div className="mx-auto max-w-6xl px-6 pt-16 md:pt-20">
+                <CtaBanner
+                    
+                    title={
+                        <>
+                            El próximo hallazgo puede ser <span className="text-star">tuyo</span>.
+                        </>
+                    }
+                    text="Compara épocas, busca por coordenadas y analiza 102 bandas infrarrojas. Explora el universo con LOOK-EON."
+                    to="/observatorio"
+                    label="Iniciar exploración en el Observatorio"
+                    icon={ArrowRight}
+                />
+            </div>
 
             {/* columnas */}
             <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr]">
                 <div>
                     <Link to="/" className="inline-block" aria-label="Ir al inicio de LOOK-EON">
-                        <img src={logo} alt="EON" className="h-12 w-auto" />
+                        <img src={logo} alt="Aetheris" className="h-12 w-auto" />
                     </Link>
                     <p className="mt-4 max-w-xs text-mist">
                         Proyecto de exploración astronómica con datos de la misión SPHEREx de la NASA.

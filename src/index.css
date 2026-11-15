@@ -1,5 +1,8 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');@import "tailwindcss";
+/* Fuentes del sitio (solo dos):
+   - Bricolage Grotesque: títulos y texto (font-sans)
+   - JetBrains Mono: datos técnicos, coordenadas, etiquetas HUD (font-hud) */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
 
 /*Tokens
    --color-night -> bg-night, text-night, border-night...
@@ -7,9 +10,9 @@
 */
 @theme {
   --font-sans: "Bricolage Grotesque", system-ui, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Space Grotesk", system-ui, sans-serif; /* se conserva por si otras páginas lo usan */
+  /* Alias por compatibilidad: font-display ahora es la misma fuente que el texto */
+  --font-display: var(--font-sans);
   --font-hud: "JetBrains Mono", ui-monospace, monospace;
-
 
   /* Fondos oscuros (cielo nocturno) */
   --color-night: #0d1230;
@@ -24,11 +27,24 @@
   --color-star: #ffb938;
   --color-star-hover: #ffc95e;
 
-   --animate-screen-in: screen-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-screen-in: screen-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   @keyframes screen-in {
     from { opacity: 0; transform: scale(1.06); filter: blur(10px); }
     to { opacity: 1; transform: none; filter: none; }
   }
+}
+
+/* Jerarquía de títulos (las clases de Tailwind de cada componente fijan el tamaño) */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  h1 { font-weight: 800; line-height: 1.04; }   /* título de página / hero */
+  h2 { font-weight: 800; line-height: 1.1; }    /* título de sección */
+  h3 { font-weight: 700; line-height: 1.2; }    /* título de tarjeta o bloque */
+  h4, h5, h6 { font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; }
 }
 
 html {

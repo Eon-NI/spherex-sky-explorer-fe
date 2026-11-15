@@ -56,15 +56,9 @@ function useMediaQuery(query: string) {
   );
 }
 
-/* =========================================================
-   Componente principal
-   ========================================================= */
-type ObservatoryTourProps = {
-  /** Qué hacer al pulsar "Ir a un lugar al azar". Por defecto navega a #sorpresa */
-  onSurprise?: () => void;
-};
 
-export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
+
+export default function ObservatoryTour() {
   const sectionRef = useRef<HTMLElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
@@ -161,10 +155,7 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
 
   const shown = leaving ? -1 : active;
 
-  const handleSurprise = () => {
-    if (onSurprise) onSurprise();
-    else window.location.hash = 'sorpresa';
-  };
+
 
   return (
     <section
@@ -247,11 +238,7 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
           </HudCard>
         </Stop>
 
-        <Stop index={4} active={shown}>
-          <HudCard code="04" label="Discovery" title="Descubre lugares asombrosos">
-            <SurpriseContent onSurprise={handleSurprise} />
-          </HudCard>
-        </Stop>
+       
 
         {/* ---------- Lectura de telemetría + progreso ---------- */}
         <div className="pointer-events-none absolute bottom-5 left-5 z-20 hidden text-xs font-medium uppercase tracking-[0.35em] text-slate-500 md:block">
@@ -602,21 +589,3 @@ function SpectralContent({
   );
 }
 
-function SurpriseContent({ onSurprise }: { onSurprise: () => void }) {
-  return (
-    <>
-      <p>
-        ¿No sabes por dónde empezar? El radar elige al azar una región interesante del cielo
-        (nebulosas, cúmulos o galaxias) y te lleva hasta ella.
-      </p>
-      <button
-        type="button"
-        onClick={onSurprise}
-        className="group inline-flex items-center gap-3 rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
-      >
-        <Dices size={18} className="transition-transform duration-500 group-hover:rotate-180" />
-        Ir a un lugar al azar
-      </button>
-    </>
-  );
-}
