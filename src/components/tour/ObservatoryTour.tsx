@@ -318,16 +318,7 @@ function HudCard({
       {/* velo oscuro para que el texto se lea aunque detrás haya metal brillante */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-[#05070f]/45" />
       <div className="mb-4 flex items-center justify-between gap-4">
-        <span className="text-xs font-medium uppercase tracking-[0.35em] text-sky-400">
-          {code} · {label}
-        </span>
-        <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-          </span>
-          Activo
-        </span>
+        
       </div>
 
       <h3 className="font-display text-2xl font-semibold text-white md:text-3xl">{title}</h3>
@@ -342,10 +333,8 @@ function HudCard({
 function HeroContent({ onStart }: { onStart: () => void }) {
   return (
     <div className="md:max-w-xl">
-      <span className="text-xs font-medium uppercase tracking-[0.35em] text-sky-400">
-        Observatorio EON · Tour de bienvenida
-      </span>
-      <h1 className="font-display mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-6xl">
+      
+      <h1 className="font-display mt-0 text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-6xl">
         Descubriendo
         <span className="block bg-gradient-to-r from-sky-300 via-blue-400 to-violet-400 bg-clip-text text-transparent">
           más allá del cosmos

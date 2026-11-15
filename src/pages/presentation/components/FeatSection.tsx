@@ -31,7 +31,7 @@ const features: FeatCardProps[] = [
             'Explora las 102 bandas de luz infrarroja de SPHEREx y los 6 conjuntos de detectores. Filtra longitudes de onda para distinguir la composición química de estrellas, enanas marrones y galaxias.',
         to: '/spectral',
         linkText: 'Analizar el espectro',
-        tone: 'mint',
+        tone: 'blue',
         art: 'spectrum',
     },
 ];

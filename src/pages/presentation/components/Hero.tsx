@@ -39,7 +39,7 @@ export default function Hero() {
                 >
                     <Link
                         to="/observatorio"
-                        className="group mt-10 inline-flex items-center justify-center gap-3 rounded-full bg-star px-7 py-4 text-base font-bold text-night shadow-[0_0_40px_-8px_var(--color-star)] transition-colors hover:bg-star-hover sm:px-8 sm:text-lg"
+                        className="group mt-10 inline-flex items-center justify-center gap-3 rounded-full bg-[color-mix(in_oklab,var(--color-star)_86%,black)] px-7 py-4 text-base font-bold text-night shadow-[0_8px_28px_-12px_color-mix(in_oklab,var(--color-star)_45%,transparent)] transition-colors hover:bg-star sm:px-8 sm:text-lg"
                     >
                         Iniciar exploración en el Observatorio
                         <ArrowRight

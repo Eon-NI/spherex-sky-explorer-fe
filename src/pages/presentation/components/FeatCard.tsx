@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import { motion } from 'motion/react';
 import { rise } from './motionPresets';
 
-export type FeatTone = 'star' | 'sky' | 'mint';
+export type FeatTone = 'star' | 'sky' | 'mint' | 'blue';
 export type FeatArt = 'rings' | 'frames' | 'split' | 'timeline' | 'coords' | 'spectrum';
 
 export type FeatCardProps = {
@@ -22,6 +22,7 @@ const TONES: Record<FeatTone, string> = {
     star: 'bg-star',
     sky: 'bg-sky',
     mint: 'bg-mint',
+    blue: 'bg-blue-400',
 };
 
 function CardArt({ variant }: { variant: FeatArt }) {
