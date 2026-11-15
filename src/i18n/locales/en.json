@@ -206,6 +206,17 @@
       "loading": "Loading images…",
       "noObs": "No observations in that region",
       "labelBlink": "Blink · {{epoch}} · {{date}}",
+      "picker": {
+        "calendar": "UTC observation calendar",
+        "available": "Observations available",
+        "previousMonth": "Previous month with observations",
+        "nextMonth": "Next month with observations",
+        "times": "Available times",
+        "observation": "Observation",
+        "otherEpoch": "Selected in the other epoch",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+      },
       "actions": {
         "title": "Actions",
         "single": "Image",
