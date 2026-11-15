@@ -4,10 +4,13 @@ import TimeLapse from './pages/TimeLapse';
 import Observatory from './pages/Observatory';
 import Search from './pages/Search';
 
+
+
 import Spectral from './pages/Spectral';
 import Minigame from './pages/Minigame';
 
 import LandingV2 from './pages/presentation/LandingV2';
+import References from './pages/References';
 
 
 function App() {
@@ -23,6 +26,8 @@ function App() {
         <Route path="/timelapse" element={<TimeLapse />} />
         <Route path="/spectral" element={<Spectral />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/referencias" element={<References />} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -32,6 +32,7 @@
       "about": "About",
       "openMenu": "Open menu",
       "closeMenu": "Close menu"
+      , "references": "References"
     },
     "hero": {
       "title": "EXPLORE THE COSMOS AND DISCOVER NEW WORLDS THROUGH TIME",
@@ -117,13 +118,14 @@
       "features": "Features",
       "functions": "Capabilities",
       "about": "About EON",
-      "backToTop": "Back to top"
+      "backToTop": "Back to top",
+      "references": "References"
     }
   },
 
   "observatory": {
     "header": {
-      "back": "Back to Home"
+      "back": "Back to Home", "backObservatory": "Back to Observatory", "backObservatoryShort": "Observatory"
     },
     "footer": {
       "ctaTitle": "Thanks for exploring the sky with <hl>Aetheris</hl>.",
@@ -199,27 +201,18 @@
     "search": {
       "eyebrow": "Module · Search",
       "title": "Find a point of <hl>interest</hl>",
-      "text": "Compare a region's observations with blink, difference or stack, and click on an object to analyze it.",
+      "text": "Compare a region's observations with image or blink, and click on an object to analyze it.",
       "querying": "Searching SPHEREx observations…",
-      "stacking": "Stacking observations…",
-      "differencing": "Computing the difference…",
       "loading": "Loading images…",
       "noObs": "No observations in that region",
-      "corsError": "The image server must allow CORS to compute the difference or the stack.",
       "labelBlink": "Blink · {{epoch}} · {{date}}",
-      "labelDifference": "B − A · {{b}} − {{a}}",
-      "labelStack": "Stack · {{count}} observations",
       "actions": {
         "title": "Actions",
         "single": "Image",
         "blink": "Blink",
-        "difference": "Difference",
-        "stack": "Stack",
         "singleHelp": "Shows the observation from epoch A.",
         "blinkUnavailable": "Blink requires two distinct real acquisition epochs.",
         "blinkHelp": "Alternates two aligned real epochs. Visual differences do not establish motion or variability.",
-        "differenceHelp": "Subtracts A from B: light blue shows what appeared or got brighter; violet shows what disappeared.",
-        "stackHelp": "Averages the {{count}} observations: more depth and less noise; whatever moves fades away.",
         "epochA": "Epoch A",
         "epochB": "Epoch B",
         "pauseBlink": "Pause blink",
@@ -358,5 +351,19 @@
   "minigame": {
     "line1": "EON © 2026. An astronomical exploration project.",
     "line2": "Explore the universe, discover time."
+  }  ,"references": {
+    "eyebrow": "References",
+    "title": "References to explore further",
+    "text": "Check out selected external sources to expand what you have learned and dive deeper into SPHEREx and the exploration of the universe.",
+    "listAria": "External references",
+    "open": "Open reference",
+    "newTab": "(opens in a new tab)",
+    "count": "SPHEREx · {{count}} references",
+    "items": {
+      "spherex": { "title": "SPHEREx Mission", "source": "NASA", "description": "Meet the NASA mission that will map the sky in 102 infrared bands." },
+      "planetX": { "title": "Planet X", "source": "NASA", "description": "Explore the hypothesis of a mysterious planet hidden at the edge of the solar system." },
+      "coordinates": { "title": "Declination and Right Ascension", "source": "NASA", "description": "Learn how celestial objects are located using sky coordinates." },
+      "spectrum": { "title": "What is a spectrum?", "source": "Video", "description": "See in a simple way how light splits apart and reveals information about the universe." }
+    }
   }
 }
