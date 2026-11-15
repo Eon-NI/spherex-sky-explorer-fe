@@ -1,38 +1,28 @@
 import { motion } from 'motion/react';
 import { Orbit, Sparkles, Telescope } from 'lucide-react';
 import logo from '../../../assets/EON.svg';
+import { useI18n } from '../../../i18n/useI18n';
 import { EASE_OUT, VIEWPORT, rise, stagger } from './motionPresets';
 
 const PILLARS = [
-    {
-        icon: Telescope,
-        title: 'Astronomía',
-        text: 'Nos mueve la curiosidad por lo que el cielo aún esconde.',
-    },
-    {
-        icon: Sparkles,
-        title: 'Tecnología',
-        text: 'Convertimos datos científicos en experiencias visuales.',
-    },
-    {
-        icon: Orbit,
-        title: 'Exploración',
-        text: 'Queremos que cualquier persona pueda descubrir el cielo.',
-    },
-];
+    { key: 'astronomy', icon: Telescope },
+    { key: 'technology', icon: Sparkles },
+    { key: 'exploration', icon: Orbit },
+] as const;
 
 /** Logo en el centro de un pequeño sistema orbital */
 function OrbitLogo() {
+    const { m } = useI18n();
     const orbits = [
         { r: 118, dur: 36, dot: 7, dotClass: 'fill-star' },
-        { r: 160, dur: 58, dot: 5, dotClass: 'fill-sky' },
-        { r: 196, dur: 84, dot: 4, dotClass: 'fill-mint' },
+        { r: 160, dur: 58, dot: 5, dotClass: 'fill-paper' },
+        { r: 196, dur: 84, dot: 4, dotClass: 'fill-mist' },
     ];
 
     return (
         <div className="relative mx-auto aspect-square w-72 sm:w-80 md:w-[26rem]">
             {/* halo */}
-            <div className="absolute inset-[18%] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-sky)_30%,transparent),transparent_70%)] blur-2xl" />
+            <div className="absolute inset-[18%] rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-star)_22%,transparent),transparent_70%)] blur-2xl" />
 
             <svg viewBox="0 0 420 420" aria-hidden="true" className="absolute inset-0 h-full w-full">
                 {orbits.map((o, i) => (
@@ -81,13 +71,15 @@ function OrbitLogo() {
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
             >
-                <img src={logo} alt="Logo EON" className="w-36 drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] md:w-48" />
+                <img src={logo} alt={m.landing.about.logoAlt} className="w-36 drop-shadow-[0_10px_30px_rgba(0,0,0,0.5)] md:w-48" />
             </motion.div>
         </div>
     );
 }
 
 export default function AboutSection() {
+    const { m } = useI18n();
+    const a = m.landing.about;
     return (
         <section
             id="about"
@@ -117,37 +109,34 @@ export default function AboutSection() {
                     whileInView="show"
                     viewport={VIEWPORT}
                 >
-                    
 
                     <motion.h2
                         id="about-title"
                         variants={rise}
-                        className="font-display mt-4 text-3xl font-extrabold tracking-tight text-balance lg:text-5xl"
+                        className="mt-4 text-3xl font-extrabold tracking-tight text-balance lg:text-5xl"
                     >
-                        Somos EON
+                        {a.title}
                     </motion.h2>
 
                     {/* Primer párrafo más destacado: marca la jerarquía del bloque */}
                     <motion.p variants={rise} className="mt-6 text-xl leading-relaxed text-paper">
-                        Somos un equipo de estudiantes apasionados por la tecnología y la astronomía.
+                        {a.lead}
                     </motion.p>
 
                     <motion.p variants={rise} className="mt-4 text-lg leading-relaxed text-mist">
-                        A través de LOOK-EON buscamos acercar la exploración astronómica a los usuarios,
-                        permitiéndoles descubrir el cielo y explorar sus cambios a través del tiempo.
+                        {a.text}
                     </motion.p>
 
                     <motion.ul variants={stagger(0.1)} className="mt-10 grid gap-4 sm:grid-cols-3">
-                        {PILLARS.map(({ icon: Icon, title, text }) => (
+                        {PILLARS.map(({ key, icon: Icon }) => (
                             <motion.li
-                                key={title}
+                                key={key}
                                 variants={rise}
                                 className="group rounded-2xl border border-paper/10 bg-night/40 p-5 transition-colors duration-300 hover:border-star/40 hover:bg-night/60"
                             >
-                                    <Icon aria-hidden="true" className="size-5" />
-                                
-                                <h3 className="mt-4 font-bold text-paper"> {title}</h3>
-                                <p className="mt-1 text-sm leading-relaxed text-mist">{text}</p>
+                                <Icon aria-hidden="true" className="size-5" />
+                                <h3 className="mt-4 font-bold text-paper">{a.pillars[key].title}</h3>
+                                <p className="mt-1 text-sm leading-relaxed text-mist">{a.pillars[key].text}</p>
                             </motion.li>
                         ))}
                     </motion.ul>

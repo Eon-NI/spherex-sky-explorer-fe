@@ -1,5 +1,7 @@
 import { CHANNEL_COUNT, channelWavelength } from '../../api/spherex';
 import { channelColor } from './spectralColors';
+import { useI18n } from '../../i18n/useI18n';
+import { fmt } from '../../i18n/format';
 
 type SpectralCubeProps = {
   channel: number;
@@ -16,9 +18,11 @@ const DY = 0.82;
 
 /**
  * Cubo espectral: las 102 imágenes de la misma región apiladas,
- * del canal 1 (0.75 µm, delante) al 102 (5 µm, al fondo).
+ * del canal 1 al 102; las longitudes de onda proceden de DR1.
  */
 export default function SpectralCube({ channel, onSelect }: SpectralCubeProps) {
+  const { m } = useI18n();
+  const t = m.modules.spectral;
   const layer = (i: number, lift = 0) => {
     const ox = 14 + i * DX;
     const oy = H - 24 - LAYER_H - i * DY - lift;
@@ -32,7 +36,7 @@ export default function SpectralCube({ channel, onSelect }: SpectralCubeProps) {
   const selY = H - 24 - LAYER_H / 2 - channel * DY - 16;
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Cubo espectral de 102 canales">
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={t.cubeAria}>
       {order.map((i) => (
         <polygon
           key={i}
@@ -43,7 +47,7 @@ export default function SpectralCube({ channel, onSelect }: SpectralCubeProps) {
           className="cursor-pointer transition-opacity hover:opacity-70"
           onClick={() => onSelect(i)}
         >
-          <title>{`Canal ${i + 1} · ${channelWavelength(i).toFixed(2)} µm`}</title>
+          <title>{fmt(t.channelTitle, { n: i + 1, wl: channelWavelength(i).toFixed(2) })}</title>
         </polygon>
       ))}
 
@@ -54,10 +58,10 @@ export default function SpectralCube({ channel, onSelect }: SpectralCubeProps) {
       </text>
 
       <text x={14} y={H - 6} className="fill-slate-500 text-[9px]">
-        0.75 µm
+        {channelWavelength(0).toFixed(3)} µm
       </text>
       <text x={W - 4} y={H - 6} textAnchor="end" className="fill-slate-500 text-[9px]">
-        5 µm al fondo
+        {channelWavelength(CHANNEL_COUNT - 1).toFixed(3)} µm · {t.cubeBack}
       </text>
     </svg>
   );

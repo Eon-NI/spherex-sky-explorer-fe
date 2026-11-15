@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react';
-import Header from './presentation/components/Header';
-import Footer from './presentation/components/Footer';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import SearchModule from '../components/search_components/SearchModule';
 
 export default function Search() {
@@ -11,7 +11,7 @@ export default function Search() {
   return (
     <>
       <Header />
-      <main className="bg-nasa min-h-screen text-white motion-safe:animate-screen-in">
+      <main className="bg-night min-h-screen text-paper motion-safe:animate-screen-in">
         <SearchModule />
       </main>
       <Footer />

@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router';
+import ModuleHeader from '../ModuleHeader';
+import { useI18n } from '../../i18n/useI18n';
+import { fmt, rich } from '../../i18n/format';
 import { AlertTriangle, CheckCircle2, Hourglass, MousePointerClick, Satellite } from 'lucide-react';
 
-import { USE_MOCK, fetchObservations, type ObservationQuery, type ObservationsResponse } from '../../api/spherex';
+import { fetchObservations, type ObservationQuery, type ObservationsResponse } from '../../api/spherex';
 import TimelapseViewer from '../timelapse_components/TimelapseViewer';
 import PointActionsMenu from '../timelapse_components/PointActionsMenu';
 import PointDetailsPanel from '../timelapse_components/PointDetailsPanel';
@@ -25,15 +28,18 @@ const DETECTOR = 'D2';
 const MODES: ViewMode[] = ['single', 'blink', 'difference', 'stack'];
 const RECORDS_KEY = 'eon:timelapse:changes'; // compartido con el Timelapse
 
-function validate(f: FormValues): { query?: ObservationQuery; error?: string } {
+type ValidationError = 'ra' | 'dec' | 'fov';
+const MAX_FOV = 2;
+
+function validate(f: FormValues): { query?: ObservationQuery; error?: ValidationError } {
   const ra = Number(f.ra.replace(',', '.'));
   const dec = Number(f.dec.replace(',', '.'));
   const raw = Number(f.fov.replace(',', '.'));
   const fovDeg = f.fovUnit === 'arcmin' ? raw / 60 : raw;
-  if (!Number.isFinite(ra) || ra < 0 || ra >= 360) return { error: 'RA debe estar entre 0° y 360°.' };
-  if (!Number.isFinite(dec) || dec < -90 || dec > 90) return { error: 'Dec debe estar entre −90° y +90°.' };
-  if (!Number.isFinite(fovDeg) || fovDeg <= 0 || fovDeg > 2)
-    return { error: 'El campo de visión debe ser mayor que 0 y como máximo 2°.' };
+  if (!Number.isFinite(ra) || ra < 0 || ra >= 360) return { error: 'ra' };
+  if (!Number.isFinite(dec) || dec < -90 || dec > 90) return { error: 'dec' };
+  if (!Number.isFinite(fovDeg) || fovDeg <= 0 || fovDeg > MAX_FOV)
+    return { error: 'fov' };
   // todas las observaciones de la misión hasta hoy
   const end = new Date().toISOString().slice(0, 10);
   return { query: { ra, dec, fovDeg, start: MISSION_START, end, detector: DETECTOR } };
@@ -51,6 +57,10 @@ function loadRecords(): ChangeRecord[] {
    Módulo Search
    ========================================================= */
 export default function SearchModule() {
+  const { m } = useI18n();
+  const sm = m.modules.search;
+  const fl = m.modules.fields;
+  const loc = m.common.dateLocale;
   const [searchParams, setSearchParams] = useSearchParams();
   const [initial] = useState(() => {
     const form: FormValues = {
@@ -71,7 +81,7 @@ export default function SearchModule() {
   });
 
   const [form, setForm] = useState<FormValues>(initial.form);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<ValidationError | 'check' | null>(null);
   const [query, setQuery] = useState<ObservationQuery | null>(() =>
     initial.auto ? (validate(initial.form).query ?? null) : null,
   );
@@ -110,7 +120,7 @@ export default function SearchModule() {
       })
       .catch((e: Error) => {
         if (e.name !== 'AbortError')
-          setResult({ key: queryKey, error: e.message || 'No se pudo conectar con el servidor.' });
+          setResult({ key: queryKey, error: e.message || 'server' });
       });
     return () => ctrl.abort();
   }, [query, queryKey]);
@@ -151,9 +161,7 @@ export default function SearchModule() {
         setComputed({
           key: computedKey,
           error:
-            e.name === 'SecurityError'
-              ? 'El servidor de imágenes debe permitir CORS para calcular la diferencia o el apilado.'
-              : e.message,
+            e.name === 'SecurityError' ? 'cors' : e.message || 'error',
         });
       });
     return () => {
@@ -229,7 +237,7 @@ export default function SearchModule() {
     e.preventDefault();
     const { query: q, error } = validate(form);
     if (!q) {
-      setFormError(error ?? 'Revisa los datos.');
+      setFormError(error ?? 'check');
       return;
     }
     setFormError(null);
@@ -273,48 +281,50 @@ export default function SearchModule() {
     ]);
   };
 
-  const errorMessage = formError ?? current?.error ?? preload.error ?? computeError;
+  const errorMessage = formError
+    ? formError === 'check'
+      ? m.common.checkData
+      : fmt(m.modules.validation[formError], { max: MAX_FOV })
+    : current?.error
+      ? m.common.serverError
+      : preload.error
+        ? m.common.imageLoadError
+        : computeError === 'cors'
+          ? sm.corsError
+          : computeError ?? null;
   const modeLabel: Record<ViewMode, string> = {
-    single: observation ? formatDate(observation.observationTime) : '',
-    blink: observation ? `Blink · ${player.index === 0 ? 'A' : 'B'} · ${formatDate(observation.observationTime)}` : 'Blink',
+    single: observation ? formatDate(observation.observationTime, loc) : '',
+    blink: observation
+      ? fmt(sm.labelBlink, { epoch: player.index === 0 ? 'A' : 'B', date: formatDate(observation.observationTime, loc) })
+      : sm.actions.blink,
     difference:
       observations[a] && observations[b]
-        ? `B − A · ${formatDate(observations[b].observationTime)} − ${formatDate(observations[a].observationTime)}`
-        : 'Difference',
-    stack: `Stack · ${observations.length} observaciones`,
+        ? fmt(sm.labelDifference, {
+            b: formatDate(observations[b].observationTime, loc),
+            a: formatDate(observations[a].observationTime, loc),
+          })
+        : sm.actions.difference,
+    stack: fmt(sm.labelStack, { count: observations.length }),
   };
 
   return (
-    <section id="search" className="px-4 py-16 md:px-8">
+    <section id="search" className="px-4 pt-5 pb-16 md:px-8 md:pt-6">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-10 text-center">
-          <span className="text-xs font-medium uppercase tracking-[0.35em] text-sky-400">Módulo · Search</span>
-          <h2 className="font-display mt-3 text-3xl font-bold text-white md:text-5xl">
-            Busca un punto de{' '}
-            <span className="bg-gradient-to-r from-sky-300 via-blue-400 to-violet-400 bg-clip-text text-transparent">
-              interés
-            </span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-slate-400">
-            Escribe las coordenadas de una región y compara sus observaciones con blink, difference o
-            stack. Haz clic sobre un objeto para ver sus coordenadas, su espectro, sus metadatos o
-            compartirlo.
-          </p>
-          {USE_MOCK && (
-            <span className="mt-4 inline-block rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
-              Datos simulados
-            </span>
-          )}
-        </div>
+        <ModuleHeader
+          eyebrow={sm.eyebrow}
+          title={rich(sm.title, { hl: (t) => <span className="text-star">{t}</span> })}
+          text={sm.text}
+        />
 
         <div className="liquid-glass rounded-3xl p-3 md:p-4">
           {/* ---------- visor ---------- */}
           <div className="relative">
             <div
               ref={viewerBoxRef}
-              className="relative h-[55vh] min-h-[340px] overflow-hidden rounded-2xl bg-[#05070f] ring-1 ring-white/10"
+              className="relative h-[max(260px,calc(100svh-32rem))] overflow-hidden rounded-2xl bg-night ring-1 ring-white/10"
             >
               <TimelapseViewer
+                ariaLabel={m.modules.viewer.aria}
                 images={viewImages}
                 posRef={player.posRef}
                 fade={mode === 'blink' ? 0.12 : 1}
@@ -327,10 +337,10 @@ export default function SearchModule() {
 
               {ready && (
                 <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap gap-2">
-                  <span className="font-display rounded-full bg-[#05070f]/70 px-3 py-1 text-sm tabular-nums text-white backdrop-blur">
+                  <span className="font-hud rounded-full bg-night/70 px-3 py-1 text-sm tabular-nums text-paper backdrop-blur">
                     {modeLabel[mode]}
                   </span>
-                  <span className="rounded-full bg-[#05070f]/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-sky-300 backdrop-blur">
+                  <span className="rounded-full bg-night/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-star backdrop-blur">
                     {DETECTOR}
                   </span>
                 </div>
@@ -339,11 +349,11 @@ export default function SearchModule() {
               {ready && observation && mode !== 'stack' && (
                 <div className="pointer-events-none absolute bottom-4 left-4">
                   {observation.flags.length === 0 ? (
-                    <span className="flex items-center gap-1.5 rounded-full bg-[#05070f]/70 px-3 py-1 text-xs text-emerald-300 backdrop-blur">
-                      <CheckCircle2 size={14} /> Observación válida
+                    <span className="flex items-center gap-1.5 rounded-full bg-night/70 px-3 py-1 text-xs text-emerald-300 backdrop-blur">
+                      <CheckCircle2 size={14} /> {m.modules.viewer.validObs}
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1.5 rounded-full bg-[#05070f]/70 px-3 py-1 text-xs text-violet-200 backdrop-blur">
+                    <span className="flex items-center gap-1.5 rounded-full bg-night/70 px-3 py-1 text-xs text-star backdrop-blur">
                       <AlertTriangle size={14} /> {observation.flags.join(', ')}
                     </span>
                   )}
@@ -351,30 +361,30 @@ export default function SearchModule() {
               )}
 
               {ready && (
-                <div className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-[#05070f]/70 p-1 backdrop-blur">
+                <div className="absolute bottom-4 right-4 flex items-center gap-1 rounded-full bg-night/70 p-1 backdrop-blur">
                   {!point && (
-                    <span className="hidden items-center gap-1.5 px-2 text-xs text-slate-300 md:flex">
-                      <MousePointerClick size={14} /> Clic en un objeto
+                    <span className="hidden items-center gap-1.5 px-2 text-xs text-paper/80 md:flex">
+                      <MousePointerClick size={14} /> {m.modules.viewer.clickShort}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => setZoom((z) => Math.max(1, z / 1.5))}
                     disabled={zoom <= 1}
-                    className="h-8 w-8 rounded-full text-slate-300 hover:bg-white/10 disabled:opacity-30"
-                    aria-label="Alejar"
+                    className="h-8 w-8 rounded-full text-paper/80 hover:bg-white/10 disabled:opacity-30"
+                    aria-label={m.common.zoomOut}
                   >
                     −
                   </button>
-                  <span className="font-display w-10 text-center text-xs tabular-nums text-slate-300">
+                  <span className="font-hud w-10 text-center text-xs tabular-nums text-paper/80">
                     {zoom.toFixed(1)}×
                   </span>
                   <button
                     type="button"
                     onClick={() => setZoom((z) => Math.min(8, z * 1.5))}
                     disabled={zoom >= 8}
-                    className="h-8 w-8 rounded-full text-slate-300 hover:bg-white/10 disabled:opacity-30"
-                    aria-label="Acercar"
+                    className="h-8 w-8 rounded-full text-paper/80 hover:bg-white/10 disabled:opacity-30"
+                    aria-label={m.common.zoomIn}
                   >
                     +
                   </button>
@@ -385,32 +395,32 @@ export default function SearchModule() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
                   {loading || computing ? (
                     <>
-                      <Hourglass size={34} className="animate-spin text-sky-300 [animation-duration:2.4s]" />
-                      <p className="font-display text-lg text-white">
+                      <Hourglass size={34} className="animate-spin text-star [animation-duration:2.4s]" />
+                      <p className="text-lg text-paper">
                         {fetching
-                          ? 'Buscando observaciones de SPHEREx…'
+                          ? sm.querying
                           : computing
                             ? mode === 'stack'
-                              ? 'Apilando observaciones…'
-                              : 'Calculando la diferencia…'
-                            : 'Cargando imágenes…'}
+                              ? sm.stacking
+                              : sm.differencing
+                            : sm.loading}
                       </p>
                       {!fetching && !computing && preload.total > 0 && (
-                        <p className="font-display text-xs tabular-nums text-slate-400">
+                        <p className="font-hud text-xs tabular-nums text-mist">
                           {preload.loaded} / {preload.total}
                         </p>
                       )}
                     </>
                   ) : current?.data && observations.length === 0 ? (
                     <>
-                      <Satellite size={34} className="text-slate-500" />
-                      <p className="font-display text-lg text-white">Sin observaciones en esa región</p>
+                      <Satellite size={34} className="text-mist/70" />
+                      <p className="text-lg text-paper">{sm.noObs}</p>
                     </>
                   ) : (
                     <>
-                      <Satellite size={34} className="text-sky-300" />
-                      <p className="font-display text-lg text-white">Elige una región del cielo</p>
-                      <p className="max-w-sm text-sm text-slate-400">Escribe RA, Dec y campo de visión y pulsa «GO».</p>
+                      <Satellite size={34} className="text-star" />
+                      <p className="text-lg text-paper">{m.modules.viewer.chooseRegion}</p>
+                      <p className="max-w-sm text-sm text-mist">{m.modules.viewer.chooseShort}</p>
                     </>
                   )}
                 </div>
@@ -459,12 +469,12 @@ export default function SearchModule() {
           {/* ---------- controles (como el wireframe) ---------- */}
           <div className="mt-3 grid gap-3 lg:grid-cols-[1.25fr_1fr]">
             <form onSubmit={onSubmit} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-              <p className="mb-4 text-sm text-slate-400">
-                Ingresa la ascensión recta, la declinación y el campo de visión.
+              <p className="mb-4 text-sm text-mist">
+                {fl.intro}
               </p>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
                 <label className="block">
-                  <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">RA</span>
+                  <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{fl.ra}</span>
                   <input
                     className={inputClass}
                     inputMode="decimal"
@@ -473,10 +483,10 @@ export default function SearchModule() {
                     onChange={(e) => setForm((f) => ({ ...f, ra: e.target.value }))}
                     required
                   />
-                  <span className="mt-1 block text-[11px] text-slate-500">Right Ascension (°)</span>
+                  <span className="mt-1 block text-[11px] text-mist/70">{fl.raHelp}</span>
                 </label>
                 <label className="block">
-                  <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">Dec</span>
+                  <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{fl.dec}</span>
                   <input
                     className={inputClass}
                     inputMode="decimal"
@@ -485,13 +495,13 @@ export default function SearchModule() {
                     onChange={(e) => setForm((f) => ({ ...f, dec: e.target.value }))}
                     required
                   />
-                  <span className="mt-1 block text-[11px] text-slate-500">Declination (°)</span>
+                  <span className="mt-1 block text-[11px] text-mist/70">{fl.decHelp}</span>
                 </label>
                 <label className="block">
-                  <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">FV</span>
-                  <div className="mt-1.5 flex overflow-hidden rounded-xl border border-white/15 bg-white/5 focus-within:border-sky-400">
+                  <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{fl.fov}</span>
+                  <div className="mt-1.5 flex overflow-hidden rounded-xl border border-white/15 bg-white/5 focus-within:border-star">
                     <input
-                      className="font-display w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 focus:outline-none"
+                      className="font-hud w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums text-paper placeholder:text-mist/70 focus:outline-none"
                       inputMode="decimal"
                       value={form.fov}
                       placeholder="0.1"
@@ -499,29 +509,29 @@ export default function SearchModule() {
                       required
                     />
                     <select
-                      aria-label="Unidad del campo de visión"
+                      aria-label={fl.fovUnit}
                       value={form.fovUnit}
                       onChange={(e) => setForm((f) => ({ ...f, fovUnit: e.target.value as FormValues['fovUnit'] }))}
-                      className="border-l border-white/10 bg-transparent px-2 text-sm text-slate-300 focus:outline-none [&>option]:bg-[#0a1230]"
+                      className="border-l border-white/10 bg-transparent px-2 text-sm text-paper/80 focus:outline-none [&>option]:bg-night-soft"
                     >
                       <option value="deg">°</option>
                       <option value="arcmin">′</option>
                     </select>
                   </div>
-                  <span className="mt-1 block text-[11px] text-slate-500">Field of view</span>
+                  <span className="mt-1 block text-[11px] text-mist/70">{fl.fovHelp}</span>
                 </label>
                 <div className="pb-5">
                   <button
                     type="submit"
                     disabled={fetching}
-                    className="w-full rounded-full bg-sky-500 px-7 py-2.5 text-sm font-bold tracking-[0.2em] text-slate-950 transition hover:bg-sky-400 disabled:opacity-50"
+                    className="w-full rounded-full bg-star px-7 py-2.5 text-sm font-bold tracking-[0.2em] text-night transition hover:bg-star-hover disabled:opacity-50"
                   >
-                    {fetching ? '…' : 'GO'}
+                    {fetching ? '…' : fl.go}
                   </button>
                 </div>
               </div>
               {errorMessage && (
-                <p role="alert" className="mt-1 flex items-center gap-2 text-sm text-violet-300">
+                <p role="alert" className="mt-1 flex items-center gap-2 text-sm text-star">
                   <AlertTriangle size={16} /> {errorMessage}
                 </p>
               )}

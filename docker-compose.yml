@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spherex-sky-explorer-fe:latest
+    container_name: spherex-fe
+    ports:
+      - "0.0.0.0:8080:80"
+    restart: unless-stopped

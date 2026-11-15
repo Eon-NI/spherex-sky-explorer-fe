@@ -12,9 +12,11 @@ import { useNavigate } from 'react-router';
 import { Canvas } from '@react-three/fiber';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ChevronDown, Crosshair, Dices, Maximize2, MousePointerClick, Pause, Play } from 'lucide-react';
+import { ChevronDown, Crosshair, Maximize2, MousePointerClick, Pause, Play } from 'lucide-react';
 
 import { nearestChannel } from '../../api/spherex';
+import { useI18n } from '../../i18n/useI18n';
+import { fmt } from '../../i18n/format';
 
 import SatelliteScene from './SatelliteScene';
 import {
@@ -59,12 +61,9 @@ function useMediaQuery(query: string) {
 /* =========================================================
    Componente principal
    ========================================================= */
-type ObservatoryTourProps = {
-  /** Qué hacer al pulsar "Ir a un lugar al azar". Por defecto navega a #sorpresa */
-  onSurprise?: () => void;
-};
-
-export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
+export default function ObservatoryTour() {
+  const { m } = useI18n();
+  const tt = m.observatory.tour;
   const sectionRef = useRef<HTMLElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
@@ -161,16 +160,11 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
 
   const shown = leaving ? -1 : active;
 
-  const handleSurprise = () => {
-    if (onSurprise) onSurprise();
-    else window.location.hash = 'sorpresa';
-  };
-
   return (
     <section
       ref={sectionRef}
-      aria-label="Tour de bienvenida del Observatorio EON"
-      className="bg-nasa relative"
+      aria-label={tt.aria}
+      className="bg-night relative"
       style={{ height: `${(STOPS.length - 1) * VH_PER_STOP + 100}vh` }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
@@ -194,8 +188,8 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
         </Canvas>
 
         {/* fundidos con el resto de la página */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#05070f] to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#05070f] to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-night to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-night to-transparent" />
 
         {/* ---------- Navegación de paradas ---------- */}
         <div
@@ -204,8 +198,8 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
           }`}
         >
         <nav
-          aria-label="Paradas del tour"
-          className="liquid-glass pointer-events-auto flex items-center gap-1 rounded-full px-2 py-1.5"
+          aria-label={tt.stopsNav}
+          className="pointer-events-auto flex items-center gap-1 rounded-full border border-paper/15 bg-night/70 p-1.5 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.7)] backdrop-blur-md md:gap-1.5 md:p-2"
         >
           {STOPS.map((s, i) => (
             <button
@@ -213,12 +207,13 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
               type="button"
               onClick={() => goTo(i)}
               aria-current={active === i ? 'step' : undefined}
-              className={`font-display flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium tabular-nums transition ${
-                active === i ? 'bg-white/10 text-white' : 'text-slate-400 hover:text-white'
+              aria-label={`${s.code} ${tt.stops[s.id]}`}
+              className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-colors md:px-5 md:py-3 md:text-base ${
+                active === i ? 'bg-star text-night' : 'text-mist hover:bg-paper/10 hover:text-paper'
               }`}
             >
-              <span>{s.code}</span>
-              <span className="hidden lg:inline">{s.label}</span>
+              <span className="font-hud tabular-nums">{s.code}</span>
+              <span className="hidden sm:inline">{tt.stops[s.id]}</span>
             </button>
           ))}
         </nav>
@@ -230,35 +225,29 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
         </Stop>
 
         <Stop index={1} active={shown}>
-          <HudCard code="01" label="Timelapse" title="El cielo a través del tiempo">
+          <HudCard code="01" label={tt.timelapse.label} title={tt.timelapse.title} activeLabel={tt.active}>
             <TimelapseContent controlsRef={controlsRef} onOpen={() => openScreen('timelapse')} />
           </HudCard>
         </Stop>
 
         <Stop index={2} active={shown}>
-          <HudCard code="02" label="Search" title="Busca un punto de interés">
+          <HudCard code="02" label={tt.search.label} title={tt.search.title} activeLabel={tt.active}>
             <SearchContent searchRef={searchRef} onOpen={() => openScreen('search')} />
           </HudCard>
         </Stop>
 
         <Stop index={3} active={shown}>
-          <HudCard code="03" label="Spectral Explorer" title="Los 102 canales de SPHEREx">
+          <HudCard code="03" label={tt.spectral.label} title={tt.spectral.title} activeLabel={tt.active}>
             <SpectralContent controlsRef={controlsRef} onOpen={() => openScreen('spectral')} />
           </HudCard>
         </Stop>
 
-        <Stop index={4} active={shown}>
-          <HudCard code="04" label="Discovery" title="Descubre lugares asombrosos">
-            <SurpriseContent onSurprise={handleSurprise} />
-          </HudCard>
-        </Stop>
-
         {/* ---------- Lectura de telemetría + progreso ---------- */}
-        <div className="pointer-events-none absolute bottom-5 left-5 z-20 hidden text-xs font-medium uppercase tracking-[0.35em] text-slate-500 md:block">
-          CAM · STOP {STOPS[active].code}/{STOPS[STOPS.length - 1].code} · {STOPS[active].label}
+        <div className="pointer-events-none absolute bottom-5 left-5 z-20 hidden text-xs font-medium uppercase tracking-[0.35em] text-mist/70 md:block">
+          CAM · STOP {STOPS[active].code}/{STOPS[STOPS.length - 1].code} · {tt.stops[STOPS[active].id]}
         </div>
         <div className="absolute inset-x-0 bottom-0 z-20 h-px bg-white/10">
-          <div ref={barRef} className="h-px origin-left scale-x-0 bg-sky-400" />
+          <div ref={barRef} className="h-px origin-left scale-x-0 bg-star" />
         </div>
 
         {/* ---------- Fundido al "entrar" en la pantalla del timelapse ---------- */}
@@ -267,7 +256,7 @@ export default function ObservatoryTour({ onSurprise }: ObservatoryTourProps) {
           className={`pointer-events-none absolute inset-0 z-40 transition-opacity ease-in ${
             leaving ? 'opacity-100 delay-700 duration-500' : 'opacity-0 duration-300'
           }`}
-          style={{ background: 'radial-gradient(circle at 50% 50%, #0a1230 0%, #05070f 75%)' }}
+          style={{ background: 'radial-gradient(circle at 50% 50%, var(--color-night-soft) 0%, var(--color-night) 75%)' }}
         />
       </div>
     </section>
@@ -306,23 +295,26 @@ function HudCard({
   code,
   label,
   title,
+  activeLabel,
   children,
 }: {
   code: string;
   label: string;
   title: string;
+  activeLabel: string;
   children: ReactNode;
 }) {
   return (
     <div className="liquid-glass liquid-glass-dark rounded-3xl p-6 md:p-8">
       {/* velo oscuro para que el texto se lea aunque detrás haya metal brillante */}
-      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-[#05070f]/45" />
+      <div className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-night/45" />
       <div className="mb-4 flex items-center justify-between gap-4">
-        
+        <span className="text-xs font-semibold uppercase tracking-widest text-star">{code} · {label}</span>
+        <span className="text-xs text-mist">{activeLabel}</span>
       </div>
 
-      <h3 className="font-display text-2xl font-semibold text-white md:text-3xl">{title}</h3>
-      <div className="mt-3 space-y-4 text-sm leading-6 text-slate-300">{children}</div>
+      <h3 className="text-2xl font-semibold text-paper md:text-3xl">{title}</h3>
+      <div className="mt-3 space-y-4 text-sm leading-6 text-paper/80">{children}</div>
     </div>
   );
 }
@@ -331,28 +323,31 @@ function HudCard({
    Contenido de cada parada
    ========================================================= */
 function HeroContent({ onStart }: { onStart: () => void }) {
+  const { m } = useI18n();
+  const h = m.observatory.tour.hero;
   return (
     <div className="md:max-w-xl">
-      
-      <h1 className="font-display mt-0 text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-6xl">
-        Descubriendo
-        <span className="block bg-gradient-to-r from-sky-300 via-blue-400 to-violet-400 bg-clip-text text-transparent">
-          más allá del cosmos
+      <span className="text-xs font-medium uppercase tracking-[0.35em] text-star">
+        {h.eyebrow}
+      </span>
+      <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-paper md:text-6xl">
+        {h.titleA}
+        <span className="block text-star">
+          {h.titleB}
         </span>
       </h1>
-      <p className="mt-5 max-w-md text-base leading-7 text-slate-300">
-        Recorre el panel de control del satélite. Cada pantalla es un módulo del observatorio:
-        desliza hacia abajo y descúbrelos paso a paso.
+      <p className="mt-5 max-w-md text-base leading-7 text-paper/80">
+        {h.text}
       </p>
       <button
         type="button"
         onClick={onStart}
-        className="mt-8 inline-flex items-center gap-3 rounded-full bg-sky-500 py-2 pl-2 pr-5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+        className="mt-8 inline-flex items-center gap-3 rounded-full bg-star py-2 pl-2 pr-5 text-sm font-semibold text-night transition hover:bg-star-hover"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-950/15">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-night/15">
           <ChevronDown size={16} className="animate-bounce" />
         </span>
-        Comenzar recorrido
+        {h.start}
       </button>
     </div>
   );
@@ -360,12 +355,13 @@ function HeroContent({ onStart }: { onStart: () => void }) {
 
 /** Gráfico: 5 fotogramas del mismo trozo de cielo con un objeto que se desplaza */
 function FilmStrip() {
-  const frames = ['May', 'Jul', 'Sep', 'Nov', 'Ene'];
+  const { m } = useI18n();
+  const frames = m.observatory.tour.timelapse.months;
   const stars = [
     [10, 12], [34, 9], [44, 30], [16, 38], [28, 22], [40, 44], [8, 26],
   ];
   return (
-    <svg viewBox="0 0 300 74" className="w-full" role="img" aria-label="Cinco fotogramas en los que un objeto se desplaza">
+    <svg viewBox="0 0 300 74" className="w-full" role="img" aria-label={m.observatory.tour.timelapse.filmStripAria}>
       <defs>
         <linearGradient id="tl-strip" x1="0" x2="1">
           <stop offset="0%" stopColor="#a78bfa" />
@@ -378,7 +374,7 @@ function FilmStrip() {
         const x = 4 + i * 59;
         const t = i / (frames.length - 1);
         return (
-          <g key={label} transform={`translate(${x} 4)`}>
+          <g key={i} transform={`translate(${x} 4)`}>
             <rect width="52" height="52" rx="8" fill="#0a1230" stroke="rgba(255,255,255,0.12)" />
             {stars.map(([sx, sy], k) => (
               <circle key={k} cx={sx} cy={sy} r={k % 3 === 0 ? 1.4 : 0.9} fill="#e2e8f0" opacity={0.7} />
@@ -386,7 +382,7 @@ function FilmStrip() {
             {/* objeto en movimiento */}
             <circle cx={12 + t * 30} cy={40 - t * 24} r="5" fill="#7dd3fc" opacity="0.25" />
             <circle cx={12 + t * 30} cy={40 - t * 24} r="2.2" fill="#ffffff" />
-            <text x="26" y="66" textAnchor="middle" className="fill-slate-500 text-[9px]">
+            <text x="26" y="66" textAnchor="middle" className="fill-mist text-[9px]">
               {label}
             </text>
           </g>
@@ -404,6 +400,8 @@ function TimelapseContent({
   onOpen: () => void;
 }) {
   const [playing, setPlaying] = useState(true);
+  const { m } = useI18n();
+  const tl = m.observatory.tour.timelapse;
 
   const toggle = () => {
     const next = !playing;
@@ -414,9 +412,7 @@ function TimelapseContent({
   return (
     <>
       <p>
-        Une las imágenes de un mismo trozo de cielo tomadas en fechas distintas y las reproduce como
-        un vídeo: lo que se desplaza o cambia de brillo puede ser un asteroide, un cometa o una
-        estrella variable.
+        {tl.text}
       </p>
 
       <div className="hidden rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 sm:block">
@@ -427,23 +423,23 @@ function TimelapseContent({
         <button
           type="button"
           onClick={onOpen}
-          className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+          className="inline-flex items-center gap-2 rounded-full bg-star px-5 py-2.5 text-sm font-semibold text-night transition hover:bg-star-hover"
         >
           <Maximize2 size={16} />
-          Abrir Timelapse
+          {tl.open}
         </button>
         <button
           type="button"
           onClick={toggle}
-          aria-label={playing ? 'Pausar la pantalla del satélite' : 'Reproducir la pantalla del satélite'}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-slate-300 transition hover:border-white/40 hover:text-white"
+          aria-label={playing ? tl.pause : tl.play}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-paper/80 transition hover:border-white/40 hover:text-paper"
         >
           {playing ? <Pause size={16} /> : <Play size={16} className="translate-x-px" />}
         </button>
       </div>
 
-      <p className="flex items-center gap-2 text-xs text-slate-500">
-        <MousePointerClick size={14} /> También puedes hacer clic en la pantalla del satélite.
+      <p className="flex items-center gap-2 text-xs text-mist/70">
+        <MousePointerClick size={14} /> {tl.hint}
       </p>
     </>
   );
@@ -456,10 +452,12 @@ function SearchContent({
   searchRef: RefObject<SearchCoords>;
   onOpen: () => void;
 }) {
+  const { m } = useI18n();
+  const sc = m.observatory.tour.search;
   const [ra, setRa] = useState('');
   const [dec, setDec] = useState('');
   const field =
-    'font-display mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 focus:border-sky-400 focus:outline-none';
+    'font-hud mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm tabular-nums text-paper placeholder:text-mist/70 focus:border-star focus:outline-none';
 
   const update = (next: SearchCoords) => {
     setRa(next.ra);
@@ -476,14 +474,13 @@ function SearchContent({
       }}
     >
       <p>
-        Cada punto del cielo tiene una "dirección", igual que la latitud y longitud en la Tierra.
-        Escríbela y la cámara viaja hasta esa región.
+        {sc.text}
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="text-xs font-medium uppercase tracking-[0.25em] text-sky-300">
-            RA · Ascensión recta
+          <span className="text-xs font-medium uppercase tracking-[0.25em] text-mist">
+            {sc.ra}
           </span>
           <input
             className={field}
@@ -492,14 +489,14 @@ function SearchContent({
             value={ra}
             onChange={(e) => update({ ra: e.target.value, dec })}
           />
-          <span className="mt-1.5 block text-xs leading-5 text-slate-400">
-            Como la longitud: de 0° a 360° hacia el este.
+          <span className="mt-1.5 block text-xs leading-5 text-mist">
+            {sc.raHelp}
           </span>
         </label>
 
         <label className="block">
-          <span className="text-xs font-medium uppercase tracking-[0.25em] text-sky-300">
-            Dec · Declinación
+          <span className="text-xs font-medium uppercase tracking-[0.25em] text-mist">
+            {sc.dec}
           </span>
           <input
             className={field}
@@ -508,8 +505,8 @@ function SearchContent({
             value={dec}
             onChange={(e) => update({ ra, dec: e.target.value })}
           />
-          <span className="mt-1.5 block text-xs leading-5 text-slate-400">
-            Como la latitud: de −90° a +90° desde el ecuador celeste.
+          <span className="mt-1.5 block text-xs leading-5 text-mist">
+            {sc.decHelp}
           </span>
         </label>
       </div>
@@ -517,22 +514,22 @@ function SearchContent({
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
-          className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+          className="inline-flex items-center gap-2 rounded-full bg-star px-5 py-2.5 text-sm font-semibold text-night transition hover:bg-star-hover"
         >
           <Maximize2 size={16} />
-          Buscar
+          {sc.submit}
         </button>
         <button
           type="button"
           onClick={() => update({ ra: SEARCH_EXAMPLE.ra, dec: SEARCH_EXAMPLE.dec })}
-          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-paper/90 transition hover:bg-white/10"
         >
-          <Crosshair size={14} /> Ejemplo: M101
+          <Crosshair size={14} /> {sc.example}
         </button>
       </div>
 
-      <p className="flex items-center gap-2 text-xs text-slate-500">
-        <MousePointerClick size={14} /> También puedes hacer clic en la pantalla del satélite.
+      <p className="flex items-center gap-2 text-xs text-mist/70">
+        <MousePointerClick size={14} /> {sc.hint}
       </p>
     </form>
   );
@@ -545,21 +542,21 @@ function SpectralContent({
   controlsRef: RefObject<TourControls>;
   onOpen: () => void;
 }) {
+  const { m } = useI18n();
+  const sp = m.observatory.tour.spectral;
   const [wl, setWl] = useState(2.2);
   const channel = wavelengthToChannel(wl);
 
   return (
     <>
       <p>
-        SPHEREx no toma una sola foto: divide la luz infrarroja en {CHANNELS} canales, de{' '}
-        {WL_MIN} µm a {WL_MAX} µm. Cada canal revela algo distinto, como hielo de agua, polvo o
-        galaxias lejanas.
+        {fmt(sp.text, { channels: CHANNELS, min: WL_MIN, max: WL_MAX })}
       </p>
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
         <div className="mb-3 flex items-baseline justify-between gap-3 text-xs">
-          <span className="font-medium uppercase tracking-[0.25em] text-slate-400">Longitud de onda</span>
-          <span className="font-display tabular-nums text-sky-300">
+          <span className="font-medium uppercase tracking-[0.25em] text-mist">{sp.wavelength}</span>
+          <span className="font-hud tabular-nums text-star">
             λ {wl.toFixed(2)} µm · CH {String(channel).padStart(3, '0')}
           </span>
         </div>
@@ -576,10 +573,10 @@ function SpectralContent({
             setWl(v);
             controlsRef.current.wavelength = v;
           }}
-          aria-label="Longitud de onda en micrómetros"
-          className="w-full cursor-pointer accent-sky-400"
+          aria-label={sp.sliderAria}
+          className="w-full cursor-pointer accent-star"
         />
-        <div className="font-display mt-1 flex justify-between text-xs tabular-nums text-slate-500">
+        <div className="font-hud mt-1 flex justify-between text-xs tabular-nums text-mist/70">
           <span>0.75 µm</span>
           <span>5 µm</span>
         </div>
@@ -588,35 +585,15 @@ function SpectralContent({
       <button
         type="button"
         onClick={onOpen}
-        className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
+        className="inline-flex items-center gap-2 rounded-full bg-star px-5 py-2.5 text-sm font-semibold text-night transition hover:bg-star-hover"
       >
         <Maximize2 size={16} />
-        Abrir Spectral Explorer
+        {sp.open}
       </button>
 
-      <p className="flex items-center gap-2 text-xs text-slate-500">
-        <MousePointerClick size={14} /> Mueve el control (las perillas responden) o haz clic en la
-        pantalla del satélite.
+      <p className="flex items-center gap-2 text-xs text-mist/70">
+        <MousePointerClick size={14} /> {sp.hint}
       </p>
-    </>
-  );
-}
-
-function SurpriseContent({ onSurprise }: { onSurprise: () => void }) {
-  return (
-    <>
-      <p>
-        ¿No sabes por dónde empezar? El radar elige al azar una región interesante del cielo
-        (nebulosas, cúmulos o galaxias) y te lleva hasta ella.
-      </p>
-      <button
-        type="button"
-        onClick={onSurprise}
-        className="group inline-flex items-center gap-3 rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-sky-400"
-      >
-        <Dices size={18} className="transition-transform duration-500 group-hover:rotate-180" />
-        Ir a un lugar al azar
-      </button>
     </>
   );
 }

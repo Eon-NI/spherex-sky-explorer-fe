@@ -34,7 +34,7 @@ export const wavelengthToChannel = (wl: number) =>
   Math.round(((wl - WL_MIN) / (WL_MAX - WL_MIN)) * (CHANNELS - 1)) + 1;
 
 /* ---------- Paradas de la cámara ---------- */
-export type StopId = 'hero' | 'timelapse' | 'search' | 'spectral' | 'surprise';
+export type StopId = 'hero' | 'timelapse' | 'search' | 'spectral';
 
 export type CameraStop = {
   id: StopId;
@@ -90,16 +90,6 @@ export const STOPS: CameraStop[] = [
     target: facePoint(FACE.spectral, BUS_APOTHEM, 0.05),
     shiftX: -0.55,
     shiftY: -0.35,
-  },
-  {
-    id: 'surprise',
-    code: '04',
-    label: 'Sorpresa',
-    align: 'right',
-    position: new THREE.Vector3(1.9, 5.4, 2.3),
-    target: new THREE.Vector3(0, 1.8, 0),
-    shiftX: 0.7,
-    shiftY: -0.5,
   },
 ];
 

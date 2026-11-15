@@ -1,5 +1,6 @@
 /**
- * Datos simulados para generar cutouts sintéticos (estrellas fijas + un asteroide que se mueve + una estrella variable)
+ * Datos simulados para desarrollar el frontend sin backend.
+ * Genera cutouts sintéticos (estrellas fijas + un asteroide que se mueve + una estrella variable)
  * para poder probar el timelapse, el clic y las acciones.
  */
 import {

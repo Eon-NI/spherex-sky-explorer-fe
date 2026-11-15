@@ -22,4 +22,4 @@ export function hueAtPosition(pos: number) {
 export const channelColor = (index: number, alpha = 1) => `hsla(${channelHue(index)}, 85%, 62%, ${alpha})`;
 
 /** Colores de los objetos comparados (paleta del landing) */
-export const OBJECT_COLORS = ['#7dd3fc', '#a78bfa', '#e2e8f0'];
+export const OBJECT_COLORS = ['#ffb938', '#7dd3fc', '#e2e8f0'];

@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useI18n } from '../../../i18n/useI18n';
 
 /**
  * Capas animadas sobre las imágenes de la sección informativa.
@@ -7,6 +8,7 @@ import { motion } from 'motion/react';
 
 /** SPHEREx: una franja de escaneo recorre la imagen y deja ver las bandas infrarrojas */
 export function SpherexScan() {
+    const { m } = useI18n();
     return (
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
             <motion.div
@@ -20,13 +22,13 @@ export function SpherexScan() {
                 animate={{ x: '400%' }}
                 transition={{ duration: 7, ease: 'linear', repeat: Infinity, repeatDelay: 1.5 }}
             />
-            <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-night/75 px-3 py-1.5 text-xs font-semibold text-paper backdrop-blur">
+            <div className="font-hud absolute bottom-4 left-4 flex items-center gap-2 rounded-full bg-night/75 px-3 py-1.5 text-xs font-medium text-paper backdrop-blur">
                 <span className="flex h-2 w-14 overflow-hidden rounded-full">
                     {['#a78bfa', '#60a5fa', '#38bdf8', '#34d399', '#facc15', '#fb923c'].map((c) => (
                         <span key={c} className="flex-1" style={{ background: c }} />
                     ))}
                 </span>
-                102 bandas · 0.75–5 µm
+                {m.landing.info.spherex.chip}
             </div>
         </div>
     );
@@ -37,6 +39,7 @@ export function SpherexScan() {
  * y se desplaza lentamente; deja marcas de sus posiciones anteriores.
  */
 export function HiddenWorldTrail() {
+    const { m } = useI18n();
     return (
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
             {/* posiciones registradas en capturas anteriores */}
@@ -67,8 +70,8 @@ export function HiddenWorldTrail() {
                 </span>
             </motion.span>
 
-            <div className="absolute right-4 bottom-4 rounded-full bg-night/75 px-3 py-1.5 text-xs font-semibold text-paper backdrop-blur">
-                Infrarrojo · objeto en movimiento
+            <div className="font-hud absolute right-4 bottom-4 rounded-full bg-night/75 px-3 py-1.5 text-xs font-medium text-paper backdrop-blur">
+                {m.landing.info.planetX.chip}
             </div>
         </div>
     );

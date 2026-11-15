@@ -127,7 +127,7 @@ function Screen({
       {interactive && (
         <mesh position-z={0.001}>
           <planeGeometry args={[w + 0.2, h + 0.2]} />
-          <meshBasicMaterial color="#38bdf8" transparent opacity={hovered ? 0.45 : 0} toneMapped={false} />
+          <meshBasicMaterial color="#ffb938" transparent opacity={hovered ? 0.45 : 0} toneMapped={false} />
         </mesh>
       )}
       {/* bisel */}
@@ -157,7 +157,7 @@ function Screen({
       {/* tira de luz cian */}
       <mesh position={[0, -h / 2 - 0.07, 0.03]}>
         <boxGeometry args={[w * 0.55, 0.012, 0.012]} />
-        <meshBasicMaterial color="#38bdf8" toneMapped={false} />
+        <meshBasicMaterial color="#ffb938" toneMapped={false} />
       </mesh>
     </group>
   );
@@ -180,8 +180,8 @@ function Keypad() {
         <mesh key={i} position={[k.x, k.y, 0.025]}>
           <boxGeometry args={[0.15, 0.09, 0.04]} />
           <meshStandardMaterial
-            color={k.lit ? '#38bdf8' : '#1e2638'}
-            emissive={k.lit ? '#38bdf8' : '#000000'}
+            color={k.lit ? '#ffb938' : '#1e2638'}
+            emissive={k.lit ? '#ffb938' : '#000000'}
             emissiveIntensity={k.lit ? 1.2 : 0}
             metalness={0.5}
             roughness={0.4}
@@ -214,11 +214,11 @@ function SpectralControls({ controlsRef }: { controlsRef: RefObject<TourControls
       {/* pista del slider */}
       <mesh position={[0, -0.27, 0.015]}>
         <boxGeometry args={[0.86, 0.025, 0.02]} />
-        <meshBasicMaterial color="#0c4a6e" toneMapped={false} />
+        <meshBasicMaterial color="#5a4313" toneMapped={false} />
       </mesh>
       <mesh ref={handle} position={[0, -0.27, 0.04]}>
         <boxGeometry args={[0.05, 0.11, 0.05]} />
-        <meshStandardMaterial color="#e2e8f0" emissive="#7dd3fc" emissiveIntensity={0.6} metalness={0.6} roughness={0.25} />
+        <meshStandardMaterial color="#e2e8f0" emissive="#ffc95e" emissiveIntensity={0.6} metalness={0.6} roughness={0.25} />
       </mesh>
 
       {/* perillas */}
@@ -236,7 +236,7 @@ function SpectralControls({ controlsRef }: { controlsRef: RefObject<TourControls
           </mesh>
           <mesh position={[0, 0.05, 0.037]}>
             <boxGeometry args={[0.012, 0.04, 0.005]} />
-            <meshBasicMaterial color="#38bdf8" toneMapped={false} />
+            <meshBasicMaterial color="#ffb938" toneMapped={false} />
           </mesh>
         </group>
       ))}
@@ -388,7 +388,7 @@ function Satellite({
       </mesh>
       <mesh position-y={BUS_HEIGHT / 2 + 1.11} rotation-x={Math.PI / 2}>
         <torusGeometry args={[0.6, 0.018, 12, 64]} />
-        <meshBasicMaterial color="#38bdf8" toneMapped={false} />
+        <meshBasicMaterial color="#ffb938" toneMapped={false} />
       </mesh>
 
       {/* ---------- Panel solar y propulsores ---------- */}

@@ -1,11 +1,11 @@
-import type { Detector } from "../../api/spherex";
+import type { Detector } from '../../api/spherex';
 
 /** Valores del formulario (texto, tal y como los escribe la persona) */
 export type SearchFormValues = {
   ra: string;
   dec: string;
   fov: string;
-  fovUnit: "deg" | "arcmin";
+  fovUnit: 'deg' | 'arcmin';
   start: string;
   end: string;
   detector: Detector;
@@ -21,7 +21,7 @@ export type SelectedPoint = {
   frameIndex: number;
 };
 
-export type PointAction = "coordinates" | "spectrum" | "metadata" | "share";
+export type PointAction = 'coordinates' | 'spectrum' | 'metadata' | 'share';
 
 /** Cambio registrado por la persona usuaria */
 export type ChangeRecord = {

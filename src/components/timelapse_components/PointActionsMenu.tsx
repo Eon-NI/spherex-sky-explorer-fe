@@ -1,13 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { Activity, FileText, MapPin, Share2, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { ACTIONS } from './pointActions';
 import type { PointAction } from './types';
+import { useI18n } from '../../i18n/useI18n';
 
-export const ACTIONS: { id: PointAction; label: string; icon: typeof MapPin }[] = [
-  { id: 'coordinates', label: 'Coordenadas', icon: MapPin },
-  { id: 'spectrum', label: 'Espectro', icon: Activity },
-  { id: 'metadata', label: 'Metadatos', icon: FileText },
-  { id: 'share', label: 'Compartir URL', icon: Share2 },
-];
 
 type PointActionsMenuProps = {
   x: number;
@@ -30,6 +26,7 @@ export default function PointActionsMenu({
   onChoose,
   onClose,
 }: PointActionsMenuProps) {
+  const { m } = useI18n();
   const firstRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -47,29 +44,29 @@ export default function PointActionsMenu({
     <div className="absolute z-20" style={{ left, top, width: MENU_W }} role="menu">
       <div className="liquid-glass liquid-glass-dark rounded-2xl p-2">
         <div className="flex items-center justify-between px-2 pb-1 pt-0.5">
-          <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">
-            Punto
+          <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">
+            {m.modules.point.menuTitle}
           </span>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
-            className="rounded-full p-1 text-slate-400 hover:bg-white/10 hover:text-white"
+            aria-label={m.common.close}
+            className="rounded-full p-1 text-mist hover:bg-white/10 hover:text-paper"
           >
             <X size={14} />
           </button>
         </div>
-        {ACTIONS.map(({ id, label, icon: Icon }, i) => (
+        {ACTIONS.map(({ id, icon: Icon }, i) => (
           <button
             key={id}
             ref={i === 0 ? firstRef : undefined}
             type="button"
             role="menuitem"
             onClick={() => onChoose(id)}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-slate-200 transition hover:bg-white/10 hover:text-white focus:bg-white/10 focus:outline-none"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-paper/90 transition hover:bg-white/10 hover:text-paper focus:bg-white/10 focus:outline-none"
           >
-            <Icon size={16} className="text-sky-300" />
-            {label}
+            <Icon size={16} className="text-star" />
+            {m.modules.point[id]}
           </button>
         ))}
       </div>

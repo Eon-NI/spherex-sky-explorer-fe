@@ -47,5 +47,5 @@ export function formatDecDms(decDeg: number) {
   return `${sign}${pad(a)}° ${pad(m)}′ ${s.toFixed(1).padStart(4, '0')}″`;
 }
 
-export const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString('es', { year: 'numeric', month: 'short', day: '2-digit' });
+export const formatDate = (iso: string, locale = 'es') =>
+  new Date(iso).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: '2-digit' });

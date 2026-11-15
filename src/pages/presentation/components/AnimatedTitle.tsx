@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'motion/react';
 import { EASE_OUT } from './motionPresets';
+import { useI18n } from '../../../i18n/useI18n';
 
 /**
  * Título del hero con animación tipográfica.
@@ -13,15 +14,17 @@ import { EASE_OUT } from './motionPresets';
  * la versión animada es decorativa (aria-hidden).
  */
 
-const TEXT = 'EXPLORA EL COSMOS Y DESCUBRE NUEVOS MUNDOS A TRAVÉS DEL TIEMPO';
-
 type Word = { text: string; open?: boolean };
 
-const LINES: Word[][] = [
-    [{ text: 'EXPLORA' }, { text: 'EL' }, { text: 'COSMOS', open: true }],
-    [{ text: 'Y' }, { text: 'DESCUBRE' }, { text: 'NUEVOS' }, { text: 'MUNDOS', open: true }],
-    [{ text: 'A' }, { text: 'TRAVÉS' }, { text: 'DEL' }, { text: 'TIEMPO' }],
-];
+/**
+ * Las líneas vienen del JSON de idioma (landing.hero.titleLines).
+ * Una palabra que empieza con "*" es la que se "abre" desde su letra O.
+ */
+function parseLines(lines: string[][]): Word[][] {
+    return lines.map((line) =>
+        line.map((w) => (w.startsWith('*') ? { text: w.slice(1), open: true } : { text: w })),
+    );
+}
 
 /** Momento (s) en que empieza cada línea */
 const LINE_START = [0.15, 0.95, 1.6];
@@ -129,13 +132,15 @@ function OpeningWord({ text, delay }: { text: string; delay: number }) {
 
 export default function AnimatedTitle({ className = '', id }: { className?: string; id?: string }) {
     const reduced = useReducedMotion();
+    const { m } = useI18n();
+    const lines = parseLines(m.landing.hero.titleLines);
 
     return (
         <h1 id={id} className={className}>
-            <span className="sr-only">{TEXT}</span>
+            <span className="sr-only">{m.landing.hero.title}</span>
 
             <span aria-hidden="true" className="block">
-                {LINES.map((line, li) => {
+                {lines.map((line, li) => {
                     return (
                         <span key={li} className="block">
                             {line.map((word, wi) => {
@@ -150,8 +155,8 @@ export default function AnimatedTitle({ className = '', id }: { className?: stri
                                     );
                                 }
                                 const delay = word.open
-                                    ? LINE_START[li] + OPEN_OFFSET[li]
-                                    : LINE_START[li] + wi * 0.08;
+                                    ? (LINE_START[li] ?? 1.6) + (OPEN_OFFSET[li] ?? 0.25)
+                                    : (LINE_START[li] ?? 1.6) + wi * 0.08;
                                 return (
                                     <span key={wi}>
                                         {word.open ? (
