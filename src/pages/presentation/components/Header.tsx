@@ -8,9 +8,10 @@ import LanguageSwitcher from "../../../i18n/LanguageSwitcher";
 const navLink =
   "rounded-full px-3 py-2 transition-colors hover:bg-paper/10 sm:px-4";
 
-type NavItem = { key: "observatory" | "features" | "about" | "references"; to?: string; href?: string };
+type NavItem = { key: "home" | "observatory" | "features" | "about" | "references"; to?: string; href?: string };
 
 const links: NavItem[] = [
+  { key: "home", to: "/" },
   { key: "observatory", to: "/observatorio" },
   { key: "features", href: "/#caracteristicas" },
   { key: "about", href: "/#about" },
@@ -30,7 +31,7 @@ export default function Header() {
   }, [open]);
 
   const item = (l: NavItem, className: string) => {
-    const label = m.landing.nav[l.key];
+    const label = l.key === "home" ? m.common.homeAria : m.landing.nav[l.key];
     // Link también para las anclas ("/#about"): desde otra página vuelve a la landing
     // sin recargar y LandingV2 hace el scroll a la sección
     return (

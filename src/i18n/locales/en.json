@@ -24,22 +24,34 @@
       "spectral": "Spectral analysis"
     }
   },
-
   "landing": {
     "nav": {
+      "home": "Home",
       "observatory": "Observatory",
       "features": "Features",
       "about": "About",
       "openMenu": "Open menu",
-      "closeMenu": "Close menu"
-      , "references": "References"
+      "closeMenu": "Close menu",
+      "references": "References"
     },
     "hero": {
       "title": "EXPLORE THE COSMOS AND DISCOVER NEW WORLDS THROUGH TIME",
       "titleLines": [
-        ["EXPLORE", "THE", "*COSMOS"],
-        ["AND", "DISCOVER", "NEW", "*WORLDS"],
-        ["THROUGH", "TIME"]
+        [
+          "EXPLORE",
+          "THE",
+          "*COSMOS"
+        ],
+        [
+          "AND",
+          "DISCOVER",
+          "NEW",
+          "*WORLDS"
+        ],
+        [
+          "THROUGH",
+          "TIME"
+        ]
       ],
       "subtitle": "Analyze more than a billion objects captured by NASA's SPHEREx mission. Compare epochs, filter 102 infrared bands and help us find asteroids, brown dwarfs and the next great astronomical discovery with EON.",
       "cta": "Start exploring in the Observatory"
@@ -101,9 +113,18 @@
       "text": "Through Aetheris we aim to bring astronomical exploration closer to everyone, letting them discover the sky and explore how it changes over time.",
       "logoAlt": "EON logo",
       "pillars": {
-        "astronomy": { "title": "Astronomy", "text": "We are driven by curiosity about what the sky still hides." },
-        "technology": { "title": "Technology", "text": "We turn scientific data into visual experiences." },
-        "exploration": { "title": "Exploration", "text": "We want anyone to be able to discover the sky." }
+        "astronomy": {
+          "title": "Astronomy",
+          "text": "We are driven by curiosity about what the sky still hides."
+        },
+        "technology": {
+          "title": "Technology",
+          "text": "We turn scientific data into visual experiences."
+        },
+        "exploration": {
+          "title": "Exploration",
+          "text": "We want anyone to be able to discover the sky."
+        }
       }
     },
     "footer": {
@@ -117,14 +138,15 @@
       "features": "Features",
       "functions": "Capabilities",
       "about": "About EON",
-      "backToTop": "Back to top", 
+      "backToTop": "Back to top",
       "references": "References"
     }
   },
-
   "observatory": {
     "header": {
-      "back": "Back to Home", "backObservatory": "Back to Observatory", "backObservatoryShort": "Observatory"
+      "back": "Back to Home",
+      "backObservatory": "Back to Observatory",
+      "backObservatoryShort": "Observatory"
     },
     "footer": {
       "ctaTitle": "Thanks for exploring the sky with <hl>Aetheris</hl>.",
@@ -154,7 +176,13 @@
         "title": "The sky through time",
         "text": "It joins images of the same patch of sky taken on different dates and plays them like a video: whatever moves or changes brightness could be an asteroid, a comet or a variable star.",
         "filmStripAria": "Five frames in which an object moves",
-        "months": ["May", "Jul", "Sep", "Nov", "Jan"],
+        "months": [
+          "May",
+          "Jul",
+          "Sep",
+          "Nov",
+          "Jan"
+        ],
         "open": "Open Timelapse",
         "pause": "Pause the satellite screen",
         "play": "Play the satellite screen",
@@ -183,7 +211,6 @@
       }
     }
   },
-
   "modules": {
     "timelapse": {
       "eyebrow": "Module · Timelapse",
@@ -354,11 +381,11 @@
       "copyCode": "Copy code"
     }
   },
-
   "minigame": {
     "line1": "EON © 2026. An astronomical exploration project.",
     "line2": "Explore the universe, discover time."
-  }  ,"references": {
+  },
+  "references": {
     "eyebrow": "References",
     "title": "References to explore further",
     "text": "Check out selected external sources to expand what you have learned and dive deeper into SPHEREx and the exploration of the universe.",
@@ -367,10 +394,26 @@
     "newTab": "(opens in a new tab)",
     "count": "SPHEREx · {{count}} references",
     "items": {
-      "spherex": { "title": "SPHEREx Mission", "source": "NASA", "description": "Meet the NASA mission that will map the sky in 102 infrared bands." },
-      "planetX": { "title": "Planet X", "source": "NASA", "description": "Explore the hypothesis of a mysterious planet hidden at the edge of the solar system." },
-      "coordinates": { "title": "Declination and Right Ascension", "source": "NASA", "description": "Learn how celestial objects are located using sky coordinates." },
-      "spectrum": { "title": "What is a spectrum?", "source": "Video", "description": "See in a simple way how light splits apart and reveals information about the universe." }
+      "spherex": {
+        "title": "SPHEREx Mission",
+        "source": "NASA",
+        "description": "Meet the NASA mission that will map the sky in 102 infrared bands."
+      },
+      "planetX": {
+        "title": "Planet X",
+        "source": "NASA",
+        "description": "Explore the hypothesis of a mysterious planet hidden at the edge of the solar system."
+      },
+      "coordinates": {
+        "title": "Declination and Right Ascension",
+        "source": "NASA",
+        "description": "Learn how celestial objects are located using sky coordinates."
+      },
+      "spectrum": {
+        "title": "What is a spectrum?",
+        "source": "Video",
+        "description": "See in a simple way how light splits apart and reveals information about the universe."
+      }
     }
   }
 }

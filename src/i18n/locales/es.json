@@ -27,6 +27,7 @@
 
   "landing": {
     "nav": {
+      "home": "Inicio",
       "observatory": "Observatorio",
       "features": "Características",
       "about": "Acerca de",
