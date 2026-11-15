@@ -17,6 +17,7 @@ import {
 } from '../../api/spherex';
 import TimelapseViewer, { type ViewerMarker } from '../timelapse_components/TimelapseViewer';
 import { inputClass } from '../timelapse_components/SearchFields';
+import { uvToSky } from '../timelapse_components/skyMath';
 import ChannelSlider from './ChannelSlider';
 import SpectralCube from './SpectralCube';
 import SpectrumCompareChart, { type SpectrumSeries } from './SpectrumCompareChart';
@@ -54,9 +55,15 @@ type ObjectPoint = {
     v: number;
     ra: number;
     dec: number;
+    /** true cuando las coordenadas ya vienen del WCS del backend (o de la aproximación local) */
+    resolved: boolean;
 };
 
 const MAX_OBJECTS = 3;
+
+/* crypto.randomUUID no existe fuera de https/localhost (p. ej. http://192.168.x.x en Docker) */
+let pointSeq = 0;
+const newPointId = () => `p${Date.now().toString(36)}-${++pointSeq}`;
 
 /* =========================================================
    Módulo Spectral Explorer
@@ -99,6 +106,18 @@ export default function SpectralModule() {
     const [previewLoading, setPreviewLoading] = useState(false);
     const [playing, setPlaying] = useState(false);
     const posRef = useRef(0);
+    /* peticiones de espectro en curso, para cancelarlas al quitar un punto o buscar otra región */
+    const requestsRef = useRef(new Map<string, AbortController>());
+
+    const cancelRequest = (id: string) => {
+        requestsRef.current.get(id)?.abort();
+        requestsRef.current.delete(id);
+    };
+
+    useEffect(() => {
+        const requests = requestsRef.current;
+        return () => requests.forEach((ctrl) => ctrl.abort());
+    }, []);
 
     /* ---------- cubo espectral ---------- */
     useEffect(() => {
@@ -161,6 +180,8 @@ export default function SpectralModule() {
             return;
         }
         setFormError(null);
+        requestsRef.current.forEach((ctrl) => ctrl.abort());
+        requestsRef.current.clear();
         setObjects([]);
         setSpectra({});
         setZoom(1);
@@ -177,27 +198,65 @@ export default function SpectralModule() {
     };
 
     const onSelectPoint = (u: number, v: number) => {
-        if (!query || current?.data?.tileId === undefined) return;
-        const used = new Set(objects.map((o) => o.slot));
-        const keep = objects.length >= MAX_OBJECTS ? objects.slice(1) : objects;
-        const freed = objects.length >= MAX_OBJECTS ? objects[0].slot : undefined;
-        const slot = freed ?? [0, 1, 2].find((s) => !used.has(s)) ?? 0;
-        const point: ObjectPoint = { id: crypto.randomUUID(), slot, u, v, ra: query.ra, dec: query.dec };
-        setObjects([...keep, point]);
-        resolveSpectralPoint(current.data.tileId, query, u, v)
+        if (!query || !current?.data) return;
+        const q = query;
+        const tileId = current.data.tileId;
+
+        // máximo 3 puntos: el cuarto reemplaza al más antiguo
+        let keep = objects;
+        if (objects.length >= MAX_OBJECTS) {
+            cancelRequest(objects[0].id);
+            keep = objects.slice(1);
+        }
+        const used = new Set(keep.map((o) => o.slot));
+        const slot = [0, 1, 2].find((s) => !used.has(s)) ?? 0;
+
+        // coordenadas aproximadas al instante; luego se afinan con el WCS del tile
+        const approx = uvToSky(u, v, q.ra, q.dec, q.fovDeg);
+        const id = newPointId();
+        setObjects([...keep, { id, slot, u, v, ...approx, resolved: false }]);
+        setSpectra((s) => {
+            const next = { ...s };
+            delete next[id];
+            return next;
+        });
+
+        const ctrl = new AbortController();
+        requestsRef.current.set(id, ctrl);
+
+        // si el endpoint /point/ falla, se sigue con la aproximación local en lugar de cortar la cadena
+        const resolve =
+            tileId === undefined ? Promise.resolve(approx) : resolveSpectralPoint(tileId, q, u, v).catch(() => approx);
+
+        resolve
             .then((sky) => {
-                setObjects((list) => list.map((item) => item.id === point.id ? { ...item, ...sky } : item));
-                return fetchSpectrum(sky.ra, sky.dec, query.fovDeg);
+                if (ctrl.signal.aborted) throw new DOMException('Aborted', 'AbortError');
+                setObjects((list) => list.map((item) => (item.id === id ? { ...item, ...sky, resolved: true } : item)));
+                return fetchSpectrum(sky.ra, sky.dec, q.fovDeg, ctrl.signal);
             })
-            .then((data) => setSpectra((s) => ({ ...s, [point.id]: data })))
-            .catch((err: Error) => setSpectra((s) => ({ ...s, [point.id]: { error: err.message } })));
+            .then((data) => setSpectra((s) => ({ ...s, [id]: data })))
+            .catch((err: Error) => {
+                if (err.name === 'AbortError') return;
+                setSpectra((s) => ({ ...s, [id]: { error: err.message || m.common.serverError } }));
+            })
+            .finally(() => {
+                if (requestsRef.current.get(id) === ctrl) requestsRef.current.delete(id);
+            });
     };
 
-    const removeObject = (id: string) => setObjects((list) => list.filter((o) => o.id !== id));
+    const removeObject = (id: string) => {
+        cancelRequest(id);
+        setObjects((list) => list.filter((o) => o.id !== id));
+        setSpectra((s) => {
+            const next = { ...s };
+            delete next[id];
+            return next;
+        });
+    };
 
     const markers: ViewerMarker[] = useMemo(
-        () => objects.map((o) => ({ u: o.u, v: o.v, color: OBJECT_COLORS[o.slot], label: `Objeto ${o.slot + 1}` })),
-        [objects],
+        () => objects.map((o) => ({ u: o.u, v: o.v, color: OBJECT_COLORS[o.slot], label: fmt(t.object, { n: o.slot + 1 }) })),
+        [objects, t.object],
     );
 
     const series: SpectrumSeries[] = objects.map((o) => {
@@ -366,8 +425,14 @@ export default function SpectralModule() {
                                                         <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: OBJECT_COLORS[o.slot] }} />
                                                         <span className="font-medium text-slate-200">{fmt(t.object, { n: o.slot + 1 })}</span>
                                                         <span className="font-display flex-1 truncate tabular-nums text-slate-500">
-                                                            {o.ra.toFixed(4)}°, {o.dec >= 0 ? '+' : ''}
-                                                            {o.dec.toFixed(4)}°
+                                                            {o.resolved ? (
+                                                                <>
+                                                                    {o.ra.toFixed(4)}°, {o.dec >= 0 ? '+' : ''}
+                                                                    {o.dec.toFixed(4)}°
+                                                                </>
+                                                            ) : (
+                                                                '…'
+                                                            )}
                                                         </span>
                                                         {s && 'points' in s && (
                                                             <span className="text-slate-400" title={t.qualityTitle}>
@@ -377,7 +442,7 @@ export default function SpectralModule() {
                                                             </span>
                                                         )}
                                                         {!s && <span className="animate-pulse text-slate-500">{t.loadingShort}</span>}
-                                                        {s && 'error' in s && <span className="text-violet-300">{t.error}</span>}
+                                                        {s && 'error' in s && <span className="text-violet-300" title={s.error}>{t.error}</span>}
                                                         <button
                                                             type="button"
                                                             onClick={() => removeObject(o.id)}
