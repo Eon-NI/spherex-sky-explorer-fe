@@ -9,7 +9,8 @@ import type { LucideIcon } from 'lucide-react';
  * una órbita que gira y un botón con pulso de luz.
  */
 type CtaBannerProps = {
-    eyebrow: string;
+    /** Opcional: texto pequeño sobre el título */
+    eyebrow?: string;
     title: ReactNode;
     text: string;
     to: string;
@@ -51,8 +52,10 @@ export default function CtaBanner({ eyebrow, title, text, to, label, icon: Icon,
             </div>
 
             <div className="relative max-w-2xl">
-                <p className="font-hud text-xs font-medium tracking-[0.3em] text-star uppercase">{eyebrow}</p>
-                <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-paper sm:text-4xl lg:text-5xl">{title}</h2>
+                {eyebrow && (
+                    <p className="font-hud mb-4 text-xs font-medium tracking-[0.3em] text-star uppercase">{eyebrow}</p>
+                )}
+                <h2 className="text-3xl font-extrabold tracking-tight text-paper sm:text-4xl lg:text-5xl">{title}</h2>
                 <p className="mt-4 max-w-xl text-lg text-mist">{text}</p>
 
                 <div className="relative mt-9 inline-flex">

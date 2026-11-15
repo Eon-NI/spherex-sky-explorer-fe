@@ -69,7 +69,7 @@ export default function InfoSection({
                 <motion.h3
                     id={`${id}-title`}
                     variants={rise}
-                    className="font-display text-3xl font-extrabold tracking-tight text-balance lg:text-4xl"
+                    className="text-3xl font-extrabold tracking-tight text-balance lg:text-4xl"
                 >
                     {title}
                 </motion.h3>

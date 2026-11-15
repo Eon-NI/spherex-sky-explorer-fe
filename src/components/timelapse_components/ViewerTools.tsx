@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Minus, MoreHorizontal, Plus, Search } from 'lucide-react';
 import { MAX_ZOOM, MIN_ZOOM } from './TimelapseViewer';
+import { useI18n } from '../../i18n/useI18n';
 
 type ViewerToolsProps = {
   zoom: number;
@@ -15,13 +16,13 @@ type ViewerToolsProps = {
 
 const FPS_OPTIONS = [1, 2, 4, 8];
 const FADE_OPTIONS = [
-  { value: 0.35, label: 'Corta' },
-  { value: 0.65, label: 'Media' },
-  { value: 1, label: 'Continua' },
-];
+  { value: 0.35, key: 'fadeShort' },
+  { value: 0.65, key: 'fadeMedium' },
+  { value: 1, key: 'fadeContinuous' },
+] as const;
 
 const iconBtn =
-  'flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-slate-300 transition hover:border-white/40 hover:text-white disabled:opacity-30';
+  'flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-paper/80 transition hover:border-white/40 hover:text-paper disabled:opacity-30';
 
 export default function ViewerTools({
   zoom,
@@ -33,6 +34,8 @@ export default function ViewerTools({
   fade,
   onFadeChange,
 }: ViewerToolsProps) {
+  const { m } = useI18n();
+  const t = m.modules.tools;
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -52,31 +55,31 @@ export default function ViewerTools({
 
   const chip = (active: boolean) =>
     `rounded-full px-3 py-1 text-xs font-medium transition ${
-      active ? 'bg-sky-500 text-slate-950' : 'bg-white/5 text-slate-300 hover:bg-white/10'
+      active ? 'bg-star text-night' : 'bg-white/5 text-paper/80 hover:bg-white/10'
     }`;
 
   return (
     <div className="flex items-center justify-end gap-2">
       <div className="flex items-center gap-1 rounded-full border border-white/15 py-1 pl-3 pr-1">
-        <Search size={15} className="text-slate-400" />
-        <span className="font-display w-10 text-center text-xs tabular-nums text-slate-300">
+        <Search size={15} className="text-mist" />
+        <span className="font-hud w-10 text-center text-xs tabular-nums text-paper/80">
           {zoom.toFixed(1)}×
         </span>
         <button
           type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-slate-300 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          className="flex h-8 w-8 items-center justify-center rounded-full text-paper/80 hover:bg-white/10 hover:text-paper disabled:opacity-30"
           onClick={() => onZoomChange(Math.min(MAX_ZOOM, zoom * 1.5))}
           disabled={zoom >= MAX_ZOOM}
-          aria-label="Acercar"
+          aria-label={m.common.zoomIn}
         >
           <Plus size={16} />
         </button>
         <button
           type="button"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-slate-300 hover:bg-white/10 hover:text-white disabled:opacity-30"
+          className="flex h-8 w-8 items-center justify-center rounded-full text-paper/80 hover:bg-white/10 hover:text-paper disabled:opacity-30"
           onClick={() => onZoomChange(Math.max(MIN_ZOOM, zoom / 1.5))}
           disabled={zoom <= MIN_ZOOM}
-          aria-label="Alejar"
+          aria-label={m.common.zoomOut}
         >
           <Minus size={16} />
         </button>
@@ -87,7 +90,7 @@ export default function ViewerTools({
           type="button"
           className={iconBtn}
           onClick={() => setOpen((v) => !v)}
-          aria-label="Más opciones"
+          aria-label={t.more}
           aria-expanded={open}
         >
           <MoreHorizontal size={18} />
@@ -97,8 +100,8 @@ export default function ViewerTools({
           <div className="absolute bottom-12 right-0 z-30 w-64">
             <div className="liquid-glass liquid-glass-dark space-y-4 rounded-2xl p-4">
               <div>
-                <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">
-                  Velocidad
+                <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.25em] text-mist">
+                  {t.speed}
                 </p>
                 <div className="flex gap-1.5">
                   {FPS_OPTIONS.map((f) => (
@@ -110,8 +113,8 @@ export default function ViewerTools({
               </div>
 
               <div>
-                <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">
-                  Transición
+                <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.25em] text-mist">
+                  {t.transition}
                 </p>
                 <div className="flex gap-1.5">
                   {FADE_OPTIONS.map((o) => (
@@ -121,24 +124,24 @@ export default function ViewerTools({
                       className={chip(fade === o.value)}
                       onClick={() => onFadeChange(o.value)}
                     >
-                      {o.label}
+                      {t[o.key]}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <label className="flex cursor-pointer items-center justify-between text-sm text-slate-300">
-                Repetir en bucle
+              <label className="flex cursor-pointer items-center justify-between text-sm text-paper/80">
+                {t.loop}
                 <input
                   type="checkbox"
                   checked={loop}
                   onChange={(e) => onLoopChange(e.target.checked)}
-                  className="h-4 w-4 accent-sky-400"
+                  className="h-4 w-4 accent-star"
                 />
               </label>
 
-              <p className="text-xs leading-5 text-slate-500">
-                Zoom con los botones o con Ctrl + rueda. Con zoom, arrastra para moverte.
+              <p className="text-xs leading-5 text-mist/70">
+                {t.hint}
               </p>
             </div>
           </div>

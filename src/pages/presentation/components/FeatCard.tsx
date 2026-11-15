@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
+import { ArrowRight } from 'lucide-react';
 import { rise } from './motionPresets';
 
 export type FeatTone = 'star' | 'sky' | 'mint' | 'blue';
@@ -25,8 +26,9 @@ export type FeatCardProps = {
 const TONES: Record<FeatTone, { bg: string; dark?: boolean }> = {
     // ámbar oscurecido a partir del color star del proyecto
     star: { bg: 'bg-[color-mix(in_oklab,var(--color-star)_100%,black)]' },
-    sky: { bg: 'bg-sky' },
-    mint: { bg: 'bg-mint' },
+    // tonos fijos: sky y mint no existen como tokens en el tema actual
+    sky: { bg: 'bg-[#a9d4ff]' },
+    mint: { bg: 'bg-[#a3e6cc]' },
     // azul noche, un poco más claro que #0d1230
     blue: { bg: 'bg-[#1b2456]', dark: true },
 };
@@ -180,45 +182,54 @@ export default function FeatCard({
 }: FeatCardProps) {
     const t = TONES[tone];
     return (
-        <motion.article
-            variants={rise}
-            className="group/card relative flex flex-col gap-5 transition-opacity duration-300 motion-reduce:transition-none group-hover/list:[&:not(:hover)]:opacity-40 group-focus-within/list:[&:not(:focus-within)]:opacity-40"
-        >
-            <div
-                style={{ ['--ink' as string]: t.dark ? 'var(--color-paper)' : 'var(--color-night)' }}
-                className={`flex min-h-[32rem] flex-1 flex-col overflow-hidden rounded-3xl px-6 pt-7 transition-transform duration-500 group-hover/card:-translate-y-1.5 group-focus-within/card:-translate-y-1.5 motion-reduce:transition-none lg:min-h-[38rem] ${t.bg}`}
-            >
-                {label && (
-                    <span className="mx-auto mb-4 inline-flex rounded-full bg-(--ink)/10 px-3 py-1 text-xs font-bold tracking-wide text-(--ink) uppercase">
-                        {label}
-                    </span>
-                )}
-
-                <h3 className="font-display text-center text-2xl font-extrabold tracking-tight text-balance text-(--ink) lg:text-[1.75rem] lg:leading-tight">
-                    {title}
-                </h3>
-
-                <p className="mt-3 text-center text-(--ink)/80">{description}</p>
-
-                {image ? (
-                    <figure className="mt-auto pt-8">
-                        <img
-                            src={image}
-                            alt={imageAlt ?? title}
-                            className="h-72 w-full translate-y-6 rounded-t-2xl object-cover object-top transition-transform duration-500 group-hover/card:translate-y-0 motion-reduce:transition-none"
-                        />
-                    </figure>
-                ) : (
-                    <CardArt variant={art} />
-                )}
-            </div>
-
+        // motion controla la entrada (su opacidad va en línea), así que el atenuado
+        // de las tarjetas vecinas se aplica en un div interior
+        <motion.div variants={rise} className="relative flex">
+            <div className="flex flex-1 transition-opacity duration-300 motion-reduce:transition-none group-hover/list:[&:not(:hover)]:opacity-40 group-focus-within/list:[&:not(:focus-within)]:opacity-40">
+            {/* toda la tarjeta es un enlace */}
             <Link
                 to={to}
-                className="mx-auto inline-flex items-center justify-center rounded-full bg-night px-6 py-3 font-bold text-paper transition duration-300 after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-night motion-reduce:transition-none [@media(hover:hover)]:translate-y-2 [@media(hover:hover)]:opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 group-focus-within/card:translate-y-0 group-focus-within/card:opacity-100"
+                className="group/card flex flex-1 flex-col gap-5 rounded-3xl focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-night"
             >
-                {linkText}
+                <div
+                    style={{ ['--ink' as string]: t.dark ? 'var(--color-paper)' : 'var(--color-night)' }}
+                    className={`flex min-h-[32rem] flex-1 flex-col overflow-hidden rounded-3xl px-6 pt-7 transition-transform duration-500 group-hover/card:-translate-y-1.5 group-focus-visible/card:-translate-y-1.5 motion-reduce:transition-none lg:min-h-[38rem] ${t.bg}`}
+                >
+                    {label && (
+                        <span className="mx-auto mb-4 inline-flex rounded-full bg-(--ink)/10 px-3 py-1 text-xs font-bold tracking-wide text-(--ink) uppercase">
+                            {label}
+                        </span>
+                    )}
+
+                    <h3 className="text-center text-2xl font-extrabold tracking-tight text-balance text-(--ink) lg:text-[1.75rem] lg:leading-tight">
+                        {title}
+                    </h3>
+
+                    <p className="mt-3 text-center text-(--ink)/80">{description}</p>
+
+                    {image ? (
+                        <figure className="mt-auto pt-8">
+                            <img
+                                src={image}
+                                alt={imageAlt ?? title}
+                                className="h-72 w-full translate-y-6 rounded-t-2xl object-cover object-top transition-transform duration-500 group-hover/card:translate-y-0 motion-reduce:transition-none"
+                            />
+                        </figure>
+                    ) : (
+                        <CardArt variant={art} />
+                    )}
+                </div>
+
+                {/* enlace visible: se ilumina al pasar el cursor por la tarjeta */}
+                <span className="mx-auto inline-flex items-center justify-center gap-2 rounded-full bg-night px-6 py-3 font-bold text-paper transition-colors duration-300 group-hover/card:bg-star group-hover/card:text-night group-focus-visible/card:bg-star group-focus-visible/card:text-night">
+                    {linkText}
+                    <ArrowRight
+                        aria-hidden="true"
+                        className="size-4 transition-transform duration-300 group-hover/card:translate-x-1 motion-reduce:transition-none"
+                    />
+                </span>
             </Link>
-        </motion.article>
+            </div>
+        </motion.div>
     );
 }

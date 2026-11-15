@@ -1,6 +1,8 @@
 import { Link } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
 import logo from '../assets/EON.svg';
+import { useI18n } from '../i18n/useI18n';
+import LanguageSwitcher from '../i18n/LanguageSwitcher';
 
 /* Mismo estilo que los enlaces del header de la landing (presentation/components/Header.tsx) */
 const navLink =
@@ -12,24 +14,29 @@ const navLink =
  * Características / Acerca de no existen aquí, el único enlace es volver al inicio.
  */
 export default function Header() {
+  const { m } = useI18n();
+
   return (
     <header className="sticky top-0 z-50 border-b border-paper/10 bg-night">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="shrink-0">
-          <Link to="/" aria-label="Ir al inicio de LOOK-EON">
-            <img src={logo} alt="EON" className="h-9 w-auto sm:h-10" />
+          <Link to="/" aria-label={m.common.homeAria}>
+            <img src={logo} alt={m.common.logoAlt} className="h-9 w-auto sm:h-10" />
           </Link>
         </div>
 
-        <nav className="flex items-center text-base font-semibold" aria-label="Navegación principal">
-          <Link to="/" className={`group ${navLink}`}>
-            <ArrowLeft
-              aria-hidden="true"
-              className="size-4 transition-transform group-hover:-translate-x-0.5 motion-reduce:transition-none"
-            />
-            Volver a Inicio
-          </Link>
-        </nav>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <nav className="flex items-center text-base font-semibold" aria-label={m.common.mainNav}>
+            <Link to="/" className={`group ${navLink}`}>
+              <ArrowLeft
+                aria-hidden="true"
+                className="size-4 transition-transform group-hover:-translate-x-0.5 motion-reduce:transition-none"
+              />
+              {m.observatory.header.back}
+            </Link>
+          </nav>
+          <LanguageSwitcher />
+        </div>
       </div>
     </header>
   );

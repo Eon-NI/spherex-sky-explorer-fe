@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
+import { useI18n } from '../../../i18n/useI18n';
+import { fmt } from '../../../i18n/format';
 
 /**
  * Demostración ilustrativa de un "comparador de parpadeo" (blink comparator),
@@ -31,7 +33,6 @@ const OBJECT = [
     { x: 176, y: 88 },
 ];
 
-const EPOCHS = ['Captura A', 'Captura B · 6 meses después'];
 
 function Field({ epoch, showTrail = false }: { epoch: 0 | 1; showTrail?: boolean }) {
     const o = OBJECT[epoch];
@@ -68,6 +69,9 @@ function Field({ epoch, showTrail = false }: { epoch: 0 | 1; showTrail?: boolean
 }
 
 export default function SkyCompare() {
+    const { m } = useI18n();
+    const c = m.landing.hook.compare;
+    const EPOCHS = [c.epochA, c.epochB];
     const [epoch, setEpoch] = useState<0 | 1>(0);
     const [playing, setPlaying] = useState(true);
     const [cycles, setCycles] = useState(0);
@@ -110,15 +114,15 @@ export default function SkyCompare() {
                         </div>
                     ))}
 
-                    <div className="pointer-events-none absolute top-3 left-3 flex items-center gap-2 rounded-full bg-night/75 px-3 py-1 text-xs font-semibold text-paper backdrop-blur">
-                        <span className={`size-2 rounded-full ${epoch === 0 ? 'bg-sky' : 'bg-star'}`} />
+                    <div className="font-hud pointer-events-none absolute top-3 left-3 flex items-center gap-2 rounded-full bg-night/75 px-3 py-1 text-xs font-medium text-paper backdrop-blur">
+                        <span className={`size-2 rounded-full ${epoch === 0 ? 'bg-paper' : 'bg-star'}`} />
                         {EPOCHS[epoch]}
                     </div>
 
                     <button
                         type="button"
                         onClick={() => setPlaying((p) => !p)}
-                        aria-label={playing ? 'Pausar la comparación' : 'Reanudar la comparación'}
+                        aria-label={playing ? c.pause : c.resume}
                         className="absolute right-3 bottom-3 flex size-9 items-center justify-center rounded-full bg-paper text-night transition hover:bg-star focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-star"
                     >
                         {playing ? <Pause className="size-4" /> : <Play className="size-4 translate-x-px" />}
@@ -127,7 +131,7 @@ export default function SkyCompare() {
 
                 {/* las dos capturas, fijas, para comparar a simple vista */}
                 <p className="mt-4 px-1 text-[11px] font-semibold tracking-wider text-mist uppercase">
-                    Capturas originales
+                    {c.originals}
                 </p>
                 <div className="mt-2 grid grid-cols-2 gap-3">
                     {[0, 1].map((e) => (
@@ -138,7 +142,7 @@ export default function SkyCompare() {
                                 setPlaying(false);
                                 setEpoch(e as 0 | 1);
                             }}
-                            aria-label={`Ver ${EPOCHS[e]}`}
+                            aria-label={fmt(c.view, { epoch: EPOCHS[e] })}
                             aria-pressed={epoch === e}
                             className={`overflow-hidden rounded-xl ring-2 transition ${
                                 epoch === e ? 'ring-star' : 'ring-transparent hover:ring-paper/30'
@@ -147,7 +151,7 @@ export default function SkyCompare() {
                             <span className="block aspect-[3/2]">
                                 <Field epoch={e as 0 | 1} />
                             </span>
-                            <span className="block bg-night-soft px-2 py-1.5 text-left text-xs font-semibold text-paper">
+                            <span className="font-hud block bg-night-soft px-2 py-1.5 text-left text-[11px] font-medium text-paper">
                                 {EPOCHS[e]}
                             </span>
                         </button>
@@ -155,8 +159,7 @@ export default function SkyCompare() {
                 </div>
 
                 <figcaption className="mt-3 px-1 text-xs text-mist">
-                    Demostración ilustrativa: las estrellas permanecen fijas; el objeto marcado cambia de
-                    posición entre ambas capturas.
+                    {c.caption}
                 </figcaption>
             </figure>
         </div>

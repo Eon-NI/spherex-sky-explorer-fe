@@ -31,24 +31,24 @@ const SKY = Array.from({ length: 180 }, () => ({
 }));
 
 // Paleta del landing: sky-300 / sky-400 / blue-500 / violet-400
-const SKY300 = '#7dd3fc';
-const SKY400 = '#38bdf8';
-// Mismas fuentes del landing (Space Grotesk para títulos/datos, Inter para texto)
-const HUD_FONT = '600 20px "Space Grotesk", system-ui, sans-serif';
-const HUD_FONT_SM = '500 15px "Space Grotesk", system-ui, sans-serif';
+const SKY300 = '#ffc95e'; // --color-star-hover
+const SKY400 = '#ffb938'; // --color-star
+// Pantallas tipo HUD: JetBrains Mono (font-hud del sitio)
+const HUD_FONT = '600 20px "JetBrains Mono", ui-monospace, monospace';
+const HUD_FONT_SM = '500 15px "JetBrains Mono", ui-monospace, monospace';
 
 /* ---------- Utilidades comunes de HUD ---------- */
 function background(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const g = ctx.createLinearGradient(0, 0, 0, h);
-  g.addColorStop(0, '#0a1230');
-  g.addColorStop(1, '#05070f');
+  g.addColorStop(0, '#171e4a'); // --color-night-soft
+  g.addColorStop(1, '#0d1230'); // --color-night
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
 }
 
 function hudFrame(ctx: CanvasRenderingContext2D, w: number, h: number, label: string) {
   // líneas de escaneo
-  ctx.fillStyle = 'rgba(125, 211, 252, 0.035)';
+  ctx.fillStyle = 'rgba(255, 185, 56, 0.035)';
   for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, w, 1);
 
   // esquinas
@@ -64,7 +64,7 @@ function hudFrame(ctx: CanvasRenderingContext2D, w: number, h: number, label: st
   ctx.stroke();
 
   ctx.font = HUD_FONT_SM;
-  ctx.fillStyle = 'rgba(125, 211, 252, 0.9)';
+  ctx.fillStyle = 'rgba(255, 185, 56, 0.9)';
   ctx.textBaseline = 'top';
   ctx.textAlign = 'left';
   ctx.fillText(label, m + 16, m + 10);
@@ -137,7 +137,7 @@ export const drawSearch: DrawFn = (ctx, w, h, t) => {
   }
 
   // rejilla RA/Dec
-  ctx.strokeStyle = 'rgba(125, 211, 252, 0.12)';
+  ctx.strokeStyle = 'rgba(255, 185, 56, 0.12)';
   ctx.lineWidth = 1;
   for (let x = 0; x <= w; x += 48) {
     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
@@ -235,10 +235,10 @@ export const drawRadar: DrawFn = (ctx, w, h, t) => {
   const cy = h / 2;
   const R = w / 2 - 6;
 
-  ctx.fillStyle = '#05070f';
+  ctx.fillStyle = '#0d1230';
   ctx.fillRect(0, 0, w, h);
 
-  ctx.strokeStyle = 'rgba(125, 211, 252, 0.3)';
+  ctx.strokeStyle = 'rgba(255, 185, 56, 0.3)';
   ctx.lineWidth = 2;
   for (let i = 1; i <= 4; i++) {
     ctx.beginPath();
@@ -277,7 +277,7 @@ export const drawRadar: DrawFn = (ctx, w, h, t) => {
     ctx.fill();
   }
 
-  ctx.font = '600 24px "Space Grotesk", system-ui, sans-serif';
+  ctx.font = '600 24px "JetBrains Mono", ui-monospace, monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = 'rgba(255,255,255,0.85)';
@@ -286,7 +286,7 @@ export const drawRadar: DrawFn = (ctx, w, h, t) => {
 
 /* ---------- Textura estática del panel solar ---------- */
 export function drawSolarPanel(ctx: CanvasRenderingContext2D, w: number, h: number) {
-  ctx.fillStyle = '#0a1230';
+  ctx.fillStyle = '#171e4a';
   ctx.fillRect(0, 0, w, h);
   const cols = 12;
   const rows = 6;

@@ -5,11 +5,11 @@ import { ArrowRight } from 'lucide-react';
 import AnimatedTitle, { TITLE_DURATION } from './AnimatedTitle';
 import CosmicBackground from './CosmicBackground';
 import { EASE_OUT } from './motionPresets';
+import { useI18n } from '../../../i18n/useI18n';
 
-const SUBTITLE =
-    'Analiza más de mil millones de objetos capturados por la misión SPHEREx de la NASA. Compara épocas, filtra 102 bandas infrarrojas y ayúdanos a encontrar asteroides, enanas marrones y el próximo gran hallazgo astronómico con EON.';
 
 export default function Hero() {
+    const { m, lang } = useI18n();
     return (
         <section
             aria-labelledby="hero-title"
@@ -19,8 +19,9 @@ export default function Hero() {
 
             <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-5 text-center sm:px-6">
                 <AnimatedTitle
+                    key={lang}
                     id="hero-title"
-                    className="font-display w-full max-w-6xl text-[clamp(2.1rem,6.4vw,4.75rem)] leading-[1.04] font-extrabold tracking-tight text-paper"
+                    className="w-full max-w-6xl text-[clamp(2.1rem,6.4vw,4.75rem)] leading-[1.04] font-extrabold tracking-tight text-paper"
                 />
 
                 <motion.p
@@ -29,7 +30,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                     transition={{ duration: 0.9, ease: EASE_OUT, delay: TITLE_DURATION }}
                 >
-                    {SUBTITLE}
+                    {m.landing.hero.subtitle}
                 </motion.p>
 
                 <motion.div
@@ -41,7 +42,7 @@ export default function Hero() {
                         to="/observatorio"
                         className="group mt-10 inline-flex items-center justify-center gap-3 rounded-full bg-[color-mix(in_oklab,var(--color-star)_86%,black)] px-7 py-4 text-base font-bold text-night shadow-[0_8px_28px_-12px_color-mix(in_oklab,var(--color-star)_45%,transparent)] transition-colors hover:bg-star sm:px-8 sm:text-lg"
                     >
-                        Iniciar exploración en el Observatorio
+                        {m.landing.hero.cta}
                         <ArrowRight
                             aria-hidden="true"
                             className="size-5 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"

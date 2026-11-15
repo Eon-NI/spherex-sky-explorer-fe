@@ -91,7 +91,6 @@ export const STOPS: CameraStop[] = [
     shiftX: -0.55,
     shiftY: -0.35,
   },
- 
 ];
 
 /* ---------- Zoom hacia las pantallas que abren una página ---------- */

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { USE_MOCK } from '../api/spherex';
+import { useI18n } from '../i18n/useI18n';
 
 /**
  * Encabezado compacto de los módulos del Observatorio:
@@ -14,8 +15,10 @@ export default function ModuleHeader({
     title: ReactNode;
     text: string;
 }) {
+    const { m } = useI18n();
+
     return (
-        <div className="mb-4 flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-x-8 gap-y-2">
             <div>
                 <p className="font-hud text-xs font-medium tracking-[0.25em] text-star uppercase">{eyebrow}</p>
                 <h1 className="mt-1 text-2xl font-extrabold text-paper md:text-3xl">{title}</h1>
@@ -24,7 +27,7 @@ export default function ModuleHeader({
                 <p className="hidden max-w-md text-sm leading-snug text-mist lg:block">{text}</p>
                 {USE_MOCK && (
                     <span className="font-hud shrink-0 rounded-full border border-star/30 bg-star/10 px-3 py-1 text-xs text-star">
-                        Datos simulados
+                        {m.common.simulatedData}
                     </span>
                 )}
             </div>

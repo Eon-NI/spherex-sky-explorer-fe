@@ -2,48 +2,48 @@ import { Link } from 'react-router';
 import { Home } from 'lucide-react';
 import logo from '../assets/EON.svg';
 import CtaBanner from './CtaBanner';
+import { useI18n } from '../i18n/useI18n';
+import { fmt, rich } from '../i18n/format';
 
 const MODULES = [
-    { label: 'Observatorio', to: '/observatorio' },
-    { label: 'Timelapse', to: '/timelapse' },
-    { label: 'Búsqueda por coordenadas', to: '/search' },
-    { label: 'Análisis espectral', to: '/spectral' },
-];
+    { key: 'observatory', to: '/observatorio' },
+    { key: 'timelapse', to: '/timelapse' },
+    { key: 'search', to: '/search' },
+    { key: 'spectral', to: '/spectral' },
+] as const;
 
 /** Footer del Observatorio y sus módulos */
 export default function Footer() {
+    const { m } = useI18n();
+    const f = m.observatory.footer;
+
     return (
         <footer className="relative isolate overflow-hidden border-t border-paper/10 bg-night text-paper">
             <div className="mx-auto max-w-7xl px-5 pt-16 md:px-8 md:pt-20">
                 <CtaBanner
-                    
-                    title={
-                        <>
-                            Gracias por explorar el cielo con <span className="text-star">LOOK-EON</span>.
-                        </>
-                    }
-                    text="Vuelve al inicio para conocer más sobre la misión SPHEREx, el Planeta X y el equipo detrás del proyecto."
+                    title={rich(f.ctaTitle, { hl: (t) => <span className="text-star">{t}</span> })}
+                    text={f.ctaText}
                     to="/"
-                    label="Regresar al inicio"
+                    label={f.ctaButton}
                     icon={Home}
                     iconFirst
                 />
             </div>
 
             <div className="mx-auto flex max-w-7xl flex-col gap-8 px-5 py-12 md:flex-row md:items-center md:justify-between md:px-8">
-                <Link to="/" aria-label="Ir al inicio de LOOK-EON" className="inline-block">
-                    <img src={logo} alt="Aetheris" className="h-11 w-auto" />
+                <Link to="/" aria-label={m.common.homeAria} className="inline-block">
+                    <img src={logo} alt={m.common.logoAlt} className="h-11 w-auto" />
                 </Link>
 
-                <nav aria-label="Módulos del Observatorio">
+                <nav aria-label={f.modulesNav}>
                     <ul className="flex flex-wrap gap-x-6 gap-y-3">
-                        {MODULES.map((m) => (
-                            <li key={m.to}>
+                        {MODULES.map((mod) => (
+                            <li key={mod.to}>
                                 <Link
-                                    to={m.to}
+                                    to={mod.to}
                                     className="text-mist underline-offset-4 transition-colors hover:text-paper hover:underline"
                                 >
-                                    {m.label}
+                                    {m.common.modules[mod.key]}
                                 </Link>
                             </li>
                         ))}
@@ -53,7 +53,7 @@ export default function Footer() {
 
             <div className="border-t border-paper/10">
                 <p className="mx-auto max-w-7xl px-5 py-6 text-sm text-mist md:px-8">
-                    EON © {new Date().getFullYear()}. Proyecto de exploración astronómica.
+                    {fmt(m.common.copyright, { year: new Date().getFullYear() })}
                 </p>
             </div>
         </footer>
