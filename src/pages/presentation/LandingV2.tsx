@@ -79,7 +79,6 @@ export default function LandingV2() {
                                 image={planetXImage}
                                 imageAlt={info.planetX.imageAlt}
                                 overlay={<HiddenWorldTrail />}
-                                caption={info.planetX.caption}
                                 reverse
                             />
                         </div>

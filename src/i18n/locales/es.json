@@ -35,13 +35,13 @@
       "references": "Referencias"
     },
     "hero": {
-      "title": "EXPLORA EL COSMOS Y DESCUBRE NUEVOS MUNDOS A TRAVÉS DEL TIEMPO",
+      "title": "EXPLORA EL COSMOS Y DESCUBRE NUEVOS OBJETOS A TRAVÉS DEL TIEMPO",
       "titleLines": [
         ["EXPLORA", "EL", "*COSMOS"],
         ["Y", "DESCUBRE", "NUEVOS", "*MUNDOS"],
         ["A", "TRAVÉS", "DEL", "TIEMPO"]
       ],
-      "subtitle": "Analiza más de mil millones de objetos capturados por la misión SPHEREx de la NASA. Compara épocas, filtra 102 bandas infrarrojas y ayúdanos a encontrar asteroides, enanas marrones y el próximo gran hallazgo astronómico con EON.",
+      "subtitle": "Analiza los objetos capturados por la misión SPHEREx de la NASA. Compara fechas, filtra 102 bandas infrarrojas y ayúdanos a encontrar el próximo gran hallazgo astronómico con EON.",
       "cta": "Iniciar exploración en el Observatorio"
     },
     "hook": {
@@ -70,7 +70,6 @@
         "title": "En la búsqueda del Planeta X y mundos ocultos",
         "text": "En los confines de nuestro sistema solar y más allá, existen cuerpos celestes demasiado fríos y oscuros para verse a simple vista: desde enanas marrones (cuerpos masivos a medio camino entre un planeta gigante y una estrella) hasta el hipotético Planeta X. Aunque apenas emiten luz visible, brillan en el espectro infrarrojo de SPHEREx y delatan su presencia al desplazarse lentamente entre una captura temporal y otra. Con Aetheris, cualquier persona puede rastrear estas anomalías en movimiento.",
         "imageAlt": "Campo estelar con un objeto tenue que brilla en infrarrojo",
-        "caption": "Ilustración: el objeto marcado representa un mundo hipotético; no es una observación real.",
         "chip": "Infrarrojo · objeto en movimiento"
       }
     },
