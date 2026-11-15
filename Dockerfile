@@ -13,8 +13,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Vite genera la versión de producción en /app/dist
-# (se usa "vite build" y no "pnpm build" porque tsc -b falla hoy en la rama)
-RUN pnpm exec vite build
+RUN pnpm build
 
 # ---------- Etapa 2: servir los archivos estáticos ----------
 FROM nginx:1.27-alpine

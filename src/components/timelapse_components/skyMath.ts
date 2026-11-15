@@ -48,4 +48,4 @@ export function formatDecDms(decDeg: number) {
 }
 
 export const formatDate = (iso: string, locale = 'es') =>
-  new Date(iso).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: '2-digit' });
+  new Date(iso).toLocaleDateString(locale, { year: 'numeric', month: 'short', day: '2-digit', timeZone: 'UTC' }) + ' UTC';
