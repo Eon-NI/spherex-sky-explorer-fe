@@ -11,7 +11,7 @@ const navLink =
 type NavItem = { key: "home" | "observatory" | "features" | "about" | "references"; to?: string; href?: string };
 
 const links: NavItem[] = [
-  { key: "home", to: "/" },
+ 
   { key: "observatory", to: "/observatorio" },
   { key: "features", href: "/#caracteristicas" },
   { key: "about", href: "/#about" },
