@@ -2,7 +2,7 @@
   "common": {
     "dateLocale": "es",
     "logoAlt": "EON",
-    "homeAria": "Ir al inicio de LOOK-EON",
+    "homeAria": "Ir al inicio de Aetheris",
     "mainNav": "Navegación principal",
     "simulatedData": "Datos simulados",
     "copyright": "EON © {{year}}. Proyecto de exploración astronómica.",
@@ -59,7 +59,7 @@
       }
     },
     "info": {
-      "title": "Conoce el universo detrás de LOOK-EON",
+      "title": "Conoce el universo detrás de Aetheris",
       "spherex": {
         "title": "¿Qué es la misión SPHEREx?",
         "text": "Lanzada en <hl>2025</hl>, SPHEREx es el observatorio espacial de la NASA que escanea la totalidad del cielo <hl>cada seis meses</hl>. A diferencia de los telescopios convencionales, observa el cosmos en <hl>102 bandas</hl> de luz infrarroja cercana, permitiendo detectar la huella química de moléculas esenciales como agua, carbono e hidrógeno en más de mil millones de objetos (desde galaxias lejanas y cuásares hasta cometas cercanos).",
@@ -68,7 +68,7 @@
       },
       "planetX": {
         "title": "En la búsqueda del Planeta X y mundos ocultos",
-        "text": "En los confines de nuestro sistema solar y más allá, existen cuerpos celestes demasiado fríos y oscuros para verse a simple vista: desde enanas marrones (cuerpos masivos a medio camino entre un planeta gigante y una estrella) hasta el hipotético Planeta X. Aunque apenas emiten luz visible, brillan en el espectro infrarrojo de SPHEREx y delatan su presencia al desplazarse lentamente entre una captura temporal y otra. Con LOOK-EON, cualquier persona puede rastrear estas anomalías en movimiento.",
+        "text": "En los confines de nuestro sistema solar y más allá, existen cuerpos celestes demasiado fríos y oscuros para verse a simple vista: desde enanas marrones (cuerpos masivos a medio camino entre un planeta gigante y una estrella) hasta el hipotético Planeta X. Aunque apenas emiten luz visible, brillan en el espectro infrarrojo de SPHEREx y delatan su presencia al desplazarse lentamente entre una captura temporal y otra. Con Aetheris, cualquier persona puede rastrear estas anomalías en movimiento.",
         "imageAlt": "Campo estelar con un objeto tenue que brilla en infrarrojo",
         "caption": "Ilustración: el objeto marcado representa un mundo hipotético; no es una observación real.",
         "chip": "Infrarrojo · objeto en movimiento"
@@ -76,7 +76,7 @@
     },
     "features": {
       "title": "Mucho más que una galería",
-      "subtitle": "Descubre diferentes formas de explorar el universo con LOOK-EON.",
+      "subtitle": "Descubre diferentes formas de explorar el universo con Aetheris.",
       "timelapse": {
         "label": "Vista por Tiempo",
         "title": "1. Evolución Temporal (Timelapse)",
@@ -99,7 +99,7 @@
     "about": {
       "title": "Somos EON",
       "lead": "Somos un equipo de estudiantes apasionados por la tecnología y la astronomía.",
-      "text": "A través de LOOK-EON buscamos acercar la exploración astronómica a los usuarios, permitiéndoles descubrir el cielo y explorar sus cambios a través del tiempo.",
+      "text": "A través de Aetheris buscamos acercar la exploración astronómica a los usuarios, permitiéndoles descubrir el cielo y explorar sus cambios a través del tiempo.",
       "logoAlt": "Logo EON",
       "pillars": {
         "astronomy": { "title": "Astronomía", "text": "Nos mueve la curiosidad por lo que el cielo aún esconde." },
@@ -109,7 +109,7 @@
     },
     "footer": {
       "ctaTitle": "El próximo hallazgo puede ser <hl>tuyo</hl>.",
-      "ctaText": "Compara épocas, busca por coordenadas y analiza 102 bandas infrarrojas. Explora el universo con LOOK-EON.",
+      "ctaText": "Compara épocas, busca por coordenadas y analiza 102 bandas infrarrojas. Explora el universo con Aetheris.",
       "ctaButton": "Iniciar exploración en el Observatorio",
       "tagline": "Proyecto de exploración astronómica con datos de la misión SPHEREx de la NASA.",
       "explore": "Explorar",
@@ -128,7 +128,7 @@
       "back": "Volver a Inicio", "backObservatory": "Volver al Observatorio", "backObservatoryShort": "Observatorio"
     },
     "footer": {
-      "ctaTitle": "Gracias por explorar el cielo con <hl>LOOK-EON</hl>.",
+      "ctaTitle": "Gracias por explorar el cielo con <hl>Aetheris</hl>.",
       "ctaText": "Vuelve al inicio para conocer más sobre la misión SPHEREx, el Planeta X y el equipo detrás del proyecto.",
       "ctaButton": "Regresar al inicio",
       "modulesNav": "Módulos del Observatorio"
