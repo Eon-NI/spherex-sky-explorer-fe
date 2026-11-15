@@ -1,0 +1,422 @@
+{
+  "common": {
+    "dateLocale": "en",
+    "logoAlt": "EON",
+    "homeAria": "Go to the Aetheris home page",
+    "mainNav": "Main navigation",
+    "simulatedData": "Simulated data",
+    "copyright": "EON © {{year}}. An astronomical exploration project.",
+    "imageLoadError": "One of the images could not be loaded.",
+    "serverError": "Could not connect to the server.",
+    "checkData": "Please check the values.",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "close": "Close",
+    "language": {
+      "label": "Language",
+      "es": "Español",
+      "en": "English"
+    },
+    "modules": {
+      "observatory": "Observatory",
+      "timelapse": "Timelapse",
+      "search": "Coordinate search",
+      "spectral": "Spectral analysis"
+    }
+  },
+  "landing": {
+    "nav": {
+      "home": "Home",
+      "observatory": "Observatory",
+      "features": "Features",
+      "about": "About",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "references": "References"
+    },
+    "hero": {
+      "title": "EXPLORE THE COSMOS AND DISCOVER NEW WORLDS THROUGH TIME",
+      "titleLines": [
+        [
+          "EXPLORE",
+          "THE",
+          "*COSMOS"
+        ],
+        [
+          "AND",
+          "DISCOVER",
+          "NEW",
+          "*WORLDS"
+        ],
+        [
+          "THROUGH",
+          "TIME"
+        ]
+      ],
+      "subtitle": "Analyze more than a billion objects captured by NASA's SPHEREx mission. Compare epochs, filter 102 infrared bands and help us find asteroids, brown dwarfs and the next great astronomical discovery with EON.",
+      "cta": "Start exploring in the Observatory"
+    },
+    "hook": {
+      "title": "Did you know that comparing two photos of the sky led to the discovery of Pluto?",
+      "text": "The universe is not static. Every six months, the SPHEREx mission maps the entire sky. By comparing images from different dates, points of light that change position reveal comets, asteroids and hidden bodies that no algorithm can analyze on its own. You could be the one who finds the next one.",
+      "cta": "Discover it in the observatory",
+      "compare": {
+        "epochA": "Capture A",
+        "epochB": "Capture B · 6 months later",
+        "pause": "Pause the comparison",
+        "resume": "Resume the comparison",
+        "view": "View {{epoch}}",
+        "originals": "Original captures",
+        "caption": "Illustrative demo: the stars stay fixed; the marked object changes position between the two captures."
+      }
+    },
+    "info": {
+      "title": "Meet the universe behind Aetheris",
+      "spherex": {
+        "title": "What is the SPHEREx mission?",
+        "text": "Launched in <hl>2025</hl>, SPHEREx is NASA's space observatory that scans the entire sky <hl>every six months</hl>. Unlike conventional telescopes, it observes the cosmos in <hl>102 bands</hl> of near-infrared light, making it possible to detect the chemical fingerprint of essential molecules such as water, carbon and hydrogen in more than a billion objects (from distant galaxies and quasars to nearby comets).",
+        "imageAlt": "SPHEREx astronomical image",
+        "chip": "102 bands · 0.75–5 µm"
+      },
+      "planetX": {
+        "title": "In search of Planet X and hidden worlds",
+        "text": "At the edges of our solar system and beyond, there are celestial bodies too cold and dark to be seen with the naked eye: from brown dwarfs (massive bodies halfway between a giant planet and a star) to the hypothetical Planet X. Although they barely emit visible light, they shine in SPHEREx's infrared spectrum and give themselves away by slowly moving from one time capture to the next. With Aetheris, anyone can track these moving anomalies.",
+        "imageAlt": "Star field with a faint object glowing in infrared",
+        "chip": "Infrared · moving object"
+      }
+    },
+    "features": {
+      "title": "Much more than a gallery",
+      "subtitle": "Discover different ways to explore the universe with Aetheris.",
+      "timelapse": {
+        "label": "Time view",
+        "title": "1. Time Evolution (Timelapse)",
+        "description": "View sequences of images captured every 6 months as a video, or subtract captures from different dates. Instantly identify asteroids, comets and nearby objects by how they move across the sky.",
+        "link": "Open Timelapse"
+      },
+      "search": {
+        "label": "Search view (Coordinates)",
+        "title": "2. Coordinate Exploration",
+        "description": "Navigate to any region of the cosmos by entering its Right Ascension (RA) and Declination (Dec). Adjust the field of view to track fast-moving sources and share findings through direct links.",
+        "link": "Search by coordinates"
+      },
+      "spectral": {
+        "label": "Spectrum view",
+        "title": "3. Infrared Spectral Analysis",
+        "description": "Explore SPHEREx's 102 infrared light bands and its 6 detector arrays. Filter wavelengths to tell apart the chemical composition of stars, brown dwarfs and galaxies.",
+        "link": "Analyze the spectrum"
+      }
+    },
+    "about": {
+      "title": "We are EON",
+      "lead": "We are a team of students passionate about technology and astronomy.",
+      "text": "Through Aetheris we aim to bring astronomical exploration closer to everyone, letting them discover the sky and explore how it changes over time.",
+      "logoAlt": "EON logo",
+      "pillars": {
+        "astronomy": {
+          "title": "Astronomy",
+          "text": "We are driven by curiosity about what the sky still hides."
+        },
+        "technology": {
+          "title": "Technology",
+          "text": "We turn scientific data into visual experiences."
+        },
+        "exploration": {
+          "title": "Exploration",
+          "text": "We want anyone to be able to discover the sky."
+        }
+      }
+    },
+    "footer": {
+      "ctaTitle": "The next discovery could be <hl>yours</hl>.",
+      "ctaText": "Compare epochs, search by coordinates and analyze 102 infrared bands. Explore the universe with Aetheris.",
+      "ctaButton": "Start exploring in the Observatory",
+      "tagline": "An astronomical exploration project using data from NASA's SPHEREx mission.",
+      "explore": "Explore",
+      "project": "Project",
+      "footerNav": "Footer navigation",
+      "features": "Features",
+      "functions": "Capabilities",
+      "about": "About EON",
+      "backToTop": "Back to top",
+      "references": "References"
+    }
+  },
+  "observatory": {
+    "header": {
+      "back": "Back to Home",
+      "backObservatory": "Back to Observatory",
+      "backObservatoryShort": "Observatory"
+    },
+    "footer": {
+      "ctaTitle": "Thanks for exploring the sky with <hl>Aetheris</hl>.",
+      "ctaText": "Head back home to learn more about the SPHEREx mission, Planet X and the team behind the project.",
+      "ctaButton": "Back to home",
+      "modulesNav": "Observatory modules"
+    },
+    "tour": {
+      "aria": "EON Observatory welcome tour",
+      "stopsNav": "Tour stops",
+      "stops": {
+        "hero": "Start",
+        "timelapse": "Timelapse",
+        "search": "Search",
+        "spectral": "Spectral"
+      },
+      "active": "Active",
+      "hero": {
+        "eyebrow": "EON Observatory · Welcome tour",
+        "titleA": "Discovering",
+        "titleB": "beyond the cosmos",
+        "text": "Explore the satellite's control panel. Each screen is a module of the observatory: scroll down and discover them step by step.",
+        "start": "Start the tour"
+      },
+      "timelapse": {
+        "label": "Timelapse",
+        "title": "The sky through time",
+        "text": "It joins images of the same patch of sky taken on different dates and plays them like a video: whatever moves or changes brightness could be an asteroid, a comet or a variable star.",
+        "filmStripAria": "Five frames in which an object moves",
+        "months": [
+          "May",
+          "Jul",
+          "Sep",
+          "Nov",
+          "Jan"
+        ],
+        "open": "Open Timelapse",
+        "pause": "Pause the satellite screen",
+        "play": "Play the satellite screen",
+        "hint": "You can also click the satellite's screen."
+      },
+      "search": {
+        "label": "Search",
+        "title": "Find a point of interest",
+        "text": "Every point in the sky has an \"address\", just like latitude and longitude on Earth. Type it in and the camera travels to that region.",
+        "ra": "RA · Right ascension",
+        "raHelp": "Like longitude: from 0° to 360° eastward.",
+        "dec": "Dec · Declination",
+        "decHelp": "Like latitude: from −90° to +90° from the celestial equator.",
+        "submit": "Search",
+        "example": "Example: M101",
+        "hint": "You can also click the satellite's screen."
+      },
+      "spectral": {
+        "label": "Spectral Explorer",
+        "title": "The 102 channels of SPHEREx",
+        "text": "SPHEREx doesn't take a single photo: it splits infrared light into {{channels}} channels, from {{min}} µm to {{max}} µm. Each channel reveals something different, such as water ice, dust or distant galaxies.",
+        "wavelength": "Wavelength",
+        "sliderAria": "Wavelength in micrometers",
+        "open": "Open Spectral Explorer",
+        "hint": "Move the control (the knobs respond) or click the satellite's screen."
+      }
+    }
+  },
+  "modules": {
+    "timelapse": {
+      "eyebrow": "Module · Timelapse",
+      "title": "The sky through time",
+      "text": "Choose a region and a date range to watch its images like a video. Click on an object that changes to analyze it.",
+      "querying": "Querying SPHEREx observations…",
+      "preparing": "Preparing images…",
+      "noObs": "No observations in that range",
+      "noObsText": "Try a wider date range, another band or a larger field of view.",
+      "chooseText": "Enter RA, Dec, field of view and dates, then press “Search region”.",
+      "submit": "Search region",
+      "searching": "Searching…"
+    },
+    "search": {
+      "eyebrow": "Module · Search",
+      "title": "Find a point of <hl>interest</hl>",
+      "text": "Compare a region's observations with image or blink, and click on an object to analyze it.",
+      "querying": "Searching SPHEREx observations…",
+      "loading": "Loading images…",
+      "noObs": "No observations in that region",
+      "labelBlink": "Blink · {{epoch}} · {{date}}",
+      "picker": {
+        "calendar": "UTC observation calendar",
+        "available": "Observations available",
+        "previousMonth": "Previous month with observations",
+        "nextMonth": "Next month with observations",
+        "times": "Available times",
+        "observation": "Observation",
+        "otherEpoch": "Selected in the other epoch",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+      },
+      "actions": {
+        "title": "Actions",
+        "single": "Image",
+        "blink": "Blink",
+        "singleHelp": "Shows the observation from epoch A.",
+        "blinkUnavailable": "Blink requires two distinct real acquisition epochs.",
+        "blinkHelp": "Alternates two aligned real epochs. Visual differences do not establish motion or variability.",
+        "epochA": "Epoch A",
+        "epochB": "Epoch B",
+        "pauseBlink": "Pause blink",
+        "resumeBlink": "Resume blink"
+      }
+    },
+    "spectral": {
+      "eyebrow": "Module · Spectral Explorer",
+      "title": "See one point across SPHEREx's <hl>102 channels</hl>",
+      "text": "The image shows one of the 102 layers in the DR1 HiPS cube. Change channels to see another wavelength; click the image to plot that point's intensity across all 102 channels.",
+      "querying": "Processing the spectral cube…",
+      "loading": "Loading the selected channel…",
+      "firstDownload": "The first request for a region downloads its official FITS tile (~321 MB). Later requests reuse the stored product.",
+      "clickHint": "Click a point to plot its spectrum",
+      "imageInfo": "One layer · {{unit}} · grayscale",
+      "missingChannel": "Channel has no data",
+      "chooseRegion": "Choose a sky region",
+      "searchHint": "Enter RA, Dec and field of view, then press GO.",
+      "cube": "Spectral cube",
+      "cubeText": "102 layers of the same region; the viewer shows one at a time. The colors in this diagram are not physical colors.",
+      "cubeAria": "Spectral cube with 102 channels",
+      "cubeBack": "at the back",
+      "channelTitle": "Channel {{n}} · {{wl}} µm",
+      "objectsTitle": "Selected point spectra",
+      "objectsEmpty": "There is no curve yet. Click the image to sample one pixel across 102 channels and compare up to {{max}} points. This is an exploratory view, not object photometry.",
+      "centerSpectrum": "Plot the center spectrum",
+      "object": "Point {{n}}",
+      "removeObject": "Remove point {{n}}",
+      "qualityTitle": "NHITS: contributing pixels; FLAGS: raw bit mask without interpretation",
+      "noData": "no data",
+      "loadingShort": "loading…",
+      "error": "error",
+      "chartAria": "Intensity by wavelength for selected points",
+      "flux": "intensity",
+      "slider": {
+        "title": "Spectrum",
+        "channel": "Channel",
+        "detector": "Detector {{d}}",
+        "sweep": "Sweep the 102 channels",
+        "pauseSweep": "Pause sweep",
+        "aria": "Spectral channel",
+        "valueText": "{{wl}} micrometers, channel {{n}}"
+      }
+    },
+    "fields": {
+      "intro": "Enter the right ascension, declination and field of view.",
+      "ra": "RA",
+      "raHelp": "Right Ascension (°)",
+      "dec": "Dec",
+      "decHelp": "Declination (°)",
+      "fov": "FOV",
+      "fovHelp": "Field of view",
+      "fovUnit": "Field of view unit",
+      "band": "Band",
+      "bandHelp": "Detector",
+      "allBands": "All",
+      "start": "Start date",
+      "end": "End date",
+      "loadingObs": "Loading observations…",
+      "countObs": "{{count}} observations",
+      "go": "GO"
+    },
+    "validation": {
+      "ra": "RA must be between 0° and 360°.",
+      "dec": "Dec must be between −90° and +90°.",
+      "fov": "The field of view must be greater than 0 and at most {{max}}°.",
+      "dates": "The start date must be earlier than the end date."
+    },
+    "viewer": {
+      "aria": "Image viewer. Click on an object to see its options.",
+      "validObs": "Valid observation",
+      "clickHint": "Click on an object to analyze it",
+      "clickShort": "Click an object",
+      "chooseRegion": "Choose a region of the sky",
+      "chooseShort": "Enter RA, Dec and field of view, then press “GO”."
+    },
+    "player": {
+      "prev": "Previous frame",
+      "next": "Next frame",
+      "play": "Play",
+      "pause": "Pause",
+      "stop": "Stop and return to the start",
+      "timeline": "Position in the timelapse"
+    },
+    "tools": {
+      "speed": "Speed",
+      "transition": "Transition",
+      "fadeShort": "Short",
+      "fadeMedium": "Medium",
+      "fadeContinuous": "Continuous",
+      "loop": "Loop",
+      "hint": "Zoom with the buttons or with Ctrl + scroll. When zoomed in, drag to move around.",
+      "more": "More options"
+    },
+    "point": {
+      "menuTitle": "Point",
+      "coordinates": "Coordinates",
+      "spectrum": "Spectrum",
+      "metadata": "Metadata",
+      "share": "Share URL",
+      "closePanel": "Close panel",
+      "coordsTitle": "Point coordinates",
+      "pixel": "Pixel",
+      "frame": "Frame",
+      "copy": "Copy",
+      "copied": "Copied",
+      "done": "Done",
+      "copyCoords": "Copy coordinates",
+      "recordTitle": "Log a change",
+      "recordPlaceholder": "E.g. Object moving to the northeast",
+      "recordButton": "Log change",
+      "records": "Logged changes ({{count}})",
+      "noNote": "No note",
+      "deleteRecord": "Delete entry",
+      "spectrumTitle": "Spectrum",
+      "spectrumLoading": "Querying the 102 channels…",
+      "spectrumHelp": "The shaded area is the band of the current frame ({{detector}}). Peaks and dips reveal composition: for example, water ice near 3 µm.",
+      "spectrumAria": "Spectrum of the point across 102 channels",
+      "metaTitle": "Current frame observation",
+      "metaId": "ID",
+      "metaDate": "Date",
+      "metaDetector": "Detector",
+      "metaBand": "Band",
+      "metaRelease": "Data release",
+      "metaPoint": "Point",
+      "flags": "Flags detected: {{flags}}",
+      "openImage": "Open frame image",
+      "noObservation": "No observation selected.",
+      "shareTitle": "Link to this point",
+      "shareHelp": "Includes coordinates, field of view, dates, band, frame and the marked point.",
+      "embedTitle": "Embed on another website",
+      "copyCode": "Copy code"
+    }
+  },
+  "minigame": {
+    "line1": "EON © 2026. An astronomical exploration project.",
+    "line2": "Explore the universe, discover time."
+  },
+  "references": {
+    "eyebrow": "References",
+    "title": "References to explore further",
+    "text": "Check out selected external sources to expand what you have learned and dive deeper into SPHEREx and the exploration of the universe.",
+    "listAria": "External references",
+    "open": "Open reference",
+    "newTab": "(opens in a new tab)",
+    "count": "SPHEREx · {{count}} references",
+    "items": {
+      "spherex": {
+        "title": "SPHEREx Mission",
+        "source": "NASA",
+        "description": "Meet the NASA mission that will map the sky in 102 infrared bands."
+      },
+      "planetX": {
+        "title": "Planet X",
+        "source": "NASA",
+        "description": "Explore the hypothesis of a mysterious planet hidden at the edge of the solar system."
+      },
+      "coordinates": {
+        "title": "Declination and Right Ascension",
+        "source": "NASA",
+        "description": "Learn how celestial objects are located using sky coordinates."
+      },
+      "spectrum": {
+        "title": "What is a spectrum?",
+        "source": "Video",
+        "description": "See in a simple way how light splits apart and reveals information about the universe."
+      }
+    }
+  }
+}

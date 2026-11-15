@@ -1,0 +1,380 @@
+{
+  "common": {
+    "dateLocale": "es",
+    "logoAlt": "EON",
+    "homeAria": "Ir al inicio de Aetheris",
+    "mainNav": "Navegación principal",
+    "simulatedData": "Datos simulados",
+    "copyright": "EON © {{year}}. Proyecto de exploración astronómica.",
+    "imageLoadError": "No se pudo cargar una de las imágenes.",
+    "serverError": "No se pudo conectar con el servidor.",
+    "checkData": "Revisa los datos.",
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "close": "Cerrar",
+    "language": {
+      "label": "Idioma",
+      "es": "Español",
+      "en": "English"
+    },
+    "modules": {
+      "observatory": "Observatorio",
+      "timelapse": "Timelapse",
+      "search": "Búsqueda por coordenadas",
+      "spectral": "Análisis espectral"
+    }
+  },
+
+  "landing": {
+    "nav": {
+      "home": "Inicio",
+      "observatory": "Observatorio",
+      "features": "Características",
+      "about": "Acerca de",
+      "openMenu": "Abrir menú",
+      "closeMenu": "Cerrar menú",
+      "references": "Referencias"
+    },
+    "hero": {
+      "title": "EXPLORA EL COSMOS Y DESCUBRE NUEVOS OBJETOS A TRAVÉS DEL TIEMPO",
+      "titleLines": [
+        ["EXPLORA", "EL", "*COSMOS"],
+        ["Y", "DESCUBRE", "NUEVOS", "*MUNDOS"],
+        ["A", "TRAVÉS", "DEL", "TIEMPO"]
+      ],
+      "subtitle": "Analiza los objetos capturados por la misión SPHEREx de la NASA. Compara fechas, filtra 102 bandas infrarrojas y ayúdanos a encontrar el próximo gran hallazgo astronómico con EON.",
+      "cta": "Iniciar exploración en el Observatorio"
+    },
+    "hook": {
+      "title": "¿Sabías que comparar dos fotos del cielo permitió descubrir Plutón?",
+      "text": "El universo no está estático. Cada seis meses, la misión SPHEREx cartografía todo el cielo. Al comparar imágenes de distintas fechas, los puntos de luz que cambian de posición revelan cometas, asteroides y cuerpos ocultos que ningún algoritmo puede analizar por sí solo. Tú puedes ser quien encuentre el siguiente.",
+      "cta": "Descúbrelo en el observatorio",
+      "compare": {
+        "epochA": "Captura A",
+        "epochB": "Captura B · 6 meses después",
+        "pause": "Pausar la comparación",
+        "resume": "Reanudar la comparación",
+        "view": "Ver {{epoch}}",
+        "originals": "Capturas originales",
+        "caption": "Demostración ilustrativa: las estrellas permanecen fijas; el objeto marcado cambia de posición entre ambas capturas."
+      }
+    },
+    "info": {
+      "title": "Conoce el universo detrás de Aetheris",
+      "spherex": {
+        "title": "¿Qué es la misión SPHEREx?",
+        "text": "Lanzada en <hl>2025</hl>, SPHEREx es el observatorio espacial de la NASA que escanea la totalidad del cielo <hl>cada seis meses</hl>. A diferencia de los telescopios convencionales, observa el cosmos en <hl>102 bandas</hl> de luz infrarroja cercana, permitiendo detectar la huella química de moléculas esenciales como agua, carbono e hidrógeno en más de mil millones de objetos (desde galaxias lejanas y cuásares hasta cometas cercanos).",
+        "imageAlt": "Imagen astronómica de SPHEREx",
+        "chip": "102 bandas · 0.75–5 µm"
+      },
+      "planetX": {
+        "title": "En la búsqueda del Planeta X y mundos ocultos",
+        "text": "En los confines de nuestro sistema solar y más allá, existen cuerpos celestes demasiado fríos y oscuros para verse a simple vista: desde enanas marrones (cuerpos masivos a medio camino entre un planeta gigante y una estrella) hasta el hipotético Planeta X. Aunque apenas emiten luz visible, brillan en el espectro infrarrojo de SPHEREx y delatan su presencia al desplazarse lentamente entre una captura temporal y otra. Con Aetheris, cualquier persona puede rastrear estas anomalías en movimiento.",
+        "imageAlt": "Campo estelar con un objeto tenue que brilla en infrarrojo",
+        "chip": "Infrarrojo · objeto en movimiento"
+      }
+    },
+    "features": {
+      "title": "Mucho más que una galería",
+      "subtitle": "Descubre diferentes formas de explorar el universo con Aetheris.",
+      "timelapse": {
+        "label": "Vista por Tiempo",
+        "title": "1. Evolución Temporal (Timelapse)",
+        "description": "Visualiza secuencias de imágenes capturadas cada 6 meses a modo de video o resta capturas entre distintas fechas. Identifica al instante asteroides, cometas y objetos cercanos por su desplazamiento en el cielo.",
+        "link": "Abrir Timelapse"
+      },
+      "search": {
+        "label": "Vista por Búsqueda (Coordenadas)",
+        "title": "2. Exploración por Coordenadas",
+        "description": "Navega por cualquier región del cosmos ingresando su Ascensión Recta (RA) y Declinación (Dec). Ajusta el campo de visión para rastrear fuentes rápidas y comparte hallazgos mediante enlaces directos.",
+        "link": "Buscar por coordenadas"
+      },
+      "spectral": {
+        "label": "Vista por Espectro",
+        "title": "3. Análisis Espectral Infrarrojo",
+        "description": "Explora las 102 bandas de luz infrarroja de SPHEREx y los 6 conjuntos de detectores. Filtra longitudes de onda para distinguir la composición química de estrellas, enanas marrones y galaxias.",
+        "link": "Analizar el espectro"
+      }
+    },
+    "about": {
+      "title": "Somos EON",
+      "lead": "Somos un equipo de estudiantes apasionados por la tecnología y la astronomía.",
+      "text": "A través de Aetheris buscamos acercar la exploración astronómica a los usuarios, permitiéndoles descubrir el cielo y explorar sus cambios a través del tiempo.",
+      "logoAlt": "Logo EON",
+      "pillars": {
+        "astronomy": { "title": "Astronomía", "text": "Nos mueve la curiosidad por lo que el cielo aún esconde." },
+        "technology": { "title": "Tecnología", "text": "Convertimos datos científicos en experiencias visuales." },
+        "exploration": { "title": "Exploración", "text": "Queremos que cualquier persona pueda descubrir el cielo." }
+      }
+    },
+    "footer": {
+      "ctaTitle": "El próximo hallazgo puede ser <hl>tuyo</hl>.",
+      "ctaText": "Compara épocas, busca por coordenadas y analiza 102 bandas infrarrojas. Explora el universo con Aetheris.",
+      "ctaButton": "Iniciar exploración en el Observatorio",
+      "tagline": "Proyecto de exploración astronómica con datos de la misión SPHEREx de la NASA.",
+      "explore": "Explorar",
+      "project": "Proyecto",
+      "footerNav": "Navegación del pie de página",
+      "features": "Características",
+      "functions": "Funcionalidades",
+      "about": "Acerca de EON",
+      "backToTop": "Volver arriba"
+      , "references": "Referencias"
+    }
+  },
+
+  "observatory": {
+    "header": {
+      "back": "Volver a Inicio", "backObservatory": "Volver al Observatorio", "backObservatoryShort": "Observatorio"
+    },
+    "footer": {
+      "ctaTitle": "Gracias por explorar el cielo con <hl>Aetheris</hl>.",
+      "ctaText": "Vuelve al inicio para conocer más sobre la misión SPHEREx, el Planeta X y el equipo detrás del proyecto.",
+      "ctaButton": "Regresar al inicio",
+      "modulesNav": "Módulos del Observatorio"
+    },
+    "tour": {
+      "aria": "Tour de bienvenida del Observatorio EON",
+      "stopsNav": "Paradas del tour",
+      "stops": {
+        "hero": "Inicio",
+        "timelapse": "Timelapse",
+        "search": "Search",
+        "spectral": "Spectral"
+      },
+      "active": "Activo",
+      "hero": {
+        "eyebrow": "Observatorio EON · Tour de bienvenida",
+        "titleA": "Descubriendo",
+        "titleB": "más allá del cosmos",
+        "text": "Recorre el panel de control del satélite. Cada pantalla es un módulo del observatorio: desliza hacia abajo y descúbrelos paso a paso.",
+        "start": "Comenzar recorrido"
+      },
+      "timelapse": {
+        "label": "Timelapse",
+        "title": "El cielo a través del tiempo",
+        "text": "Une las imágenes de un mismo trozo de cielo tomadas en fechas distintas y las reproduce como un vídeo: lo que se desplaza o cambia de brillo puede ser un asteroide, un cometa o una estrella variable.",
+        "filmStripAria": "Cinco fotogramas en los que un objeto se desplaza",
+        "months": ["May", "Jul", "Sep", "Nov", "Ene"],
+        "open": "Abrir Timelapse",
+        "pause": "Pausar la pantalla del satélite",
+        "play": "Reproducir la pantalla del satélite",
+        "hint": "También puedes hacer clic en la pantalla del satélite."
+      },
+      "search": {
+        "label": "Search",
+        "title": "Busca un punto de interés",
+        "text": "Cada punto del cielo tiene una \"dirección\", igual que la latitud y longitud en la Tierra. Escríbela y la cámara viaja hasta esa región.",
+        "ra": "RA · Ascensión recta",
+        "raHelp": "Como la longitud: de 0° a 360° hacia el este.",
+        "dec": "Dec · Declinación",
+        "decHelp": "Como la latitud: de −90° a +90° desde el ecuador celeste.",
+        "submit": "Buscar",
+        "example": "Ejemplo: M101",
+        "hint": "También puedes hacer clic en la pantalla del satélite."
+      },
+      "spectral": {
+        "label": "Spectral Explorer",
+        "title": "Los 102 canales de SPHEREx",
+        "text": "SPHEREx no toma una sola foto: divide la luz infrarroja en {{channels}} canales, de {{min}} µm a {{max}} µm. Cada canal revela algo distinto, como hielo de agua, polvo o galaxias lejanas.",
+        "wavelength": "Longitud de onda",
+        "sliderAria": "Longitud de onda en micrómetros",
+        "open": "Abrir Spectral Explorer",
+        "hint": "Mueve el control (las perillas responden) o haz clic en la pantalla del satélite."
+      }
+    }
+  },
+
+  "modules": {
+    "timelapse": {
+      "eyebrow": "Módulo · Timelapse",
+      "title": "El cielo a través del tiempo",
+      "text": "Elige una región y un rango de fechas para ver sus imágenes como un vídeo. Haz clic sobre un objeto que cambie para analizarlo.",
+      "querying": "Consultando observaciones de SPHEREx…",
+      "preparing": "Preparando imágenes…",
+      "noObs": "Sin observaciones en ese rango",
+      "noObsText": "Prueba con un rango de fechas más amplio, otra banda o un campo de visión mayor.",
+      "chooseText": "Escribe RA, Dec, campo de visión y fechas, y pulsa «Buscar región».",
+      "submit": "Buscar región",
+      "searching": "Buscando…"
+    },
+    "search": {
+      "eyebrow": "Módulo · Search",
+      "title": "Busca un punto de <hl>interés</hl>",
+      "text": "Compara las observaciones de una región con imagen o blink, y haz clic sobre un objeto para analizarlo.",
+      "querying": "Buscando observaciones de SPHEREx…",
+      "loading": "Cargando imágenes…",
+      "noObs": "Sin observaciones en esa región",
+      "labelBlink": "Blink · {{epoch}} · {{date}}",
+      "picker": {
+        "calendar": "Calendario de observaciones UTC",
+        "available": "Observaciones disponibles",
+        "previousMonth": "Mes anterior con observaciones",
+        "nextMonth": "Mes siguiente con observaciones",
+        "times": "Horas disponibles",
+        "observation": "Observación",
+        "otherEpoch": "Seleccionada en la otra época",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar"
+      },
+      "actions": {
+        "title": "Acciones",
+        "single": "Imagen",
+        "blink": "Blink",
+        "singleHelp": "Muestra la observación de la época A.",
+        "blinkUnavailable": "Blink necesita dos \u00e9pocas de adquisici\u00f3n reales diferentes.",
+        "blinkHelp": "Alterna dos \u00e9pocas reales alineadas. Las diferencias visuales no demuestran movimiento ni variabilidad.",
+        "epochA": "Época A",
+        "epochB": "Época B",
+        "pauseBlink": "Pausar blink",
+        "resumeBlink": "Reanudar blink"
+      }
+    },
+    "spectral": {
+      "eyebrow": "Módulo · Spectral Explorer",
+      "title": "Mira un punto a través de los <hl>102 canales</hl> de SPHEREx",
+      "text": "La imagen muestra una de las 102 capas del cubo HiPS DR1. Cambia de canal para ver otra longitud de onda; haz clic en la imagen para trazar la intensidad de ese punto en los 102 canales.",
+      "querying": "Procesando el cubo espectral…",
+      "loading": "Cargando el canal seleccionado…",
+      "firstDownload": "La primera consulta de una región descarga el tile FITS oficial (~321 MB). Las consultas posteriores reutilizan el producto guardado.",
+      "clickHint": "Haz clic en un punto para trazar su espectro",
+      "imageInfo": "Una capa · {{unit}} · escala de grises",
+      "missingChannel": "Canal sin datos",
+      "chooseRegion": "Elige una región del cielo",
+      "searchHint": "Escribe RA, Dec y campo de visión y pulsa «GO».",
+      "cube": "Cubo espectral",
+      "cubeText": "102 capas de la misma región; el visor enseña una a la vez. Los colores de este esquema no son colores físicos.",
+      "cubeAria": "Cubo espectral de 102 canales",
+      "cubeBack": "al fondo",
+      "channelTitle": "Canal {{n}} · {{wl}} µm",
+      "objectsTitle": "Espectro de los puntos",
+      "objectsEmpty": "Aún no hay curva. Haz clic en la imagen para medir un píxel en los 102 canales y comparar hasta {{max}} puntos. Es una vista exploratoria, no fotometría de un objeto.",
+      "centerSpectrum": "Trazar espectro del centro",
+      "object": "Punto {{n}}",
+      "removeObject": "Quitar punto {{n}}",
+      "qualityTitle": "NHITS: píxeles contribuyentes; FLAGS: máscara de bits sin interpretación",
+      "noData": "sin datos",
+      "loadingShort": "cargando…",
+      "error": "error",
+      "chartAria": "Intensidad por longitud de onda de los puntos seleccionados",
+      "flux": "intensidad",
+      "slider": {
+        "title": "Espectro",
+        "channel": "Canal",
+        "detector": "Detector {{d}}",
+        "sweep": "Recorrer los 102 canales",
+        "pauseSweep": "Pausar barrido",
+        "aria": "Canal espectral",
+        "valueText": "{{wl}} micrómetros, canal {{n}}"
+      }
+    },
+    "fields": {
+      "intro": "Ingresa la ascensión recta, la declinación y el campo de visión.",
+      "ra": "RA",
+      "raHelp": "Right Ascension (°)",
+      "dec": "Dec",
+      "decHelp": "Declination (°)",
+      "fov": "FOV",
+      "fovHelp": "Field of view",
+      "fovUnit": "Unidad del campo de visión",
+      "band": "Banda",
+      "bandHelp": "Detector",
+      "allBands": "Todas",
+      "start": "Fecha inicio",
+      "end": "Fecha final",
+      "loadingObs": "Cargando observaciones…",
+      "countObs": "{{count}} observaciones",
+      "go": "GO"
+    },
+    "validation": {
+      "ra": "RA debe estar entre 0° y 360°.",
+      "dec": "Dec debe estar entre −90° y +90°.",
+      "fov": "El campo de visión debe ser mayor que 0 y como máximo {{max}}°.",
+      "dates": "La fecha de inicio debe ser anterior a la final."
+    },
+    "viewer": {
+      "aria": "Visor de imágenes. Haz clic sobre un objeto para ver sus opciones.",
+      "validObs": "Observación válida",
+      "clickHint": "Haz clic en un objeto para analizarlo",
+      "clickShort": "Clic en un objeto",
+      "chooseRegion": "Elige una región del cielo",
+      "chooseShort": "Escribe RA, Dec y campo de visión y pulsa «GO»."
+    },
+    "player": {
+      "prev": "Frame anterior",
+      "next": "Frame siguiente",
+      "play": "Reproducir",
+      "pause": "Pausar",
+      "stop": "Detener y volver al inicio",
+      "timeline": "Posición en el timelapse"
+    },
+    "tools": {
+      "speed": "Velocidad",
+      "transition": "Transición",
+      "fadeShort": "Corta",
+      "fadeMedium": "Media",
+      "fadeContinuous": "Continua",
+      "loop": "Repetir en bucle",
+      "hint": "Zoom con los botones o con Ctrl + rueda. Con zoom, arrastra para moverte.",
+      "more": "Más opciones"
+    },
+    "point": {
+      "menuTitle": "Punto",
+      "coordinates": "Coordenadas",
+      "spectrum": "Espectro",
+      "metadata": "Metadatos",
+      "share": "Compartir URL",
+      "closePanel": "Cerrar panel",
+      "coordsTitle": "Coordenadas del punto",
+      "pixel": "Píxel",
+      "frame": "Frame",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "done": "Listo",
+      "copyCoords": "Copiar coordenadas",
+      "recordTitle": "Registrar un cambio",
+      "recordPlaceholder": "Ej. Objeto que se desplaza hacia el noreste",
+      "recordButton": "Registrar cambio",
+      "records": "Cambios registrados ({{count}})",
+      "noNote": "Sin nota",
+      "deleteRecord": "Eliminar registro",
+      "spectrumTitle": "Espectro",
+      "spectrumLoading": "Consultando los 102 canales…",
+      "spectrumHelp": "La zona sombreada es la banda del frame actual ({{detector}}). Picos y valles revelan la composición: por ejemplo, hielo de agua cerca de 3 µm.",
+      "spectrumAria": "Espectro del punto en 102 canales",
+      "metaTitle": "Observación del frame actual",
+      "metaId": "ID",
+      "metaDate": "Fecha",
+      "metaDetector": "Detector",
+      "metaBand": "Banda",
+      "metaRelease": "Data release",
+      "metaPoint": "Punto",
+      "flags": "Flags detectados: {{flags}}",
+      "openImage": "Abrir imagen del frame",
+      "noObservation": "Sin observación seleccionada.",
+      "shareTitle": "Enlace a este punto",
+      "shareHelp": "Incluye coordenadas, campo de visión, fechas, banda, frame y el punto marcado.",
+      "embedTitle": "Insertar en otra web",
+      "copyCode": "Copiar código"
+    }
+  },
+
+  "minigame": {
+    "line1": "EON © 2026. Proyecto de exploración astronómica.",
+    "line2": "Explora el universo, descubre el tiempo."
+  }  ,"references": {
+    "eyebrow": "Referencias",
+    "title": "Referencias para explorar más",
+    "text": "Consulta fuentes externas seleccionadas para ampliar lo aprendido y profundizar en SPHEREx y la exploración del universo.",
+    "listAria": "Referencias externas",
+    "open": "Abrir referencia",
+    "newTab": "(se abre en una pestaña nueva)",
+    "count": "SPHEREx · {{count}} referencias",
+    "items": {
+      "spherex": { "title": "Misión SPHEREx", "source": "NASA", "description": "Conoce la misión de la NASA que mapeará el cielo en 102 bandas infrarrojas." },
+      "planetX": { "title": "Planeta X", "source": "NASA", "description": "Explora la hipótesis del misterioso planeta oculto en los confines del sistema solar." },
+      "coordinates": { "title": "Declinación y Ascensión Recta", "source": "NASA", "description": "Aprende cómo se ubican los objetos celestes usando coordenadas del cielo." },
+      "spectrum": { "title": "¿Qué es un espectro?", "source": "Video", "description": "Visualiza de forma sencilla cómo la luz se descompone y revela información del universo." }
+    }
+  }
+}
