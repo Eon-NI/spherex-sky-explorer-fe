@@ -117,12 +117,7 @@ export default function AboutSection() {
                     whileInView="show"
                     viewport={VIEWPORT}
                 >
-                    <motion.span
-                        variants={rise}
-                        className="inline-flex rounded-full bg-paper/10 px-3 py-1 text-xs font-bold tracking-wider text-star uppercase"
-                    >
-                        Acerca de EON
-                    </motion.span>
+                    
 
                     <motion.h2
                         id="about-title"
@@ -149,10 +144,9 @@ export default function AboutSection() {
                                 variants={rise}
                                 className="group rounded-2xl border border-paper/10 bg-night/40 p-5 transition-colors duration-300 hover:border-star/40 hover:bg-night/60"
                             >
-                                <span className="flex size-10 items-center justify-center rounded-xl bg-star/15 text-star transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:rotate-6 motion-reduce:transition-none">
                                     <Icon aria-hidden="true" className="size-5" />
-                                </span>
-                                <h3 className="mt-4 font-bold text-paper">{title}</h3>
+                                
+                                <h3 className="mt-4 font-bold text-paper"> {title}</h3>
                                 <p className="mt-1 text-sm leading-relaxed text-mist">{text}</p>
                             </motion.li>
                         ))}
