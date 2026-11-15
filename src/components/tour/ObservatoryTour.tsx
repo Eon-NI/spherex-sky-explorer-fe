@@ -303,8 +303,6 @@ function Stop({ index, active, children }: { index: number; active: number; chil
    Tarjeta HUD
    ========================================================= */
 function HudCard({
-  code,
-  label,
   title,
   children,
 }: {

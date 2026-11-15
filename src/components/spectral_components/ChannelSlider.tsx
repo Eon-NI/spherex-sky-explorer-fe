@@ -23,7 +23,7 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
         <div>
           <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">Espectro</p>
           <p className="font-display mt-1 text-2xl font-semibold tabular-nums text-white">
-            {wl.toFixed(3)} <span className="text-base text-slate-400">µm</span>
+            {disabled ? '—' : wl.toFixed(3)} <span className="text-base text-slate-400">µm</span>
           </p>
         </div>
         <div className="text-right">
@@ -43,7 +43,7 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
             tabIndex={-1}
             disabled={disabled}
             onClick={() => onChange(i)}
-            title={`Canal ${i + 1} · ${channelWavelength(i).toFixed(2)} µm`}
+            title={disabled ? `Canal ${i + 1}` : `Canal ${i + 1} · ${channelWavelength(i).toFixed(2)} µm`}
             className="flex-1 transition-transform hover:scale-y-110 disabled:cursor-not-allowed"
             style={{
               background: channelColor(i, i === channel ? 1 : 0.45),
@@ -73,7 +73,7 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
         >
           {playing ? <Pause size={17} /> : <Play size={17} className="translate-x-px" />}
         </button>
-        <span className="font-display text-xs tabular-nums text-slate-400">0.75 µm</span>
+        <span className="font-display text-xs tabular-nums text-slate-400">{disabled ? '—' : `${channelWavelength(0).toFixed(3)} µm`}</span>
         <input
           type="range"
           min={0}
@@ -83,10 +83,10 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
           disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
           aria-label="Canal espectral"
-          aria-valuetext={`${wl.toFixed(2)} micrómetros, canal ${channel + 1}`}
+          aria-valuetext={disabled ? `Canal ${channel + 1}, sin metadatos` : `${wl.toFixed(2)} micrómetros, canal ${channel + 1}`}
           className="min-w-0 flex-1 cursor-pointer accent-sky-400 disabled:opacity-40"
         />
-        <span className="font-display text-xs tabular-nums text-slate-400">5 µm</span>
+        <span className="font-display text-xs tabular-nums text-slate-400">{disabled ? '—' : `${channelWavelength(CHANNEL_COUNT - 1).toFixed(3)} µm`}</span>
       </div>
     </div>
   );

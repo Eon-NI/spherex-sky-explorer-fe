@@ -16,7 +16,7 @@ const DY = 0.82;
 
 /**
  * Cubo espectral: las 102 imágenes de la misma región apiladas,
- * del canal 1 (0.75 µm, delante) al 102 (5 µm, al fondo).
+ * del canal 1 al 102; las longitudes de onda proceden de DR1.
  */
 export default function SpectralCube({ channel, onSelect }: SpectralCubeProps) {
   const layer = (i: number, lift = 0) => {
@@ -54,10 +54,10 @@ export default function SpectralCube({ channel, onSelect }: SpectralCubeProps) {
       </text>
 
       <text x={14} y={H - 6} className="fill-slate-500 text-[9px]">
-        0.75 µm
+        {channelWavelength(0).toFixed(3)} µm
       </text>
       <text x={W - 4} y={H - 6} textAnchor="end" className="fill-slate-500 text-[9px]">
-        5 µm al fondo
+        {channelWavelength(CHANNEL_COUNT - 1).toFixed(3)} µm al fondo
       </text>
     </svg>
   );

@@ -4,23 +4,21 @@ import { AlertTriangle, Hourglass, Layers, MousePointerClick, X } from 'lucide-r
 
 import {
     CHANNEL_COUNT,
-    USE_MOCK,
     channelDetector,
     channelWavelength,
     fetchSpectralCube,
     fetchSpectrum,
+    resolveSpectralPoint,
+    setLiveChannels,
     type SpectralCubeResponse,
     type SpectrumResponse,
 } from '../../api/spherex';
 import TimelapseViewer, { type ViewerMarker } from '../timelapse_components/TimelapseViewer';
 import { inputClass } from '../timelapse_components/SearchFields';
-import { useFramePreloader } from '../timelapse_components/useFramePreloader';
-import { useTimelapsePlayer } from '../timelapse_components/useTimelapsePlayer';
-import { uvToSky } from '../timelapse_components/skyMath';
 import ChannelSlider from './ChannelSlider';
 import SpectralCube from './SpectralCube';
 import SpectrumCompareChart, { type SpectrumSeries } from './SpectrumCompareChart';
-import { OBJECT_COLORS, hueAtPosition } from './spectralColors';
+import { OBJECT_COLORS } from './spectralColors';
 
 /* =========================================================
    Formulario y URL
@@ -30,7 +28,7 @@ type CubeQuery = { ra: number; dec: number; fovDeg: number };
 
 /** Por defecto: la galaxia de Andrómeda (M31), como en la figura del cubo */
 const DEFAULT_FORM: FormValues = { ra: '10.68470', dec: '41.26875', fov: '0.5', fovUnit: 'deg' };
-const MAX_FOV = 3.5; // grados
+const MAX_FOV = 1; // un tile order-5; el servidor recorta al tile
 
 function validate(f: FormValues): { query?: CubeQuery; error?: string } {
     const ra = Number(f.ra.replace(',', '.'));
@@ -85,18 +83,26 @@ export default function SpectralModule() {
     );
     const queryKey = query ? JSON.stringify(query) : '';
     const [result, setResult] = useState<{ key: string; data?: SpectralCubeResponse; error?: string } | null>(null);
+    const [cubeProgress, setCubeProgress] = useState<number | null>(null);
     const pendingChannel = useRef<number | undefined>(initial.channel);
 
     const [objects, setObjects] = useState<ObjectPoint[]>([]);
     const [spectra, setSpectra] = useState<Record<string, SpectrumResponse | { error: string }>>({});
     const [zoom, setZoom] = useState(1);
+    const [channel, setChannel] = useState(initial.channel ?? 0);
+    const [preview, setPreview] = useState<HTMLImageElement | null>(null);
+    const [previewError, setPreviewError] = useState<string | null>(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
+    const [playing, setPlaying] = useState(false);
+    const posRef = useRef(0);
 
     /* ---------- cubo espectral ---------- */
     useEffect(() => {
         if (!query) return;
         const ctrl = new AbortController();
-        fetchSpectralCube(query, ctrl.signal)
-            .then((data) => setResult({ key: queryKey, data }))
+        setCubeProgress(null);
+        fetchSpectralCube(query, ctrl.signal, (progress) => setCubeProgress(progress))
+            .then((data) => { setLiveChannels(data.channels); setResult({ key: queryKey, data }); })
             .catch((e: Error) => {
                 if (e.name !== 'AbortError')
                     setResult({ key: queryKey, error: e.message || 'No se pudo conectar con el servidor.' });
@@ -110,20 +116,37 @@ export default function SpectralModule() {
         () => [...(current?.data?.channels ?? [])].sort((a, b) => a.index - b.index),
         [current],
     );
-    const urls = useMemo(() => channels.map((c) => c.imageUrl), [channels]);
-    const preload = useFramePreloader(urls);
-    // reutilizamos el motor del timelapse: aquí cada "frame" es un canal
-    const player = useTimelapsePlayer(preload.images.length);
-    const { jumpTo } = player;
-    const ready = preload.images.length > 0;
-    const loading = fetching || preload.loading;
-    const channel = Math.min(player.index, CHANNEL_COUNT - 1);
+    useEffect(() => {
+        if (!channels.length) return;
+        setChannel(pendingChannel.current ?? 0);
+        pendingChannel.current = undefined;
+    }, [channels]);
 
     useEffect(() => {
-        if (preload.images.length === 0) return;
-        jumpTo(pendingChannel.current ?? 0);
-        pendingChannel.current = undefined;
-    }, [preload.images.length, jumpTo]);
+        const selected = channels[channel];
+        setPreview(null);
+        setPreviewError(null);
+        if (!selected || !selected.available) return;
+        const image = new Image();
+        setPreviewLoading(true);
+        image.onload = () => { setPreview(image); setPreviewLoading(false); };
+        image.onerror = () => { setPreviewError('No se pudo cargar el preview de este canal.'); setPreviewLoading(false); };
+        image.src = selected.imageUrl;
+        return () => { image.onload = null; image.onerror = null; };
+    }, [channels, channel]);
+
+    useEffect(() => {
+        if (!playing) return;
+        const timer = window.setInterval(() => setChannel((current) => {
+            let next = (current + 1) % CHANNEL_COUNT;
+            if (next === 50 || next === 51) next = 52;
+            return next;
+        }), 2500);
+        return () => window.clearInterval(timer);
+    }, [playing]);
+
+    const ready = !!preview;
+    const loading = fetching || previewLoading;
 
     /* ---------- acciones ---------- */
     const onSubmit = (e: FormEvent) => {
@@ -146,20 +169,22 @@ export default function SpectralModule() {
     };
 
     const selectChannel = (i: number) => {
-        player.goTo(i);
+        setChannel(i);
     };
 
     const onSelectPoint = (u: number, v: number) => {
-        if (!query) return;
-        const sky = uvToSky(u, v, query.ra, query.dec, query.fovDeg);
+        if (!query || current?.data?.tileId === undefined) return;
         const used = new Set(objects.map((o) => o.slot));
         const keep = objects.length >= MAX_OBJECTS ? objects.slice(1) : objects;
         const freed = objects.length >= MAX_OBJECTS ? objects[0].slot : undefined;
         const slot = freed ?? [0, 1, 2].find((s) => !used.has(s)) ?? 0;
-        const point: ObjectPoint = { id: crypto.randomUUID(), slot, u, v, ...sky };
+        const point: ObjectPoint = { id: crypto.randomUUID(), slot, u, v, ra: query.ra, dec: query.dec };
         setObjects([...keep, point]);
-
-        fetchSpectrum(sky.ra, sky.dec)
+        resolveSpectralPoint(current.data.tileId, query, u, v)
+            .then((sky) => {
+                setObjects((list) => list.map((item) => item.id === point.id ? { ...item, ...sky } : item));
+                return fetchSpectrum(sky.ra, sky.dec, query.fovDeg);
+            })
             .then((data) => setSpectra((s) => ({ ...s, [point.id]: data })))
             .catch((err: Error) => setSpectra((s) => ({ ...s, [point.id]: { error: err.message } })));
     };
@@ -175,14 +200,15 @@ export default function SpectralModule() {
         const s = spectra[o.id];
         return {
             id: o.id,
-            label: `Objeto ${o.slot + 1}`,
+            label: `Punto ${o.slot + 1}`,
             color: OBJECT_COLORS[o.slot],
             points: s && 'points' in s ? s.points : undefined,
             loading: !s,
         };
     });
-    const unit = Object.values(spectra).find((s): s is SpectrumResponse => 'points' in s)?.unit ?? 'flujo';
-    const errorMessage = formError ?? current?.error ?? preload.error;
+    const unit = Object.values(spectra).find((s): s is SpectrumResponse => 'points' in s)?.unit
+        ?? current?.data?.imageUnit ?? 'intensidad';
+    const errorMessage = formError ?? current?.error ?? previewError;
     const wl = channelWavelength(channel);
 
     return (
@@ -201,14 +227,9 @@ export default function SpectralModule() {
                         de SPHEREx
                     </h2>
                     <p className="mx-auto mt-4 max-w-2xl text-slate-400">
-                        SPHEREx fotografía cada región en 102 longitudes de onda infrarrojas. Desliza entre canales
-                        para ver cómo cambia la imagen y haz clic en hasta 3 objetos para comparar sus espectros.
+                        La imagen muestra una de las 102 capas del cubo HiPS DR1. Cambia de canal para ver otra
+                        longitud de onda; haz clic en la imagen para trazar la intensidad de ese punto en los 102 canales.
                     </p>
-                    {USE_MOCK && (
-                        <span className="mt-4 inline-block rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-medium text-sky-200">
-                            Datos simulados
-                        </span>
-                    )}
                 </div>
 
                 <div className="liquid-glass rounded-3xl p-3 md:p-4">
@@ -216,21 +237,23 @@ export default function SpectralModule() {
                         {/* ---------- visor del canal ---------- */}
                         <div className="relative h-[52vh] min-h-[340px] overflow-hidden rounded-2xl bg-[#05070f] ring-1 ring-white/10 lg:h-auto lg:min-h-[520px]">
                             <TimelapseViewer
-                                images={preload.images}
-                                posRef={player.posRef}
+                                images={preview ? [preview] : []}
+                                posRef={posRef}
                                 fade={1}
                                 zoom={zoom}
                                 onZoomChange={setZoom}
                                 selected={null}
                                 markers={markers}
                                 onSelect={onSelectPoint}
-                                hueAt={hueAtPosition}
                             />
 
                             {ready && (
                                 <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap gap-2">
                                     <span className="font-display rounded-full bg-[#05070f]/70 px-3 py-1 text-sm tabular-nums text-white backdrop-blur">
-                                        λ {wl.toFixed(2)} µm
+                                        λ {wl.toFixed(3)} µm
+                                    </span>
+                                    <span className="rounded-full bg-[#05070f]/70 px-3 py-1 text-xs text-slate-300 backdrop-blur">
+                                        Una capa · {current?.data?.imageUnit ?? 'unidad FITS'} · escala de grises
                                     </span>
                                     <span className="font-display rounded-full bg-[#05070f]/70 px-3 py-1 text-xs tabular-nums text-slate-300 backdrop-blur">
                                         CH {String(channel + 1).padStart(3, '0')} / {CHANNEL_COUNT}
@@ -269,7 +292,7 @@ export default function SpectralModule() {
 
                             {ready && objects.length === 0 && (
                                 <span className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full bg-[#05070f]/70 px-3 py-1 text-xs text-slate-300 backdrop-blur">
-                                    <MousePointerClick size={14} /> Haz clic en un objeto para ver su espectro
+                                    <MousePointerClick size={14} /> Haz clic en un punto para trazar su espectro
                                 </span>
                             )}
 
@@ -279,26 +302,14 @@ export default function SpectralModule() {
                                         <>
                                             <Hourglass size={34} className="animate-spin text-sky-300 [animation-duration:2.4s]" />
                                             <p className="font-display text-lg text-white">
-                                                {fetching ? 'Consultando el cubo espectral…' : 'Cargando los 102 canales…'}
+                                                {fetching ? `Procesando el cubo espectral…${cubeProgress === null ? '' : ` ${cubeProgress}%`}` : 'Cargando el canal seleccionado…'}
                                             </p>
-                                            {!fetching && preload.total > 0 && (
-                                                <div className="w-56">
-                                                    <div className="h-1 overflow-hidden rounded-full bg-white/10">
-                                                        <div
-                                                            className="h-full rounded-full bg-gradient-to-r from-sky-400 to-violet-400 transition-[width]"
-                                                            style={{ width: `${(preload.loaded / preload.total) * 100}%` }}
-                                                        />
-                                                    </div>
-                                                    <p className="font-display mt-2 text-xs tabular-nums text-slate-400">
-                                                        {preload.loaded} / {preload.total}
-                                                    </p>
-                                                </div>
-                                            )}
+                                            {fetching && <p className="max-w-sm text-sm text-slate-400">La primera consulta de una región descarga el tile FITS oficial (~321 MB). Las consultas posteriores reutilizan el producto guardado.</p>}
                                         </>
                                     ) : (
                                         <>
                                             <Layers size={34} className="text-sky-300" />
-                                            <p className="font-display text-lg text-white">Elige una región del cielo</p>
+                                            <p className="font-display text-lg text-white">{channels[channel] && !channels[channel].available ? 'Canal sin datos' : 'Elige una región del cielo'}</p>
                                             <p className="max-w-sm text-sm text-slate-400">
                                                 Escribe RA, Dec y campo de visión y pulsa «GO».
                                             </p>
@@ -314,46 +325,65 @@ export default function SpectralModule() {
                                 <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">
                                     Cubo espectral
                                 </p>
-                                <p className="mt-1 text-xs text-slate-500">La misma región, apilada en 102 imágenes.</p>
-                                <div className={ready ? '' : 'pointer-events-none opacity-40'}>
-                                    <SpectralCube channel={channel} onSelect={selectChannel} />
-                                </div>
+                                <p className="mt-1 text-xs text-slate-500">102 capas de la misma región; el visor enseña una a la vez. Los colores de este esquema no son colores físicos.</p>
+                                {current?.data && (
+                                    <div className={ready ? '' : 'pointer-events-none opacity-40'}>
+                                        <SpectralCube channel={channel} onSelect={selectChannel} />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex-1 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                                 <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">
-                                    Espectro de los objetos
+                                    Espectro de los puntos
                                 </p>
+                                <SpectrumCompareChart
+                                    series={series}
+                                    channel={channel}
+                                    unit={unit}
+                                    onChannelChange={selectChannel}
+                                />
                                 {objects.length === 0 ? (
-                                    <p className="mt-3 text-sm leading-6 text-slate-400">
-                                        Cada objeto brilla distinto en cada canal. Haz clic sobre la imagen para trazar su
-                                        espectro y compara hasta {MAX_OBJECTS}.
-                                    </p>
+                                    <div className="mt-2">
+                                        <p className="text-sm leading-6 text-slate-400">
+                                            Aún no hay curva. Haz clic en la imagen para medir un píxel en los 102 canales y
+                                            comparar hasta {MAX_OBJECTS} puntos. Es una vista exploratoria, no fotometría de un objeto.
+                                        </p>
+                                        <button
+                                            type="button"
+                                            disabled={!ready}
+                                            onClick={() => onSelectPoint(0.5, 0.5)}
+                                            className="mt-3 rounded-full border border-sky-400/50 px-4 py-2 text-sm font-medium text-sky-200 hover:bg-sky-400/10 disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            Trazar espectro del centro
+                                        </button>
+                                    </div>
                                 ) : (
                                     <>
-                                        <SpectrumCompareChart
-                                            series={series}
-                                            channel={channel}
-                                            unit={unit}
-                                            onChannelChange={selectChannel}
-                                        />
                                         <ul className="mt-2 space-y-1.5">
                                             {objects.map((o) => {
                                                 const s = spectra[o.id];
                                                 return (
                                                     <li key={o.id} className="flex items-center gap-2 text-xs">
                                                         <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: OBJECT_COLORS[o.slot] }} />
-                                                        <span className="font-medium text-slate-200">Objeto {o.slot + 1}</span>
+                                                        <span className="font-medium text-slate-200">Punto {o.slot + 1}</span>
                                                         <span className="font-display flex-1 truncate tabular-nums text-slate-500">
                                                             {o.ra.toFixed(4)}°, {o.dec >= 0 ? '+' : ''}
                                                             {o.dec.toFixed(4)}°
                                                         </span>
+                                                        {s && 'points' in s && (
+                                                            <span className="text-slate-400" title="NHITS: píxeles contribuyentes; FLAGS: máscara de bits sin interpretación">
+                                                                {s.points[channel]?.available
+                                                                    ? `NHITS ${s.points[channel].nhits} · FLAGS ${s.points[channel].flags}`
+                                                                    : 'sin datos'}
+                                                            </span>
+                                                        )}
                                                         {!s && <span className="animate-pulse text-slate-500">cargando…</span>}
                                                         {s && 'error' in s && <span className="text-violet-300">error</span>}
                                                         <button
                                                             type="button"
                                                             onClick={() => removeObject(o.id)}
-                                                            aria-label={`Quitar objeto ${o.slot + 1}`}
+                                                            aria-label={`Quitar punto ${o.slot + 1}`}
                                                             className="rounded-full p-1 text-slate-500 hover:bg-white/10 hover:text-white"
                                                         >
                                                             <X size={13} />
@@ -443,14 +473,10 @@ export default function SpectralModule() {
                             <ChannelSlider
                                 channel={channel}
                                 onChange={selectChannel}
-                                playing={player.playing}
-                                onPlay={() => {
-                                    player.setLoop(false);
-                                    player.setFps(14);
-                                    player.play();
-                                }}
-                                onPause={player.pause}
-                                disabled={!ready}
+                                playing={playing}
+                                onPlay={() => setPlaying(true)}
+                                onPause={() => setPlaying(false)}
+                                disabled={!current?.data}
                             />
                         </div>
                     </div>

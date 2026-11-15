@@ -16,9 +16,9 @@ const X_MAX = 5;
 
 export default function SpectrumChart({ points, unit, highlight }: SpectrumChartProps) {
   const gid = useId();
-  const fluxes = points.map((p) => p.flux);
-  const yMin = Math.min(...fluxes);
-  const yMax = Math.max(...fluxes);
+  const fluxes = points.map((p) => p.flux).filter((value): value is number => value !== null && Number.isFinite(value));
+  const yMin = fluxes.length ? Math.min(...fluxes) : 0;
+  const yMax = fluxes.length ? Math.max(...fluxes) : 1;
   const pad = (yMax - yMin) * 0.1 || 1;
   const lo = yMin - pad;
   const hi = yMax + pad;
@@ -26,8 +26,13 @@ export default function SpectrumChart({ points, unit, highlight }: SpectrumChart
   const sx = (w: number) => PAD.l + ((w - X_MIN) / (X_MAX - X_MIN)) * (W - PAD.l - PAD.r);
   const sy = (f: number) => PAD.t + (1 - (f - lo) / (hi - lo)) * (H - PAD.t - PAD.b);
 
-  const line = points.map((p, i) => `${i ? 'L' : 'M'}${sx(p.wavelength).toFixed(1)},${sy(p.flux).toFixed(1)}`).join(' ');
-  const area = `${line} L${sx(X_MAX)},${H - PAD.b} L${sx(X_MIN)},${H - PAD.b} Z`;
+  let pen = false;
+  const line = points.map((p) => {
+    if (p.flux === null || !Number.isFinite(p.wavelength)) { pen = false; return ''; }
+    const command = pen ? 'L' : 'M';
+    pen = true;
+    return `${command}${sx(p.wavelength).toFixed(1)},${sy(p.flux).toFixed(1)}`;
+  }).join(' ');
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Espectro del punto en 102 canales">
@@ -65,7 +70,6 @@ export default function SpectrumChart({ points, unit, highlight }: SpectrumChart
         {unit}
       </text>
 
-      <path d={area} fill={`url(#${gid}-area)`} />
       <path d={line} fill="none" stroke={`url(#${gid}-line)`} strokeWidth={1.8} strokeLinejoin="round" />
     </svg>
   );
