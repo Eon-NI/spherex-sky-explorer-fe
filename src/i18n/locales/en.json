@@ -2,7 +2,7 @@
   "common": {
     "dateLocale": "en",
     "logoAlt": "EON",
-    "homeAria": "Go to the LOOK-EON home page",
+    "homeAria": "Go to the Aetheris home page",
     "mainNav": "Main navigation",
     "simulatedData": "Simulated data",
     "copyright": "EON © {{year}}. An astronomical exploration project.",
@@ -58,7 +58,7 @@
       }
     },
     "info": {
-      "title": "Meet the universe behind LOOK-EON",
+      "title": "Meet the universe behind Aetheris",
       "spherex": {
         "title": "What is the SPHEREx mission?",
         "text": "Launched in <hl>2025</hl>, SPHEREx is NASA's space observatory that scans the entire sky <hl>every six months</hl>. Unlike conventional telescopes, it observes the cosmos in <hl>102 bands</hl> of near-infrared light, making it possible to detect the chemical fingerprint of essential molecules such as water, carbon and hydrogen in more than a billion objects (from distant galaxies and quasars to nearby comets).",
@@ -67,7 +67,7 @@
       },
       "planetX": {
         "title": "In search of Planet X and hidden worlds",
-        "text": "At the edges of our solar system and beyond, there are celestial bodies too cold and dark to be seen with the naked eye: from brown dwarfs (massive bodies halfway between a giant planet and a star) to the hypothetical Planet X. Although they barely emit visible light, they shine in SPHEREx's infrared spectrum and give themselves away by slowly moving from one time capture to the next. With LOOK-EON, anyone can track these moving anomalies.",
+        "text": "At the edges of our solar system and beyond, there are celestial bodies too cold and dark to be seen with the naked eye: from brown dwarfs (massive bodies halfway between a giant planet and a star) to the hypothetical Planet X. Although they barely emit visible light, they shine in SPHEREx's infrared spectrum and give themselves away by slowly moving from one time capture to the next. With Aetheris, anyone can track these moving anomalies.",
         "imageAlt": "Star field with a faint object glowing in infrared",
         "caption": "Illustration: the marked object represents a hypothetical world; it is not a real observation.",
         "chip": "Infrared · moving object"
@@ -75,7 +75,7 @@
     },
     "features": {
       "title": "Much more than a gallery",
-      "subtitle": "Discover different ways to explore the universe with LOOK-EON.",
+      "subtitle": "Discover different ways to explore the universe with Aetheris.",
       "timelapse": {
         "label": "Time view",
         "title": "1. Time Evolution (Timelapse)",
@@ -98,7 +98,7 @@
     "about": {
       "title": "We are EON",
       "lead": "We are a team of students passionate about technology and astronomy.",
-      "text": "Through LOOK-EON we aim to bring astronomical exploration closer to everyone, letting them discover the sky and explore how it changes over time.",
+      "text": "Through Aetheris we aim to bring astronomical exploration closer to everyone, letting them discover the sky and explore how it changes over time.",
       "logoAlt": "EON logo",
       "pillars": {
         "astronomy": { "title": "Astronomy", "text": "We are driven by curiosity about what the sky still hides." },
@@ -108,7 +108,7 @@
     },
     "footer": {
       "ctaTitle": "The next discovery could be <hl>yours</hl>.",
-      "ctaText": "Compare epochs, search by coordinates and analyze 102 infrared bands. Explore the universe with LOOK-EON.",
+      "ctaText": "Compare epochs, search by coordinates and analyze 102 infrared bands. Explore the universe with Aetheris.",
       "ctaButton": "Start exploring in the Observatory",
       "tagline": "An astronomical exploration project using data from NASA's SPHEREx mission.",
       "explore": "Explore",
@@ -126,7 +126,7 @@
       "back": "Back to Home"
     },
     "footer": {
-      "ctaTitle": "Thanks for exploring the sky with <hl>LOOK-EON</hl>.",
+      "ctaTitle": "Thanks for exploring the sky with <hl>Aetheris</hl>.",
       "ctaText": "Head back home to learn more about the SPHEREx mission, Planet X and the team behind the project.",
       "ctaButton": "Back to home",
       "modulesNav": "Observatory modules"
