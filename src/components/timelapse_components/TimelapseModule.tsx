@@ -303,7 +303,7 @@ export default function TimelapseModule() {
               {ready && observation && (
                 <div className="pointer-events-none absolute left-4 top-4 flex flex-wrap gap-2">
                   <span className="font-hud rounded-full bg-night/70 px-3 py-1 text-sm tabular-nums text-paper backdrop-blur">
-                    {formatDate(observation.observationTime, m.common.dateLocale)}
+                    {formatDate(observation.observationTime)}
                   </span>
                   <span className="rounded-full bg-night/70 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] text-star backdrop-blur">
                     {observation.detector}

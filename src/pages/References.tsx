@@ -77,7 +77,6 @@ export default function References() {
 
                     {/* línea de cierre */}
                     <div className="font-hud mt-12 flex items-center gap-4 text-xs tracking-[0.25em] text-mist uppercase">
-                        <span className="whitespace-nowrap">{fmt(r.count, { count: REFERENCES.length })}</span>
                         <span aria-hidden="true" className="flex flex-1 items-center gap-1.5">
                             {REFERENCES.map((ref) => (
                                 <span key={ref.key} className="h-0.5 w-6 rounded-full bg-star" />

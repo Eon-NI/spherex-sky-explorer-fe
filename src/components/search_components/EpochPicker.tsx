@@ -65,14 +65,14 @@ export default function EpochPicker({ label, observations, value, excludedId, di
     <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{label} · UTC</p>
     <details ref={details} className="mt-1.5 min-w-0" onKeyDown={e => { if (e.key === 'Escape') { e.preventDefault(); close(); } }}>
       <summary ref={summary} aria-disabled={unavailable}
-        aria-label={`${label}: ${selected ? formatEpoch(selected.observationTime, locale) : m.modules.search.noObs}`}
+        aria-label={`${label}: ${selected ? formatEpoch(selected.observationTime) : m.modules.search.noObs}`}
         onClick={e => {
           if (unavailable) e.preventDefault();
           else if (!details.current?.open) { setMonth(initialDay.slice(0, 7)); setDay(initialDay); setDraft(value ?? ''); }
         }}
         onKeyDown={e => { if (unavailable && (e.key === 'Enter' || e.key === ' ')) e.preventDefault(); }}
         className={`${buttonClass} list-none break-words ${unavailable ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'}`}>
-        {selected ? formatEpoch(selected.observationTime, locale) : m.modules.search.noObs}
+        {selected ? formatEpoch(selected.observationTime) : m.modules.search.noObs}
       </summary>
       {!unavailable && <div className="mt-2 min-w-0 rounded-xl border border-white/15 bg-night p-3">
         <div className="mb-3 flex items-center justify-between gap-1">

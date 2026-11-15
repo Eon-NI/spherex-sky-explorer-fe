@@ -3,7 +3,7 @@ import { AlertTriangle, Check, CheckCircle2, Copy, ExternalLink, Trash2, X } fro
 import { fetchSpectrum, type Observation, type SpectrumResponse } from '../../api/spherex';
 import { ACTIONS } from './pointActions';
 import SpectrumChart from './SpectrumChart';
-import { formatDate, formatDecDms, formatRaHms } from './skyMath';
+import { formatDate, formatDateTime, formatDecDms, formatRaHms } from './skyMath';
 import type { ChangeRecord, PointAction, SelectedPoint } from './types';
 import { useI18n } from '../../i18n/useI18n';
 import { fmt } from '../../i18n/format';
@@ -118,7 +118,7 @@ function CoordinatesTab({ point, observation, imageSize, records, onRecord, onRe
         <Row k="RA (hms)" v={formatRaHms(point.ra)} />
         <Row k="Dec (dms)" v={formatDecDms(point.dec)} />
         <Row k={t.pixel} v={`${Math.round(point.u * imageSize)}, ${Math.round(point.v * imageSize)}`} />
-        {observation && <Row k={t.frame} v={formatDate(observation.observationTime, m.common.dateLocale)} />}
+        {observation && <Row k={t.frame} v={formatDate(observation.observationTime)} />}
       </div>
 
       <button
@@ -162,7 +162,7 @@ function CoordinatesTab({ point, observation, imageSize, records, onRecord, onRe
               <li key={r.id} className="flex items-start gap-2 rounded-xl bg-white/5 px-3 py-2">
                 <button type="button" onClick={() => onSelectRecord(r)} className="flex-1 text-left">
                   <span className="font-hud block text-xs tabular-nums text-star">
-                    {r.ra.toFixed(4)}°, {r.dec.toFixed(4)}° · {formatDate(r.observationTime, m.common.dateLocale)}
+                    {r.ra.toFixed(4)}°, {r.dec.toFixed(4)}° · {formatDate(r.observationTime)}
                   </span>
                   <span className="block text-sm text-paper/80">{r.note || t.noNote}</span>
                 </button>
@@ -238,7 +238,7 @@ function MetadataTab({ point, observation }: PointDetailsPanelProps) {
       <p className={sectionLabel}>{t.metaTitle}</p>
       <div>
         <Row k={t.metaId} v={observation.id} />
-        <Row k={t.metaDate} v={new Date(observation.observationTime).toLocaleString(m.common.dateLocale)} />
+        <Row k={t.metaDate} v={formatDateTime(observation.observationTime)} />
         <Row k={t.metaDetector} v={observation.detector} />
         <Row k={t.metaBand} v={`${observation.wavelengthMin.toFixed(2)} – ${observation.wavelengthMax.toFixed(2)} µm`} />
         {observation.dataRelease && <Row k={t.metaRelease} v={observation.dataRelease} />}

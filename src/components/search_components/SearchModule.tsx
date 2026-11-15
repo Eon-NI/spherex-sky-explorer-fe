@@ -60,7 +60,6 @@ export default function SearchModule() {
   const { m } = useI18n();
   const sm = m.modules.search;
   const fl = m.modules.fields;
-  const loc = m.common.dateLocale;
   const [searchParams, setSearchParams] = useSearchParams();
   const [initial] = useState(() => {
     const form: FormValues = {
@@ -270,9 +269,9 @@ export default function SearchModule() {
         ? m.common.imageLoadError
         : null;
   const modeLabel: Record<ViewMode, string> = {
-    single: observation ? formatDate(observation.observationTime, loc) : '',
+    single: observation ? formatDate(observation.observationTime) : '',
     blink: observation
-      ? fmt(sm.labelBlink, { epoch: player.index === 0 ? 'A' : 'B', date: formatDate(observation.observationTime, loc) })
+      ? fmt(sm.labelBlink, { epoch: player.index === 0 ? 'A' : 'B', date: formatDate(observation.observationTime) })
       : sm.actions.blink,
   };
 

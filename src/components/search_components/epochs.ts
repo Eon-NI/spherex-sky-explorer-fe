@@ -1,4 +1,5 @@
 import type { TemporalProduct } from '../../api/spherex';
+import { formatDateTime } from '../timelapse_components/skyMath';
 
 export function catalogueObservations(products: TemporalProduct[]) {
   return products.map(p => ({ id: p.product_id, detector: p.detector,
@@ -11,10 +12,9 @@ export function resolveEpochs(count: number, epochA: number, epochB: number) {
   return { a, b };
 }
 
-export function formatEpoch(iso: string, locale: string) {
-  return new Date(iso).toLocaleString(locale, { timeZone: 'UTC', year: 'numeric', month: 'short',
-    day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3,
-    hourCycle: 'h23' }) + ' UTC';
+/** "05/13/2025 14:03:22.123 UTC" (MM/DD/YYYY) */
+export function formatEpoch(iso: string) {
+  return formatDateTime(iso, true);
 }
 
 /** Results from another query or selection must never supply options or images. */
