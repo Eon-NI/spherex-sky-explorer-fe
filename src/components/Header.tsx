@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router';
-import { ArrowLeft, Home } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import logo from '../assets/Aetheris.svg';
 import { useI18n } from '../i18n/useI18n';
 import LanguageSwitcher from '../i18n/LanguageSwitcher';

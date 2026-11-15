@@ -31,7 +31,7 @@
       "features": "Características",
       "about": "Acerca de",
       "openMenu": "Abrir menú",
-      "closeMenu": "Cerrar menú", 
+      "closeMenu": "Cerrar menú",
       "references": "Referencias"
     },
     "hero": {
@@ -205,12 +205,24 @@
       "loading": "Cargando imágenes…",
       "noObs": "Sin observaciones en esa región",
       "labelBlink": "Blink · {{epoch}} · {{date}}",
+      "picker": {
+        "calendar": "Calendario de observaciones UTC",
+        "available": "Observaciones disponibles",
+        "previousMonth": "Mes anterior con observaciones",
+        "nextMonth": "Mes siguiente con observaciones",
+        "times": "Horas disponibles",
+        "observation": "Observación",
+        "otherEpoch": "Seleccionada en la otra época",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar"
+      },
       "actions": {
         "title": "Acciones",
         "single": "Imagen",
         "blink": "Blink",
         "singleHelp": "Muestra la observación de la época A.",
-        "blinkHelp": "Alterna rápido entre A y B: lo que salta de sitio se está moviendo.",
+        "blinkUnavailable": "Blink necesita dos \u00e9pocas de adquisici\u00f3n reales diferentes.",
+        "blinkHelp": "Alterna dos \u00e9pocas reales alineadas. Las diferencias visuales no demuestran movimiento ni variabilidad.",
         "epochA": "Época A",
         "epochB": "Época B",
         "pauseBlink": "Pausar blink",
@@ -365,4 +377,3 @@
     }
   }
 }
-
