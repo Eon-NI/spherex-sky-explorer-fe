@@ -25,22 +25,16 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
     <div>
       <div className="mb-3 flex items-end justify-between gap-3">
         <div>
-<<<<<<< HEAD
-          <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">Espectro</p>
+        <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300">{t.title}</p>
           <p className="font-display mt-1 text-2xl font-semibold tabular-nums text-white">
             {disabled ? '—' : wl.toFixed(3)} <span className="text-base text-slate-400">µm</span>
-=======
-          <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{t.title}</p>
-          <p className="font-hud mt-1 text-2xl font-semibold tabular-nums text-paper">
-            {wl.toFixed(3)} <span className="text-base text-mist">µm</span>
->>>>>>> origin/development
           </p>
         </div>
         <div className="text-right">
-          <p className="font-hud text-sm tabular-nums text-paper/80">
-            {t.channel} {channel + 1} <span className="text-mist/70">/ {CHANNEL_COUNT}</span>
+          <p className="font-display text-sm tabular-nums text-slate-300">
+            {t.channel} {channel + 1} <span className="text-slate-500">/ {CHANNEL_COUNT}</span>
           </p>
-          <p className="text-xs text-mist/70">{fmt(t.detector, { d: channelDetector(channel) })}</p>
+          <p className="text-xs text-slate-500">{fmt(t.detector, { d: channelDetector(channel) })}</p>
         </div>
       </div>
 
@@ -53,11 +47,7 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
             tabIndex={-1}
             disabled={disabled}
             onClick={() => onChange(i)}
-<<<<<<< HEAD
-            title={disabled ? `Canal ${i + 1}` : `Canal ${i + 1} · ${channelWavelength(i).toFixed(2)} µm`}
-=======
             title={fmt(m.modules.spectral.channelTitle, { n: i + 1, wl: channelWavelength(i).toFixed(2) })}
->>>>>>> origin/development
             className="flex-1 transition-transform hover:scale-y-110 disabled:cursor-not-allowed"
             style={{
               background: channelColor(i, i === channel ? 1 : 0.45),
@@ -68,9 +58,9 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
       </div>
 
       {/* separadores de detectores */}
-      <div className="mt-1 grid grid-cols-6 text-center text-[10px] font-medium text-mist/70">
+      <div className="mt-1 grid grid-cols-6 text-center text-[10px] font-medium text-slate-500">
         {DETECTOR_IDS.map((d) => (
-          <span key={d} className={channelDetector(channel) === d ? 'text-star' : ''}>
+          <span key={d} className={channelDetector(channel) === d ? 'text-sky-300' : ''}>
             {d}
           </span>
         ))}
@@ -83,15 +73,11 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
           disabled={disabled}
           aria-label={playing ? t.pauseSweep : t.sweep}
           title={t.sweep}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-star text-night transition hover:bg-star-hover disabled:opacity-40"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-500 text-slate-950 transition hover:bg-sky-400 disabled:opacity-40"
         >
           {playing ? <Pause size={17} /> : <Play size={17} className="translate-x-px" />}
         </button>
-<<<<<<< HEAD
         <span className="font-display text-xs tabular-nums text-slate-400">{disabled ? '—' : `${channelWavelength(0).toFixed(3)} µm`}</span>
-=======
-        <span className="font-hud text-xs tabular-nums text-mist">0.75 µm</span>
->>>>>>> origin/development
         <input
           type="range"
           min={0}
@@ -100,19 +86,11 @@ export default function ChannelSlider({ channel, onChange, playing, onPlay, onPa
           value={channel}
           disabled={disabled}
           onChange={(e) => onChange(Number(e.target.value))}
-<<<<<<< HEAD
-          aria-label="Canal espectral"
-          aria-valuetext={disabled ? `Canal ${channel + 1}, sin metadatos` : `${wl.toFixed(2)} micrómetros, canal ${channel + 1}`}
+          aria-label={t.aria}
+          aria-valuetext={disabled ? `${t.channel} ${channel + 1}` : fmt(t.valueText, { wl: wl.toFixed(2), n: channel + 1 })}
           className="min-w-0 flex-1 cursor-pointer accent-sky-400 disabled:opacity-40"
         />
         <span className="font-display text-xs tabular-nums text-slate-400">{disabled ? '—' : `${channelWavelength(CHANNEL_COUNT - 1).toFixed(3)} µm`}</span>
-=======
-          aria-label={t.aria}
-          aria-valuetext={fmt(t.valueText, { wl: wl.toFixed(2), n: channel + 1 })}
-          className="min-w-0 flex-1 cursor-pointer accent-star disabled:opacity-40"
-        />
-        <span className="font-hud text-xs tabular-nums text-mist">5 µm</span>
->>>>>>> origin/development
       </div>
     </div>
   );

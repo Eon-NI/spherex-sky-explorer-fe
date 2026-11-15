@@ -1,6 +1,7 @@
 import { useId, type MouseEvent } from 'react';
 import { channelWavelength, nearestChannel, type SpectrumPoint } from '../../api/spherex';
 import { wavelengthHue } from './spectralColors';
+import { useI18n } from '../../i18n/useI18n';
 
 export type SpectrumSeries = {
   id: string;
@@ -15,7 +16,6 @@ type Props = {
   channel: number;
   unit: string;
   onChannelChange: (index: number) => void;
-  ariaLabel?: string;
 };
 
 const W = 340;
@@ -24,13 +24,9 @@ const PAD = { l: 36, r: 14, t: 12, b: 34 };
 const X_MIN = 0.75;
 const X_MAX = 5;
 
-<<<<<<< HEAD
 /** Espectros exploratorios de hasta 3 píxeles; clic en el gráfico para cambiar de canal */
 export default function SpectrumCompareChart({ series, channel, unit, onChannelChange }: Props) {
-=======
-/** Espectros de hasta 3 objetos; clic en el gráfico para cambiar de canal */
-export default function SpectrumCompareChart({ series, channel, unit, onChannelChange, ariaLabel }: Props) {
->>>>>>> origin/development
+  const { m } = useI18n();
   const gid = useId();
   const all = series.flatMap((s) => s.points ?? []);
   const fluxes = all.map((p) => p.flux).filter((value): value is number => value !== null && Number.isFinite(value));
@@ -66,11 +62,7 @@ export default function SpectrumCompareChart({ series, channel, unit, onChannelC
       className="w-full cursor-crosshair"
       onClick={onClick}
       role="img"
-<<<<<<< HEAD
-      aria-label="Intensidad por longitud de onda de los puntos seleccionados"
-=======
-      aria-label={ariaLabel}
->>>>>>> origin/development
+      aria-label={m.modules.spectral.chartAria}
     >
       <defs>
         <linearGradient id={`${gid}-band`} x1="0" x2="1">
@@ -84,13 +76,13 @@ export default function SpectrumCompareChart({ series, channel, unit, onChannelC
       {[1, 2, 3, 4, 5].map((w) => (
         <g key={w}>
           <line x1={sx(w)} x2={sx(w)} y1={PAD.t} y2={H - PAD.b} stroke="rgba(255,255,255,0.06)" />
-          <text x={sx(w)} y={H - 8} textAnchor="middle" className="fill-mist text-[9px]">
+          <text x={sx(w)} y={H - 8} textAnchor="middle" className="fill-slate-500 text-[9px]">
             {w} µm
           </text>
         </g>
       ))}
       <rect x={PAD.l} y={H - PAD.b + 4} width={W - PAD.l - PAD.r} height={4} rx={2} fill={`url(#${gid}-band)`} opacity={0.8} />
-      <text x={4} y={PAD.t + 6} className="fill-mist text-[9px]">
+      <text x={4} y={PAD.t + 6} className="fill-slate-500 text-[9px]">
         {unit}
       </text>
 
@@ -117,7 +109,7 @@ export default function SpectrumCompareChart({ series, channel, unit, onChannelC
                 cy={sy(s.points[channel].flux!)}
                 r={4}
                 fill={s.color}
-                stroke="#0d1230"
+                stroke="#05070f"
                 strokeWidth={1.5}
               />
             )}
