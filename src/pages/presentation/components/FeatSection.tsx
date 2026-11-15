@@ -2,41 +2,18 @@ import { motion } from 'motion/react';
 import FeatCard from './FeatCard';
 import type { FeatCardProps } from './FeatCard';
 import { VIEWPORT, rise, stagger } from './motionPresets';
+import { useI18n } from '../../../i18n/useI18n';
 
-const features: FeatCardProps[] = [
-    {
-        label: 'Vista por Tiempo',
-        title: '1. Evolución Temporal (Timelapse)',
-        description:
-            'Visualiza secuencias de imágenes capturadas cada 6 meses a modo de video o resta capturas entre distintas fechas. Identifica al instante asteroides, cometas y objetos cercanos por su desplazamiento en el cielo.',
-        to: '/timelapse',
-        linkText: 'Abrir Timelapse',
-        tone: 'star',
-        art: 'timeline',
-    },
-    {
-        label: 'Vista por Búsqueda (Coordenadas)',
-        title: '2. Exploración por Coordenadas',
-        description:
-            'Navega por cualquier región del cosmos ingresando su Ascensión Recta (RA) y Declinación (Dec). Ajusta el campo de visión para rastrear fuentes rápidas y comparte hallazgos mediante enlaces directos.',
-        to: '/search',
-        linkText: 'Buscar por coordenadas',
-        tone: 'sky',
-        art: 'coords',
-    },
-    {
-        label: 'Vista por Espectro',
-        title: '3. Análisis Espectral Infrarrojo',
-        description:
-            'Explora las 102 bandas de luz infrarroja de SPHEREx y los 6 conjuntos de detectores. Filtra longitudes de onda para distinguir la composición química de estrellas, enanas marrones y galaxias.',
-        to: '/spectral',
-        linkText: 'Analizar el espectro',
-        tone: 'blue',
-        art: 'spectrum',
-    },
+/** Datos fijos de cada tarjeta; los textos vienen del JSON (landing.features.<key>) */
+const FEATURES: (Pick<FeatCardProps, 'to' | 'tone' | 'art'> & { key: 'timelapse' | 'search' | 'spectral' })[] = [
+    { key: 'timelapse', to: '/timelapse', tone: 'star', art: 'timeline' },
+    { key: 'search', to: '/search', tone: 'sky', art: 'coords' },
+    { key: 'spectral', to: '/spectral', tone: 'blue', art: 'spectrum' },
 ];
 
 export default function FeatSection() {
+    const { m } = useI18n();
+    const f = m.landing.features;
     return (
         <section
             id="servicios"
@@ -54,13 +31,13 @@ export default function FeatSection() {
                     <motion.h2
                         id="feat-title"
                         variants={rise}
-                        className="font-display text-3xl font-extrabold tracking-tight text-balance lg:text-5xl"
+                        className="text-3xl font-extrabold tracking-tight text-balance lg:text-5xl"
                     >
-                        Mucho más que una galería
+                        {f.title}
                     </motion.h2>
 
                     <motion.p variants={rise} className="mt-4 text-lg text-dim">
-                        Descubre diferentes formas de explorar el universo con LOOK-EON.
+                        {f.subtitle}
                     </motion.p>
                 </motion.div>
 
@@ -72,8 +49,15 @@ export default function FeatSection() {
                     whileInView="show"
                     viewport={{ once: true, amount: 0.15 }}
                 >
-                    {features.map((feature) => (
-                        <FeatCard key={feature.title} {...feature} />
+                    {FEATURES.map(({ key, ...rest }) => (
+                        <FeatCard
+                            key={key}
+                            {...rest}
+                            label={f[key].label}
+                            title={f[key].title}
+                            description={f[key].description}
+                            linkText={f[key].link}
+                        />
                     ))}
                 </motion.div>
             </div>

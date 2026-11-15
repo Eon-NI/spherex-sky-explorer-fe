@@ -2,9 +2,11 @@ import { Link } from 'react-router';
 import { motion } from 'motion/react';
 import { PlanetArt, SatelliteArt } from './HookArt';
 import SkyCompare from './SkyCompare';
+import { useI18n } from '../../../i18n/useI18n';
 import { EASE_OUT, VIEWPORT, rise, stagger } from './motionPresets';
 
 export default function TravelHook() {
+    const { m } = useI18n();
     return (
         <section
             aria-labelledby="travel-hook-title"
@@ -25,16 +27,13 @@ export default function TravelHook() {
                     <motion.h2
                         id="travel-hook-title"
                         variants={rise}
-                        className="font-display text-3xl font-extrabold tracking-tight text-balance sm:text-4xl lg:text-5xl"
+                        className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl lg:text-5xl"
                     >
-                        ¿Sabías que comparar dos fotos del cielo permitió descubrir Plutón?
+                        {m.landing.hook.title}
                     </motion.h2>
 
                     <motion.p variants={rise} className="mt-6 text-lg leading-relaxed text-dim">
-                        El universo no está estático. Cada seis meses, la misión SPHEREx cartografía todo
-                        el cielo. Al comparar imágenes de distintas fechas, los puntos de luz que cambian de
-                        posición revelan cometas, asteroides y cuerpos ocultos que ningún algoritmo puede
-                        analizar por sí solo. Tú puedes ser quien encuentre el siguiente.
+                        {m.landing.hook.text}
                     </motion.p>
 
                     <motion.div variants={rise}>
@@ -42,7 +41,7 @@ export default function TravelHook() {
                             to="/observatorio"
                             className="mt-10 inline-flex items-center justify-center rounded-full bg-night px-8 py-4 text-lg font-bold text-paper transition-colors hover:bg-night-soft"
                         >
-                            Descúbrelo en el observatorio
+                            {m.landing.hook.cta}
                         </Link>
                     </motion.div>
                 </motion.div>

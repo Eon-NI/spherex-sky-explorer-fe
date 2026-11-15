@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react';
-import Header from './presentation/components/Header';
-import Footer from './presentation/components/Footer';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import TimelapseModule from '../components/timelapse_components/TimelapseModule';
 
 export default function TimeLapse() {
@@ -13,7 +13,7 @@ export default function TimeLapse() {
     <>
       <Header />
       {/* animate-screen-in: continúa el zoom de la pantalla del satélite */}
-      <main className="bg-nasa min-h-screen text-white motion-safe:animate-screen-in">
+      <main className="bg-night min-h-screen text-paper motion-safe:animate-screen-in">
         <TimelapseModule />
       </main>
       <Footer />

@@ -1,28 +1,32 @@
 import { Hourglass } from 'lucide-react';
 import { DETECTORS, type Detector } from '../../api/spherex';
 import type { SearchFormValues } from './types';
+import { useI18n } from '../../i18n/useI18n';
+import { fmt } from '../../i18n/format';
 
 type FieldsProps = {
   values: SearchFormValues;
   onChange: (patch: Partial<SearchFormValues>) => void;
 };
 
-const label = 'text-[11px] font-medium uppercase tracking-[0.25em] text-sky-300';
-const hint = 'mt-1 block text-[11px] text-slate-500';
+const label = 'text-[11px] font-medium uppercase tracking-[0.25em] text-mist';
+const hint = 'mt-1 block text-[11px] text-mist/70';
 export const inputClass =
-  'font-display mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 transition focus:border-sky-400 focus:bg-white/10 focus:outline-none';
+  'font-hud mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm tabular-nums text-paper placeholder:text-mist/70 transition focus:border-star focus:bg-white/10 focus:outline-none';
 
 /** RA, Dec, campo de visión y detector */
 export function CoordinateFields({ values, onChange }: FieldsProps) {
+  const { m } = useI18n();
+  const t = m.modules.fields;
   return (
     <div>
-      <p className="mb-3 text-sm text-slate-400">
-        Ingresa la ascensión recta, la declinación y el campo de visión.
+      <p className="mb-3 text-sm text-mist">
+        {t.intro}
       </p>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <label className="block">
-          <span className={label}>RA</span>
+          <span className={label}>{t.ra}</span>
           <input
             className={inputClass}
             inputMode="decimal"
@@ -31,11 +35,11 @@ export function CoordinateFields({ values, onChange }: FieldsProps) {
             onChange={(e) => onChange({ ra: e.target.value })}
             required
           />
-          <span className={hint}>Right Ascension (°)</span>
+          <span className={hint}>{t.raHelp}</span>
         </label>
 
         <label className="block">
-          <span className={label}>Dec</span>
+          <span className={label}>{t.dec}</span>
           <input
             className={inputClass}
             inputMode="decimal"
@@ -44,14 +48,14 @@ export function CoordinateFields({ values, onChange }: FieldsProps) {
             onChange={(e) => onChange({ dec: e.target.value })}
             required
           />
-          <span className={hint}>Declination (°)</span>
+          <span className={hint}>{t.decHelp}</span>
         </label>
 
         <label className="block">
-          <span className={label}>FOV</span>
-          <div className="mt-1.5 flex overflow-hidden rounded-xl border border-white/15 bg-white/5 focus-within:border-sky-400">
+          <span className={label}>{t.fov}</span>
+          <div className="mt-1.5 flex overflow-hidden rounded-xl border border-white/15 bg-white/5 focus-within:border-star">
             <input
-              className="font-display w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums text-white placeholder:text-slate-500 focus:outline-none"
+              className="font-hud w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums text-paper placeholder:text-mist/70 focus:outline-none"
               inputMode="decimal"
               placeholder="0.1"
               value={values.fov}
@@ -59,32 +63,32 @@ export function CoordinateFields({ values, onChange }: FieldsProps) {
               required
             />
             <select
-              aria-label="Unidad del campo de visión"
+              aria-label={t.fovUnit}
               value={values.fovUnit}
               onChange={(e) => onChange({ fovUnit: e.target.value as SearchFormValues['fovUnit'] })}
-              className="border-l border-white/10 bg-transparent px-2 text-sm text-slate-300 focus:outline-none [&>option]:bg-[#0a1230]"
+              className="border-l border-white/10 bg-transparent px-2 text-sm text-paper/80 focus:outline-none [&>option]:bg-night-soft"
             >
               <option value="deg">°</option>
               <option value="arcmin">′</option>
             </select>
           </div>
-          <span className={hint}>Field of view</span>
+          <span className={hint}>{t.fovHelp}</span>
         </label>
 
         <label className="block">
-          <span className={label}>Banda</span>
+          <span className={label}>{t.band}</span>
           <select
-            className={`${inputClass} [&>option]:bg-[#0a1230]`}
+            className={`${inputClass} [&>option]:bg-night-soft`}
             value={values.detector}
             onChange={(e) => onChange({ detector: e.target.value as Detector })}
           >
             {DETECTORS.map((d) => (
               <option key={d.id} value={d.id}>
-                {d.id === 'All' ? 'Todas' : d.id}
+                {d.id === 'All' ? t.allBands : d.id}
               </option>
             ))}
           </select>
-          <span className={hint}>Detector</span>
+          <span className={hint}>{t.bandHelp}</span>
         </label>
       </div>
     </div>
@@ -98,10 +102,12 @@ export function DateRangeFields({
   loading,
   count,
 }: FieldsProps & { loading: boolean; count: number }) {
+  const { m } = useI18n();
+  const t = m.modules.fields;
   return (
     <div className="flex items-end gap-3">
       <label className="block flex-1">
-        <span className={label}>Fecha inicio</span>
+        <span className={label}>{t.start}</span>
         <input
           type="date"
           className={`${inputClass} [color-scheme:dark]`}
@@ -112,17 +118,17 @@ export function DateRangeFields({
       </label>
 
       <div
-        className="flex shrink-0 flex-col items-center pb-1.5 text-sky-300"
-        title={loading ? 'Cargando observaciones…' : `${count} observaciones`}
+        className="flex shrink-0 flex-col items-center pb-1.5 text-star"
+        title={loading ? t.loadingObs : fmt(t.countObs, { count })}
       >
         <Hourglass size={22} className={loading ? 'animate-spin [animation-duration:2.4s]' : ''} />
-        <span className="font-display mt-1 text-[11px] tabular-nums text-slate-400">
+        <span className="font-hud mt-1 text-[11px] tabular-nums text-mist">
           {loading ? '…' : count}
         </span>
       </div>
 
       <label className="block flex-1">
-        <span className={label}>Fecha final</span>
+        <span className={label}>{t.end}</span>
         <input
           type="date"
           className={`${inputClass} [color-scheme:dark]`}

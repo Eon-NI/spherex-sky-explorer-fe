@@ -15,6 +15,8 @@ type TimelapseViewerProps = {
   markers: Marker[];
   /** Clic sobre la imagen: posición normalizada y posición en px dentro del visor */
   onSelect: (u: number, v: number, x: number, y: number) => void;
+  /** Texto accesible del visor (traducido) */
+  ariaLabel?: string;
   /** Opcional: tono (0–360) con el que colorear la imagen según la posición (falso color espectral) */
   hueAt?: (pos: number) => number;
 };
@@ -37,6 +39,7 @@ export default function TimelapseViewer({
   markers,
   onSelect,
   hueAt,
+  ariaLabel,
 }: TimelapseViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pan = useRef({ x: 0, y: 0 });
@@ -82,7 +85,7 @@ export default function TimelapseViewer({
       const dpr = layout.current.dpr;
 
       ctx.globalAlpha = 1;
-      ctx.fillStyle = '#05070f';
+      ctx.fillStyle = '#0d1230'; // --color-night
       ctx.fillRect(0, 0, W, H);
       if (imgs.length === 0) return;
 
@@ -136,7 +139,7 @@ export default function TimelapseViewer({
         ctx.arc(mx, my, (m.label ? 11 : 7) * dpr, 0, Math.PI * 2);
         ctx.stroke();
         if (m.label) {
-          ctx.font = `600 ${12 * dpr}px "Space Grotesk", system-ui, sans-serif`;
+          ctx.font = `600 ${12 * dpr}px "JetBrains Mono", ui-monospace, monospace`;
           ctx.fillStyle = m.color ?? '#ffffff';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'middle';
@@ -149,7 +152,7 @@ export default function TimelapseViewer({
         const sx = x + sel.u * dw;
         const sy = y + sel.v * dh;
         const r = 14 * dpr;
-        ctx.strokeStyle = '#7dd3fc';
+        ctx.strokeStyle = '#ffb938'; // --color-star
         ctx.lineWidth = 2 * dpr;
         ctx.beginPath();
         ctx.arc(sx, sy, r, 0, Math.PI * 2);
@@ -220,7 +223,7 @@ export default function TimelapseViewer({
       className={`block h-full w-full touch-none ${
         zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-crosshair'
       }`}
-      aria-label="Visor del timelapse. Haz clic sobre un objeto para ver sus opciones."
+      aria-label={ariaLabel}
     />
   );
 }
