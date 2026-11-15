@@ -112,8 +112,8 @@ export type SpectrumResponse = {
    ========================================================= */
 export const USE_MOCK = false;
 
-const OBSERVATION_API_URL = import.meta.env.VITE_OBSERVATION_API_URL ?? 'http://localhost:8001';
-const JOBS_API_URL = import.meta.env.VITE_JOBS_API_URL ?? 'http://localhost:8004';
+const OBSERVATION_API_URL = import.meta.env.VITE_OBSERVATION_API_URL ?? (import.meta.env.PROD ? window.location.origin : 'http://localhost:8001');
+const JOBS_API_URL = import.meta.env.VITE_JOBS_API_URL ?? (import.meta.env.PROD ? window.location.origin : 'http://localhost:8004');
 
 export type TemporalProduct = { product_id: string; time_bounds_lower: number; detector: string };
 type Frame = { index: number; product_id: string; timestamp: string; object_key: string };
@@ -232,7 +232,7 @@ export async function discoverSearchProducts(q: ObservationQuery, signal?: Abort
   return products.filter((p, i) => products.findIndex(other => other.product_id === p.product_id) === i);
 }
 
-const SPECTRAL_API_URL = import.meta.env.VITE_SPECTRAL_API_URL ?? 'http://localhost:8003';
+const SPECTRAL_API_URL = import.meta.env.VITE_SPECTRAL_API_URL ?? (import.meta.env.PROD ? window.location.origin : 'http://localhost:8003');
 type SpectralJob<T> = { job_id: string; status: 'pending' | 'running' | 'completed' | 'failed'; progress: number | null; error: string | null; result: T | null };
 type CubeResult = { product_id: string; tile_id: number; image_unit: string | null; channels: { channel_index: number; wavelength_um: number; band: number; available: boolean }[] };
 type SpectrumResult = { product_id: string; object_key: string; unit: string; method: string; flags_header_names: Record<string, string>; points: { channel_index: number; wavelength_um: number | null; flux: number | null; nhits: number; flags: number; available: boolean }[] };

@@ -6,7 +6,6 @@ import { VIEWPORT, rise, stagger } from './presentation/components/motionPresets
 import ReferenceCard from '../components/references_components/ReferenceCard';
 import type { ReferenceArtVariant } from '../components/references_components/ReferenceArt';
 import { useI18n } from '../i18n/useI18n';
-import { fmt } from '../i18n/format';
 
 /** Fuentes externas: el texto de cada una vive en los JSON de idioma (references.items) */
 const REFERENCES: { key: ReferenceArtVariant; href: string }[] = [

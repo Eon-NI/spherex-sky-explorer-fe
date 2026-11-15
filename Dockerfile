@@ -13,6 +13,9 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Vite genera la versión de producción en /app/dist
+ARG VITE_OBSERVATION_API_URL
+ARG VITE_JOBS_API_URL
+ARG VITE_SPECTRAL_API_URL
 RUN pnpm build
 
 # ---------- Etapa 2: servir los archivos estáticos ----------
