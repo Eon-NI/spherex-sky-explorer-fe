@@ -1,4 +1,4 @@
-import { Image as ImageIcon, Layers, Pause, Play, Repeat, SplitSquareHorizontal } from 'lucide-react';
+import { Image as ImageIcon, Pause, Play, Repeat } from 'lucide-react';
 import type { Observation } from '../../api/spherex';
 import { formatDate } from '../timelapse_components/skyMath';
 import { useI18n } from '../../i18n/useI18n';
@@ -9,8 +9,6 @@ export type ViewMode = 'single' | 'blink' | 'difference' | 'stack';
 const MODES: { id: ViewMode; icon: typeof Repeat }[] = [
   { id: 'single', icon: ImageIcon },
   { id: 'blink', icon: Repeat },
-  { id: 'difference', icon: SplitSquareHorizontal },
-  { id: 'stack', icon: Layers },
 ];
 
 type ActionsPanelProps = {
@@ -44,19 +42,20 @@ export default function ActionsPanel({
   const { m } = useI18n();
   const t = m.modules.search.actions;
   const loc = m.common.dateLocale;
-  const help = fmt(t[`${mode}Help`], { count: observations.length });
+  const help = mode === 'blink' && (observations.length < 2 || epochA === epochB)
+    ? t.blinkUnavailable : fmt(t[`${mode}Help`], { count: observations.length });
   const usesB = mode === 'blink' || mode === 'difference';
 
   return (
     <div>
       <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-mist">{t.title}</p>
 
-      <div className="mt-3 grid grid-cols-4 gap-2">
+      <div className="mt-3 grid grid-cols-2 gap-2">
         {MODES.map(({ id, icon: Icon }) => (
           <button
             key={id}
             type="button"
-            disabled={disabled}
+            disabled={disabled || (id === 'blink' && observations.length < 2)}
             onClick={() => onModeChange(id)}
             aria-pressed={mode === id}
             className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-2.5 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-40 ${
@@ -77,7 +76,7 @@ export default function ActionsPanel({
           <button
             type="button"
             onClick={onToggleBlink}
-            disabled={disabled}
+            disabled={disabled || observations.length < 2 || epochA === epochB}
             aria-label={blinkPlaying ? t.pauseBlink : t.resumeBlink}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-star text-night transition hover:bg-star-hover disabled:opacity-40"
           >
@@ -112,7 +111,7 @@ export default function ActionsPanel({
               onChange={(e) => onEpochB(Number(e.target.value))}
             >
               {observations.map((o, i) => (
-                <option key={o.id} value={i}>
+                <option key={o.id} value={i} disabled={i === epochA}>
                   {formatDate(o.observationTime, loc)}
                 </option>
               ))}

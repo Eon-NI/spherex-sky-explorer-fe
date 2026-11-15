@@ -25,11 +25,11 @@ type FormValues = { ra: string; dec: string; fov: string; fovUnit: 'deg' | 'arcm
 const DEFAULT_FORM: FormValues = { ra: '210.80227', dec: '54.34895', fov: '0.1', fovUnit: 'deg' };
 const MISSION_START = '2025-05-01';
 const DETECTOR = 'D2';
-const MODES: ViewMode[] = ['single', 'blink', 'difference', 'stack'];
+const MODES: ViewMode[] = ['single', 'blink'];
 const RECORDS_KEY = 'eon:timelapse:changes'; // compartido con el Timelapse
 
 type ValidationError = 'ra' | 'dec' | 'fov';
-const MAX_FOV = 2;
+const MAX_FOV = 0.2;
 
 function validate(f: FormValues): { query?: ObservationQuery; error?: ValidationError } {
   const ra = Number(f.ra.replace(',', '.'));
@@ -86,6 +86,7 @@ export default function SearchModule() {
     initial.auto ? (validate(initial.form).query ?? null) : null,
   );
   const queryKey = query ? JSON.stringify(query) : '';
+  const [processing, setProcessing] = useState('');
   const [result, setResult] = useState<{ key: string; data?: ObservationsResponse; error?: string } | null>(null);
   const pendingPoint = useRef(initial.point);
 
@@ -103,7 +104,8 @@ export default function SearchModule() {
   useEffect(() => {
     if (!query) return;
     const ctrl = new AbortController();
-    fetchObservations(query, ctrl.signal)
+    setProcessing('');
+    fetchObservations(query, ctrl.signal, 2, status => { if (!ctrl.signal.aborted) setProcessing(status); })
       .then((data) => {
         setResult({ key: queryKey, data });
         setEpochA(0);
@@ -180,9 +182,9 @@ export default function SearchModule() {
   const viewImages = useMemo(() => {
     if (!loaded) return [];
     if (mode === 'single') return [obsImages[a]];
-    if (mode === 'blink') return [obsImages[a], obsImages[b]];
+    if (mode === 'blink') return observations.length > 1 && a !== b ? [obsImages[a], obsImages[b]] : [];
     return computedPreload.images;
-  }, [loaded, mode, obsImages, a, b, computedPreload.images]);
+  }, [loaded, mode, obsImages, observations.length, a, b, computedPreload.images]);
 
   const player = useTimelapsePlayer(viewImages.length);
   const computing = loaded && (mode === 'difference' || mode === 'stack') && viewImages.length === 0;
@@ -398,7 +400,7 @@ export default function SearchModule() {
                       <Hourglass size={34} className="animate-spin text-star [animation-duration:2.4s]" />
                       <p className="text-lg text-paper">
                         {fetching
-                          ? sm.querying
+                          ? (processing.startsWith('running') ? m.modules.timelapse.preparing : sm.querying)
                           : computing
                             ? mode === 'stack'
                               ? sm.stacking
@@ -544,8 +546,8 @@ export default function SearchModule() {
                 observations={observations}
                 epochA={a}
                 epochB={b}
-                onEpochA={setEpochA}
-                onEpochB={setEpochB}
+                onEpochA={i => { setEpochA(i); if (i === epochB && observations.length > 1) setEpochB((i + 1) % observations.length); }}
+                onEpochB={i => { if (i !== epochA) setEpochB(i); }}
                 disabled={!loaded}
                 blinkPlaying={player.playing}
                 onToggleBlink={() => {
