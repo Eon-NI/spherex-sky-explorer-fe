@@ -292,12 +292,14 @@ function Stop({ index, active, children }: { index: number; active: number; chil
    Tarjeta HUD
    ========================================================= */
 function HudCard({
-
+  code,
+  label,
   title,
   activeLabel,
   children,
 }: {
-  
+  code: string;
+  label: string;
   title: string;
   activeLabel: string;
   children: ReactNode;
@@ -307,8 +309,8 @@ function HudCard({
       {/* velo oscuro para que el texto se lea aunque detrás haya metal brillante */}
       <div className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] bg-night/45" />
       <div className="mb-4 flex items-center justify-between gap-4">
-       
-       
+        <span className="text-xs font-semibold uppercase tracking-widest text-star">{code} · {label}</span>
+        <span className="text-xs text-mist">{activeLabel}</span>
       </div>
 
       <h3 className="text-2xl font-semibold text-paper md:text-3xl">{title}</h3>

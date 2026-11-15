@@ -1,6 +1,7 @@
 import { useId, type MouseEvent } from 'react';
 import { channelWavelength, nearestChannel, type SpectrumPoint } from '../../api/spherex';
 import { wavelengthHue } from './spectralColors';
+import { useI18n } from '../../i18n/useI18n';
 
 export type SpectrumSeries = {
   id: string;
@@ -15,7 +16,6 @@ type Props = {
   channel: number;
   unit: string;
   onChannelChange: (index: number) => void;
-  ariaLabel?: string;
 };
 
 const W = 340;
@@ -24,11 +24,12 @@ const PAD = { l: 36, r: 14, t: 12, b: 34 };
 const X_MIN = 0.75;
 const X_MAX = 5;
 
-/** Espectros de hasta 3 objetos; clic en el gráfico para cambiar de canal */
-export default function SpectrumCompareChart({ series, channel, unit, onChannelChange, ariaLabel }: Props) {
+/** Espectros exploratorios de hasta 3 píxeles; clic en el gráfico para cambiar de canal */
+export default function SpectrumCompareChart({ series, channel, unit, onChannelChange }: Props) {
+  const { m } = useI18n();
   const gid = useId();
   const all = series.flatMap((s) => s.points ?? []);
-  const fluxes = all.map((p) => p.flux);
+  const fluxes = all.map((p) => p.flux).filter((value): value is number => value !== null && Number.isFinite(value));
   const yMin = fluxes.length ? Math.min(...fluxes) : 0;
   const yMax = fluxes.length ? Math.max(...fluxes) : 1;
   const pad = (yMax - yMin) * 0.12 || 1;
@@ -38,6 +39,15 @@ export default function SpectrumCompareChart({ series, channel, unit, onChannelC
   const sx = (w: number) => PAD.l + ((w - X_MIN) / (X_MAX - X_MIN)) * (W - PAD.l - PAD.r);
   const sy = (f: number) => PAD.t + (1 - (f - lo) / (hi - lo)) * (H - PAD.t - PAD.b);
   const wl = channelWavelength(channel);
+  const spectrumPath = (points: SpectrumPoint[]) => {
+    let pen = false;
+    return points.map((point) => {
+      if (point.flux === null || !Number.isFinite(point.wavelength)) { pen = false; return ''; }
+      const command = pen ? 'L' : 'M';
+      pen = true;
+      return `${command}${sx(point.wavelength).toFixed(1)},${sy(point.flux).toFixed(1)}`;
+    }).join(' ');
+  };
 
   const onClick = (e: MouseEvent<SVGSVGElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -52,7 +62,7 @@ export default function SpectrumCompareChart({ series, channel, unit, onChannelC
       className="w-full cursor-crosshair"
       onClick={onClick}
       role="img"
-      aria-label={ariaLabel}
+      aria-label={m.modules.spectral.chartAria}
     >
       <defs>
         <linearGradient id={`${gid}-band`} x1="0" x2="1">
@@ -66,13 +76,13 @@ export default function SpectrumCompareChart({ series, channel, unit, onChannelC
       {[1, 2, 3, 4, 5].map((w) => (
         <g key={w}>
           <line x1={sx(w)} x2={sx(w)} y1={PAD.t} y2={H - PAD.b} stroke="rgba(255,255,255,0.06)" />
-          <text x={sx(w)} y={H - 8} textAnchor="middle" className="fill-mist text-[9px]">
+          <text x={sx(w)} y={H - 8} textAnchor="middle" className="fill-slate-500 text-[9px]">
             {w} µm
           </text>
         </g>
       ))}
       <rect x={PAD.l} y={H - PAD.b + 4} width={W - PAD.l - PAD.r} height={4} rx={2} fill={`url(#${gid}-band)`} opacity={0.8} />
-      <text x={4} y={PAD.t + 6} className="fill-mist text-[9px]">
+      <text x={4} y={PAD.t + 6} className="fill-slate-500 text-[9px]">
         {unit}
       </text>
 
@@ -83,23 +93,23 @@ export default function SpectrumCompareChart({ series, channel, unit, onChannelC
         s.points ? (
           <g key={s.id}>
             <path
-              d={s.points.map((p, i) => `${i ? 'L' : 'M'}${sx(p.wavelength).toFixed(1)},${sy(p.flux).toFixed(1)}`).join(' ')}
+              d={spectrumPath(s.points)}
               fill="none"
               stroke={s.color}
               strokeWidth={1.4}
               strokeLinejoin="round"
               opacity={0.9}
             />
-            {s.points.map((p, i) => (
-              <circle key={i} cx={sx(p.wavelength)} cy={sy(p.flux)} r={1.1} fill={s.color} opacity={0.6} />
+            {s.points.filter((p) => p.flux !== null && Number.isFinite(p.wavelength)).map((p, i) => (
+              <circle key={i} cx={sx(p.wavelength)} cy={sy(p.flux!)} r={1.1} fill={s.color} opacity={0.6} />
             ))}
-            {s.points[channel] && (
+            {s.points[channel]?.flux !== null && Number.isFinite(s.points[channel]?.wavelength) && (
               <circle
                 cx={sx(s.points[channel].wavelength)}
-                cy={sy(s.points[channel].flux)}
+                cy={sy(s.points[channel].flux!)}
                 r={4}
                 fill={s.color}
-                stroke="#0d1230"
+                stroke="#05070f"
                 strokeWidth={1.5}
               />
             )}
